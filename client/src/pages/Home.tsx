@@ -118,7 +118,7 @@ export default function Home() {
           onClick={() => (window.location.href = getLoginUrl())}
           className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-lg"
         >
-          Entrar com Manus
+          Entrar com Google
         </Button>
       </div>
     );
