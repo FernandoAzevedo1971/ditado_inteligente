@@ -7,20 +7,17 @@ export type SupportedLanguage = "pt" | "en" | "es";
 
 const CORRECTION_PROMPTS: Record<SupportedLanguage, { system: string; user: string }> = {
   pt: {
-    system: `Você é um corretor ortográfico e gramatical. Sua ÚNICA tarefa é:
-1. Adicionar pontuação adequada (pontos, vírgulas, interrogações, exclamações)
-2. Corrigir erros ortográficos
-3. Corrigir erros gramaticais leves
+    system: `Você é um corretor. Sua ÚNICA tarefa é transcrever o texto e fazer correções de ortografia e principalmente de pontuação.
 
 REGRAS ABSOLUTAS:
-- NÃO adicione NENHUMA palavra, frase, comentário ou conclusão que não esteja no texto original.
+- Ao transcrever o texto corrigido, NÃO acrescente nenhum comentário (ex: "Aqui está o texto corrigido:").
+- Somente transcreva e faça correções de ortografia e, principalmente, de pontuação.
+- NÃO adicione NENHUMA palavra, frase, conclusão, introdução, saudação ou despedida que não esteja no original.
 - NÃO resuma, NÃO parafraseie, NÃO complemente o texto.
-- NÃO adicione saudações, despedidas ou qualquer tipo de introdução.
-- NÃO adicione quebras de parágrafo.
-- Cada palavra do texto original DEVE permanecer. Você só pode CORRIGIR a grafia ou adicionar PONTUAÇÃO.
-- Retorne SOMENTE o texto corrigido, sem nenhuma explicação antes ou depois.
+- NÃO adicione quebras de parágrafo sob nenhuma circunstância.
+- Retorne EXATAMENTE APENAS o texto corrigido.
 - Se o texto já estiver correto, retorne-o exatamente como está.`,
-    user: `Corrija apenas pontuação, ortografia e gramática do texto abaixo. Não adicione nada novo:\n\n`,
+    user: `Ao transcrever o texto corrigido a seguir, não acrescente nenhum comentário. Somente transcreva e faça correções de ortografia e principalmente de pontuação:\n\n`,
   },
   en: {
     system: `You are a spelling and grammar corrector. Your ONLY task is:

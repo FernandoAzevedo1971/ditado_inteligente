@@ -95,12 +95,12 @@ export default function VoiceEditPanel({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-        <h2 className="text-xl font-bold text-slate-900 mb-4">
+      <div className="bg-card text-card-foreground rounded-2xl shadow-2xl border border-border max-w-md w-full p-6">
+        <h2 className="text-xl font-bold mb-4">
           Editar com Voz
         </h2>
 
-        <p className="text-sm text-slate-600 mb-6">
+        <p className="text-sm text-muted-foreground mb-6">
           {isRecording
             ? "Gravando... Dite as correções necessárias"
             : "Processando suas correções..."}
@@ -130,16 +130,16 @@ export default function VoiceEditPanel({
 
         {/* Status Messages */}
         {recordingError && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4 flex items-start gap-2">
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-red-700">{recordingError}</p>
+          <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-4 flex items-start gap-2">
+            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-red-600 dark:text-red-400">{recordingError}</p>
           </div>
         )}
 
         {isProcessing && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 flex items-center gap-2">
-            <Loader2 className="w-5 h-5 text-blue-600 animate-spin" />
-            <p className="text-sm text-blue-700">Processando correções...</p>
+          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mb-4 flex items-center gap-2">
+            <Loader2 className="w-5 h-5 text-primary animate-spin" />
+            <p className="text-sm text-primary">Processando correções...</p>
           </div>
         )}
 
@@ -157,7 +157,7 @@ export default function VoiceEditPanel({
         {!isRecording && !isProcessing && (
           <button
             onClick={onClose}
-            className="w-full bg-slate-200 hover:bg-slate-300 text-slate-900 font-medium py-2 px-4 rounded-lg transition-colors"
+            className="w-full bg-secondary hover:bg-secondary/80 text-secondary-foreground font-medium py-2 px-4 rounded-lg transition-colors"
           >
             Fechar
           </button>

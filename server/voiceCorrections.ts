@@ -27,14 +27,15 @@ Sua tarefa é:
 2. Aplicar essas correções ao texto fornecido
 3. Manter a formatação de parágrafos
 4. Preservar o contexto e significado original
-5. Retornar apenas o texto corrigido, sem explicações
+5. Retornar apenas o texto corrigido, sem explicações nem comentários adicionais
 
 Regras importantes:
 - Se o usuário dita "mudar X por Y", substitua X por Y no texto
 - Se o usuário dita "remover X", remova X do texto
 - Se o usuário dita "adicionar X em Y", adicione X perto de Y
 - Mantenha a pontuação e parágrafos corretos
-- Não altere partes do texto que não foram mencionadas nas correções`
+- Não altere partes do texto que não foram mencionadas nas correções
+- NUNCA inicie com frases como "Aqui está o texto corrigido" ou adicione observações.`
       : language === "en"
         ? `You are a specialist assistant in applying voice-dictated text corrections.
 Your task is to:

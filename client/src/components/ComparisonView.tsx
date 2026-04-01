@@ -46,65 +46,70 @@ export function ComparisonView({
 
   return (
     <>
-      <div className="w-full max-w-4xl mx-auto p-4 md:p-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div className="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
-          {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
-            <h2 className="text-xl font-semibold text-slate-800">
-              Resultado da Correção
-            </h2>
+      <div className="w-full max-w-5xl mx-auto p-4 md:p-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="space-y-8">
+          {/* Header - Transparent and minimal */}
+          <div className="flex items-center justify-between pb-4 border-b border-white/5">
+            <div>
+              <h2 className="text-3xl font-black text-foreground tracking-tight">
+                Análise do Ditado
+              </h2>
+              <p className="text-muted-foreground font-medium mt-1">Veja como a IA aprimorou seu texto</p>
+            </div>
             <button
               onClick={onClose}
-              className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+              className="p-3 text-muted-foreground hover:text-foreground hover:bg-white/5 rounded-full transition-all hover:rotate-90 duration-300"
             >
-              <X className="w-5 h-5" />
+              <X className="w-8 h-8" />
             </button>
           </div>
 
-          {/* Content */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-0 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+          {/* Content - Wide open layout */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
             {/* Original */}
-            <div className="p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-2 h-2 rounded-full bg-slate-400" />
-                <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider">
-                  Texto Original (Áudio)
-                </h3>
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="px-3 py-1 rounded-full bg-zinc-800/50 text-zinc-400 text-xs font-bold uppercase tracking-widest border border-white/5">
+                  Original
+                </div>
               </div>
-              <p className="text-slate-600 leading-relaxed font-medium whitespace-pre-wrap">
-                {originalText}
-              </p>
+              <div className="p-2 border-l-2 border-zinc-800">
+                <p className="text-muted-foreground text-lg leading-relaxed font-medium whitespace-pre-wrap italic">
+                  "{originalText}"
+                </p>
+              </div>
             </div>
 
             {/* Corrected */}
-            <div className="p-6 bg-gradient-to-br from-blue-50/50 to-indigo-50/50">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]" />
-                <h3 className="text-sm font-medium text-blue-700 uppercase tracking-wider">
-                  Texto Corrigido (IA)
-                </h3>
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-bold uppercase tracking-widest border border-blue-500/20">
+                  Corrigido
+                </div>
               </div>
-              <p className="text-slate-900 leading-relaxed font-semibold text-lg whitespace-pre-wrap">
-                {currentCorrected}
-              </p>
+              <div className="p-2 border-l-2 border-blue-500/50">
+                <p className="text-foreground text-2xl leading-snug font-bold whitespace-pre-wrap">
+                  {currentCorrected}
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/30">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {/* Action Buttons - Horizontal list of pill buttons */}
+          <div className="pt-10 border-t border-white/5">
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
               {/* Copiar Texto */}
               <button
                 onClick={handleCopy}
-                className="flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 bg-blue-50 text-blue-700 hover:bg-blue-100 active:scale-95"
+                className="flex items-center gap-3 px-6 py-4 text-base font-bold rounded-2xl transition-all duration-300 bg-white text-black hover:bg-zinc-200 active:scale-95 shadow-lg shadow-white/5"
               >
                 {copied ? (
                   <>
-                    <Check className="w-4 h-4" /> Copiado!
+                    <Check className="w-5 h-5" /> Copiado!
                   </>
                 ) : (
                   <>
-                    <Copy className="w-4 h-4" /> Copiar
+                    <Copy className="w-5 h-5" /> Copiar Texto
                   </>
                 )}
               </button>
@@ -112,25 +117,25 @@ export function ComparisonView({
               {/* Editar por Voz */}
               <button
                 onClick={() => setShowVoiceEdit(true)}
-                className="flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 bg-purple-50 text-purple-700 hover:bg-purple-100 active:scale-95"
+                className="flex items-center gap-3 px-6 py-4 text-base font-bold rounded-2xl transition-all duration-300 bg-zinc-800 text-white hover:bg-zinc-700 active:scale-95 border border-white/5"
               >
-                <Mic className="w-4 h-4" /> Editar por Voz
+                <Mic className="w-5 h-5 text-purple-400" /> Editar com IA
               </button>
 
               {/* WhatsApp */}
               <button
                 onClick={handleWhatsApp}
-                className="flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 bg-green-50 text-green-700 hover:bg-green-100 active:scale-95"
+                className="flex items-center gap-3 px-6 py-4 text-base font-bold rounded-2xl transition-all duration-300 bg-emerald-600/10 text-emerald-500 border border-emerald-500/20 hover:bg-emerald-600/20 active:scale-95"
               >
-                <MessageCircle className="w-4 h-4" /> WhatsApp
+                <MessageCircle className="w-5 h-5" /> Compartilhar
               </button>
 
               {/* Nova Gravação */}
               <button
                 onClick={onClose}
-                className="flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 bg-slate-100 text-slate-700 hover:bg-slate-200 active:scale-95"
+                className="flex items-center gap-3 px-6 py-4 text-base font-bold rounded-2xl transition-all duration-300 text-muted-foreground hover:text-foreground hover:bg-white/5 active:scale-95"
               >
-                <RotateCcw className="w-4 h-4" /> Nova Gravação
+                <RotateCcw className="w-5 h-5" /> Novo
               </button>
             </div>
           </div>

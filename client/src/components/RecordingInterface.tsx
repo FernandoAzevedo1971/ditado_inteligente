@@ -74,21 +74,22 @@ export function RecordingInterface({
         )}
 
         {/* Main Card */}
-        <Card className="p-5 shadow-lg border-0 rounded-xl bg-white">
+        {/* Main Interface Content (No Card/Frame) */}
+        <div className="p-5 flex flex-col items-center">
           {/* Recording Status */}
-          <div className="text-center mb-4">
-            <h1 className="text-3xl font-bold mb-1 text-slate-900">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-extrabold mb-3 text-foreground tracking-tight">
               {isRecording ? "Gravando..." : audioBlob ? "Processando..." : "Ditado Inteligente"}
             </h1>
-            <p className="text-base text-slate-600">
-              {isRecording ? "Fale claramente" : isProcessing ? "Aguarde..." : "Toque para começar"}
+            <p className="text-lg text-muted-foreground font-medium">
+              {isRecording ? "Fale claramente" : isProcessing ? "Aguarde..." : "Toque no ícone para começar"}
             </p>
           </div>
 
           {/* Recording Time */}
           {isRecording && (
-            <div className="text-center mb-4">
-              <div className="text-5xl font-mono font-bold text-blue-600">
+            <div className="text-center mb-8">
+              <div className="text-6xl font-mono font-black text-blue-500 animate-pulse">
                 {formatTime(recordingTime)}
               </div>
             </div>
@@ -96,30 +97,31 @@ export function RecordingInterface({
 
           {/* Audio Waveform Visualization */}
           {isRecording && mediaStream && (
-            <AudioWaveform isRecording={isRecording} audioStream={mediaStream} />
+            <div className="w-full max-w-xs mb-8 opacity-80">
+              <AudioWaveform isRecording={isRecording} audioStream={mediaStream} />
+            </div>
           )}
 
           {/* Main Recording Button - Larger with Volume Indicator */}
-          <div className="flex justify-center mb-6 relative h-40 flex items-center">
+          <div className="flex justify-center mb-10 relative h-48 items-center">
             {/* Volume Indicator Rings */}
             {isRecording && (
               <>
                 {/* Outer ring */}
                 <div
-                  className={`absolute rounded-full border-4 ${getVolumeColor()} transition-all duration-100`}
+                  className={`absolute rounded-full border-4 ${getVolumeColor()} transition-all duration-100 animate-ping`}
                   style={{
-                    width: `${getVolumeSize() + 40}px`,
-                    height: `${getVolumeSize() + 40}px`,
-                    opacity: 0.3,
+                    width: `${getVolumeSize() + 60}px`,
+                    height: `${getVolumeSize() + 60}px`,
+                    opacity: 0.15,
                   }}
                 />
                 {/* Middle ring */}
                 <div
-                  className={`absolute rounded-full border-2 ${getVolumeColor()} transition-all duration-100`}
+                  className={`absolute rounded-full border-2 ${getVolumeColor()} transition-all duration-100 opacity-40`}
                   style={{
-                    width: `${getVolumeSize() + 20}px`,
-                    height: `${getVolumeSize() + 20}px`,
-                    opacity: 0.5,
+                    width: `${getVolumeSize() + 30}px`,
+                    height: `${getVolumeSize() + 30}px`,
                   }}
                 />
               </>
@@ -128,53 +130,49 @@ export function RecordingInterface({
             {!isRecording && !audioBlob ? (
               <button
                 onClick={startRecording}
-                className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-2xl hover:shadow-2xl transition-all transform hover:scale-110 flex items-center justify-center relative z-10 active:scale-95"
+                className="w-36 h-36 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-[0_0_40px_rgba(59,130,246,0.5)] hover:shadow-[0_0_60px_rgba(59,130,246,0.8)] transition-all transform hover:scale-105 flex items-center justify-center relative z-10 active:scale-95"
               >
-                <Mic className="w-16 h-16" />
+                <div className="absolute inset-0 rounded-full bg-blue-400/20 animate-pulse -z-10" />
+                <Mic className="w-20 h-20" />
               </button>
             ) : isRecording ? (
               <button
                 onClick={stopRecording}
-                className="w-32 h-32 rounded-full bg-gradient-to-br from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white shadow-2xl hover:shadow-2xl transition-all transform hover:scale-110 flex items-center justify-center relative z-10 active:scale-95 animate-pulse"
+                className="w-36 h-36 rounded-full bg-gradient-to-br from-red-500 to-red-700 text-white shadow-[0_0_40px_rgba(239,68,68,0.5)] hover:shadow-[0_0_60px_rgba(239,68,68,0.8)] transition-all transform hover:scale-105 flex items-center justify-center relative z-10 active:scale-95"
               >
                 <Square className="w-16 h-16 fill-current" />
               </button>
             ) : audioBlob && !isSubmitting ? (
               <button
                 onClick={handleManualSubmit}
-                className="w-32 h-32 rounded-full bg-gradient-to-br from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-2xl hover:shadow-2xl transition-all transform hover:scale-110 flex items-center justify-center relative z-10 active:scale-95"
+                className="w-36 h-36 rounded-full bg-gradient-to-br from-green-500 to-green-700 text-white shadow-[0_0_40px_rgba(34,197,94,0.5)] hover:shadow-[0_0_60px_rgba(34,197,94,0.8)] transition-all transform hover:scale-105 flex items-center justify-center relative z-10 active:scale-95"
               >
-                <Mic className="w-16 h-16" />
+                <Mic className="w-20 h-20" />
               </button>
             ) : (
-              <button
-                disabled
-                className="w-32 h-32 rounded-full bg-gray-400 text-white shadow-2xl flex items-center justify-center cursor-not-allowed relative z-10"
-              >
-                <Loader2 className="w-16 h-16 animate-spin" />
-              </button>
+              <div className="w-36 h-36 rounded-full bg-zinc-800 text-zinc-500 flex items-center justify-center relative z-10">
+                <Loader2 className="w-20 h-20 animate-spin" />
+              </div>
             )}
           </div>
 
           {/* Instructions and Status Text */}
           <div className="text-center">
-            <p className="text-sm font-semibold text-slate-700 mb-2">
+            <p className="text-lg font-bold text-foreground mb-1">
               {isRecording
-                ? "🎤 Solte para enviar"
+                ? "🎤 Gravando Áudio"
                 : audioBlob && !isRecording && !isSubmitting
-                  ? "✓ Pronto para transcrever"
+                  ? "✓ Processando..."
                   : isSubmitting
-                    ? "⏳ Processando..."
-                    : "Pressione e fale"}
+                    ? "⏳ Quase pronto..."
+                    : "Pressione para falar"}
             </p>
-            <p className="text-xs text-slate-500">
-              {isRecording &&
-                `Volume: ${amplitude < 0.3 ? "Baixo" : amplitude < 0.6 ? "Médio" : "Alto"}`}
-              {!isRecording && audioBlob && !isSubmitting &&
-                "Clique para enviar ou grave novamente"}
+            <p className="text-sm text-muted-foreground font-medium">
+              {!isRecording && !audioBlob && "Inicie um novo ditado inteligente agora"}
+              {isRecording && `Nível de captação: ${amplitude < 0.3 ? "Baixo" : amplitude < 0.6 ? "Médio" : "Excelente"}`}
             </p>
           </div>
-        </Card>
+        </div>
       </div>
     </div>
   );

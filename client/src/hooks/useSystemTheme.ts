@@ -12,11 +12,18 @@ export function useSystemTheme() {
     
     // Função para atualizar tema
     const updateTheme = (e: MediaQueryListEvent | MediaQueryList) => {
-      setTheme(e.matches ? "dark" : "light");
+      const newTheme = e.matches ? "dark" : "light";
+      setTheme(newTheme);
+      
+      const root = window.document.documentElement;
+      root.classList.remove("light", "dark");
+      if (newTheme === "light") {
+        root.classList.add("light");
+      }
     };
 
     // Definir tema inicial
-    setTheme(mediaQuery.matches ? "dark" : "light");
+    updateTheme(mediaQuery);
     setIsInitialized(true);
 
     // Escutar mudanças de preferência

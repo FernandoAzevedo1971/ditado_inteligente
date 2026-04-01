@@ -1,7 +1,7 @@
 import { getLoginUrl } from "@/const";
-import { trpc } from "@/lib/trpc";
-import { TRPCClientError } from "@trpc/client";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { auth } from "@/lib/firebase";
+import { onAuthStateChanged, signOut as firebaseSignOut, User } from "firebase/auth";
 
 type UseAuthOptions = {
   redirectOnUnauthenticated?: boolean;
@@ -11,67 +11,51 @@ type UseAuthOptions = {
 export function useAuth(options?: UseAuthOptions) {
   const { redirectOnUnauthenticated = false, redirectPath = getLoginUrl() } =
     options ?? {};
-  const utils = trpc.useUtils();
 
-  const meQuery = trpc.auth.me.useQuery(undefined, {
-    retry: false,
-    refetchOnWindowFocus: false,
-  });
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const logoutMutation = trpc.auth.logout.useMutation({
-    onSuccess: () => {
-      utils.auth.me.setData(undefined, null);
-    },
-  });
+  useEffect(() => {
+    // If auth is not configured (missing env vars), we fail gracefully
+    if (!auth) {
+      setLoading(false);
+      return;
+    }
+
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const logout = useCallback(async () => {
+    if (!auth) return;
     try {
-      await logoutMutation.mutateAsync();
-    } catch (error: unknown) {
-      if (
-        error instanceof TRPCClientError &&
-        error.data?.code === "UNAUTHORIZED"
-      ) {
-        return;
-      }
-      throw error;
-    } finally {
-      utils.auth.me.setData(undefined, null);
-      await utils.auth.me.invalidate();
+      await firebaseSignOut(auth);
+    } catch (error) {
+      console.error("Logout failed", error);
     }
-  }, [logoutMutation, utils]);
-
-  const state = useMemo(() => {
-    // Fake user for local testing purposes to bypass the missing OAuth server
-    const fakeUser = { id: "local-dev", name: "Usuário Teste", email: "teste@local.com" };
-    
-    return {
-      user: fakeUser,
-      loading: false,
-      error: null,
-      isAuthenticated: true,
-    };
   }, []);
 
   useEffect(() => {
     if (!redirectOnUnauthenticated) return;
-    if (meQuery.isLoading || logoutMutation.isPending) return;
-    if (state.user) return;
+    if (loading) return;
+    if (user) return;
     if (typeof window === "undefined") return;
     if (window.location.pathname === redirectPath) return;
 
-    window.location.href = redirectPath
-  }, [
-    redirectOnUnauthenticated,
-    redirectPath,
-    logoutMutation.isPending,
-    meQuery.isLoading,
-    state.user,
-  ]);
+    window.location.href = redirectPath;
+  }, [redirectOnUnauthenticated, redirectPath, loading, user]);
 
   return {
-    ...state,
-    refresh: () => meQuery.refetch(),
+    user,
+    loading,
+    error: null,
+    isAuthenticated: !!user,
+    refresh: () => { /* Firebase gerencia a sessão automaticamente */ },
     logout,
   };
 }
+

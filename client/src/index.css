@@ -43,6 +43,42 @@
 }
 
 :root {
+  --primary: #3B82F6;
+  --primary-foreground: #F0F9FF;
+  --sidebar-primary: #2563EB;
+  --sidebar-primary-foreground: #F0F9FF;
+  --background: #09090b;
+  --foreground: #F1F5F9;
+  --card: #18181b;
+  --card-foreground: #F1F5F9;
+  --popover: #18181b;
+  --popover-foreground: #F1F5F9;
+  --secondary: #A78BFA;
+  --secondary-foreground: #0F172A;
+  --muted: #27272a;
+  --muted-foreground: #94A3B8;
+  --accent: #10B981;
+  --accent-foreground: #0F172A;
+  --destructive: #F87171;
+  --destructive-foreground: #0F172A;
+  --border: #27272a;
+  --input: #18181b;
+  --ring: #3B82F6;
+  --chart-1: #60A5FA;
+  --chart-2: #3B82F6;
+  --chart-3: #2563EB;
+  --chart-4: #1E40AF;
+  --chart-5: #1E3A8A;
+  --sidebar: #18181b;
+  --sidebar-foreground: #F1F5F9;
+  --sidebar-accent: #1E40AF;
+  --sidebar-accent-foreground: #E0E7FF;
+  --sidebar-border: #27272a;
+  --sidebar-ring: #3B82F6;
+  --radius: 0.75rem;
+}
+
+.light {
   --primary: #2563EB;
   --primary-foreground: #F0F9FF;
   --sidebar-primary: #1E40AF;
@@ -52,7 +88,6 @@
   --chart-3: #1E40AF;
   --chart-4: #1E3A8A;
   --chart-5: #172554;
-  --radius: 0.75rem;
   --background: #FFFFFF;
   --foreground: #0F172A;
   --card: #F8FAFC;
@@ -78,47 +113,12 @@
   --sidebar-ring: #3B82F6;
 }
 
-.dark {
-  --primary: #3B82F6;
-  --primary-foreground: #F0F9FF;
-  --sidebar-primary: #2563EB;
-  --sidebar-primary-foreground: #F0F9FF;
-  --background: #0F172A;
-  --foreground: #F1F5F9;
-  --card: #1E293B;
-  --card-foreground: #F1F5F9;
-  --popover: #1E293B;
-  --popover-foreground: #F1F5F9;
-  --secondary: #A78BFA;
-  --secondary-foreground: #0F172A;
-  --muted: #334155;
-  --muted-foreground: #94A3B8;
-  --accent: #10B981;
-  --accent-foreground: #0F172A;
-  --destructive: #F87171;
-  --destructive-foreground: #0F172A;
-  --border: #334155;
-  --input: #1E293B;
-  --ring: #3B82F6;
-  --chart-1: #60A5FA;
-  --chart-2: #3B82F6;
-  --chart-3: #2563EB;
-  --chart-4: #1E40AF;
-  --chart-5: #1E3A8A;
-  --sidebar: #1E293B;
-  --sidebar-foreground: #F1F5F9;
-  --sidebar-accent: #1E40AF;
-  --sidebar-accent-foreground: #E0E7FF;
-  --sidebar-border: #334155;
-  --sidebar-ring: #3B82F6;
-}
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-gradient-to-br from-white via-blue-50 to-indigo-50 text-foreground;
+    @apply bg-background text-foreground min-h-screen;
   }
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
