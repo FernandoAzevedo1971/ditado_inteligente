@@ -109,3 +109,7 @@ temp/
 # Webdev artifacts (checkpoint zips, migrations, etc.)
 .webdev/
 
+# Manus artifacts (legacy)
+.manus/
+.manus-logs/
+__manus__/

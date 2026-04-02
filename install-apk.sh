@@ -64,7 +64,7 @@ if adb install "$APK_PATH"; then
     echo ""
     echo "Próximas ações:"
     echo "  1. Abra o app no seu telefone"
-    echo "  2. Faça login com sua conta Manus"
+    echo "  2. Faça login com sua conta Google"
     echo "  3. Comece a transcrever com voz"
     echo ""
     echo "💡 Dica: Use 'adb logcat' para ver logs do app"
