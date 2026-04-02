@@ -17,12 +17,14 @@ export const appRouter = router({
         language: LANGUAGE_ENUM.default("auto"),
       }))
       .mutation(async ({ input }) => {
-        const binaryString = atob(input.audioData);
-        const bytes = new Uint8Array(binaryString.length);
-        for (let i = 0; i < binaryString.length; i++) {
-          bytes[i] = binaryString.charCodeAt(i);
-        }
-        const blob = new Blob([bytes], { type: "audio/webm" });
+        // Remove o prefixo "data:audio/webm;base64," se existir
+        const base64Data = input.audioData.includes(",") 
+          ? input.audioData.split(",")[1] 
+          : input.audioData;
+        
+        const buffer = Buffer.from(base64Data, 'base64');
+        const blob = new Blob([buffer], { type: "audio/webm" });
+
         // Se language é "auto", deixa undefined para detecção automática
         const lang = input.language === "auto" ? undefined : (input.language as SupportedLanguage);
         const transcribedText = await transcribeAudioFile(blob, lang);
