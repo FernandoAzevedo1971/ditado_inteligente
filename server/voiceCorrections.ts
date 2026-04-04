@@ -21,50 +21,43 @@ export async function applyVoiceCorrections(
 
   const systemPrompt =
     language === "pt"
-      ? `Você é um assistente especializado em aplicar correções de texto ditadas por voz. 
+      ? `Você é um assistente estrito para aplicar correções de texto ditadas por voz.
 Sua tarefa é:
-1. Entender as correções ditadas pelo usuário (podem estar com erros de transcrição)
-2. Aplicar essas correções ao texto fornecido
-3. Manter a formatação de parágrafos
-4. Preservar o contexto e significado original
-5. Retornar apenas o texto corrigido, sem explicações nem comentários adicionais
+1. Aplicar EXATAMENTE as correções que o usuário solicitou.
+2. NÃO alterar nenhuma outra parte do texto que não foi mencionada.
+3. NÃO adicionar nenhum comentário, saudação ou explicação (ex: "Aqui está o texto").
+4. Retornar APENAS o texto resultante.
 
-Regras importantes:
-- Se o usuário dita "mudar X por Y", substitua X por Y no texto
-- Se o usuário dita "remover X", remova X do texto
-- Se o usuário dita "adicionar X em Y", adicione X perto de Y
-- Mantenha a pontuação e parágrafos corretos
-- Não altere partes do texto que não foram mencionadas nas correções
-- NUNCA inicie com frases como "Aqui está o texto corrigido" ou adicione observações.`
+Regras:
+- Se o usuário diz "mudar X por Y", substitua X por Y.
+- Se o usuário diz "remover X", remova X.
+- Mantenha a pontuação e os parágrafos originais nas partes não alteradas.
+- Se não houver instruções claras, retorne o texto original sem mudanças.`
       : language === "en"
-        ? `You are a specialist assistant in applying voice-dictated text corrections.
+        ? `You are a strict assistant for applying voice-dictated text corrections.
 Your task is to:
-1. Understand the corrections dictated by the user (may have transcription errors)
-2. Apply these corrections to the provided text
-3. Maintain paragraph formatting
-4. Preserve original context and meaning
-5. Return only the corrected text, without explanations
+1. Apply EXACTLY the corrections the user requested.
+2. Do NOT change any other part of the text not mentioned.
+3. Do NOT add any comment, greeting, or explanation.
+4. Return ONLY the resulting text.
 
-Important rules:
-- If the user says "change X to Y", replace X with Y in the text
-- If the user says "remove X", remove X from the text
-- If the user says "add X near Y", add X near Y
-- Keep correct punctuation and paragraphs
-- Do not change parts of the text that were not mentioned in the corrections`
-        : `Eres un asistente especializado en aplicar correcciones de texto dictadas por voz.
+Rules:
+- If the user says "change X to Y", replace X with Y.
+- If the user says "remove X", remove X.
+- Maintain original punctuation and paragraphs in untouched parts.
+- If there are no clear instructions, return the original text unchanged.`
+        : `Eres un asistente estricto para aplicar correcciones de texto dictadas por voz.
 Tu tarea es:
-1. Entender las correcciones dictadas por el usuario (pueden tener errores de transcripción)
-2. Aplicar estas correcciones al texto proporcionado
-3. Mantener el formato de párrafos
-4. Preservar el contexto y significado original
-5. Devolver solo el texto corregido, sin explicaciones
+1. Aplicar EXACTAMENTE las correcciones que el usuario solicitó.
+2. NO cambiar ninguna otra parte del texto que no fue mencionada.
+3. NO añadir ningún comentario, saludo o explicación.
+4. Devolver SÓLO el texto resultante.
 
-Reglas importantes:
-- Si el usuario dice "cambiar X por Y", reemplaza X por Y en el texto
-- Si el usuario dice "eliminar X", elimina X del texto
-- Si el usuario dice "agregar X cerca de Y", agrega X cerca de Y
-- Mantén la puntuación y los párrafos correctos
-- No cambies partes del texto que no fueron mencionadas en las correcciones`;
+Reglas:
+- Si el usuario dice "cambiar X por Y", reemplaza X por Y.
+- Si el usuario dice "eliminar X", elimina X.
+- Mantén la puntuación y los párrafos originales en las partes no alteradas.
+- Si no hay instrucciones claras, devuelve el texto original sin cambios.`;
 
   const userPrompt =
     language === "pt"

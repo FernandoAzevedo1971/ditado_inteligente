@@ -7,49 +7,43 @@ export type SupportedLanguage = "pt" | "en" | "es";
 
 const CORRECTION_PROMPTS: Record<SupportedLanguage, { system: string; user: string }> = {
   pt: {
-    system: `Você é um corretor. Sua ÚNICA tarefa é transcrever o texto e fazer correções de ortografia e principalmente de pontuação.
+    system: `Você é um corretor gramatical estrito. Sua ÚNICA tarefa é corrigir ortografia e, principalmente, pontuação.
 
 REGRAS ABSOLUTAS:
-- Ao transcrever o texto corrigido, NÃO acrescente nenhum comentário (ex: "Aqui está o texto corrigido:").
-- Somente transcreva e faça correções de ortografia e, principalmente, de pontuação.
-- NÃO adicione NENHUMA palavra, frase, conclusão, introdução, saudação ou despedida que não esteja no original.
-- NÃO resuma, NÃO parafraseie, NÃO complemente o texto.
-- NÃO adicione quebras de parágrafo sob nenhuma circunstância.
+- Mantenha EXATAMENTE as mesmas palavras do original, na mesma ordem.
+- NÃO substitua palavras por sinônimos, nem melhore o estilo.
+- NÃO adicione NENHUM comentário, introdução ou observação (ex: "Aqui está o texto:").
+- NÃO resuma, não parafraseie e não complemente o texto.
+- NÃO adicione quebras de parágrafo.
 - Retorne EXATAMENTE APENAS o texto corrigido.
-- Se o texto já estiver correto, retorne-o exatamente como está.`,
-    user: `Ao transcrever o texto corrigido a seguir, não acrescente nenhum comentário. Somente transcreva e faça correções de ortografia e principalmente de pontuação:\n\n`,
+- Se o texto já estiver correto, retorne-o identicamente.`,
+    user: `Corrija apenas a pontuação, ortografia e gramática do texto abaixo, mantendo as palavras originais:\n\n`,
   },
   en: {
-    system: `You are a spelling and grammar corrector. Your ONLY task is:
-1. Add proper punctuation (periods, commas, question marks, exclamation marks)
-2. Correct spelling errors
-3. Correct minor grammatical errors
+    system: `You are a strict grammar corrector. Your ONLY task is to correct spelling, punctuation and grammar.
 
 ABSOLUTE RULES:
-- Do NOT add ANY word, phrase, comment or conclusion that is not in the original text.
+- Keep EXACTLY the same words from the original, in the same order.
+- Do NOT replace words with synonyms or "improve" the style.
+- Do NOT add ANY comment, intro or feedback (e.g. "Here is the text:").
 - Do NOT summarize, paraphrase, or supplement the text.
-- Do NOT add greetings, closings, or any kind of introduction.
 - Do NOT add paragraph breaks.
-- Every word from the original text MUST remain. You may only CORRECT spelling or add PUNCTUATION.
-- Return ONLY the corrected text, with no explanation before or after.
-- If the text is already correct, return it exactly as is.`,
-    user: `Correct only punctuation, spelling and grammar of the text below. Do not add anything new:\n\n`,
+- Return ONLY the corrected text.
+- If the text is already correct, return it identically.`,
+    user: `Correct only punctuation, spelling and grammar of the text below, keeping original words:\n\n`,
   },
   es: {
-    system: `Eres un corrector ortográfico y gramatical. Tu ÚNICA tarea es:
-1. Añadir puntuación adecuada (puntos, comas, signos de interrogación, signos de exclamación)
-2. Corregir errores ortográficos
-3. Corregir errores gramaticales leves
+    system: `Eres um corrector gramatical estricto. Tu ÚNICA tarea es corregir ortografía, puntuación y gramática.
 
 REGLAS ABSOLUTAS:
-- NO añadas NINGUNA palabra, frase, comentario o conclusión que no esté en el texto original.
-- NO resumas, NO parafrasees, NO complementes el texto.
-- NO añadas saludos, despedidas o ningún tipo de introducción.
+- Mantén EXACTAMENTE as mismas palabras del original, en el mismo orden.
+- NO substituyas palabras por sinónimos, ni "mejoras" el estilo.
+- NO añadas NINGÚN comentario, introducción u observación (ex: "Aquí está el texto:").
+- NO resumas, no parafrasees y no complementes el texto.
 - NO añadas saltos de párrafo.
-- Cada palabra del texto original DEBE permanecer. Solo puedes CORREGIR la ortografía o añadir PUNTUACIÓN.
-- Devuelve SOLO el texto corregido, sin ninguna explicación antes o después.
-- Si el texto ya es correcto, devuélvelo exactamente como está.`,
-    user: `Corrige solo puntuación, ortografía y gramática del texto a continuación. No añadas nada nuevo:\n\n`,
+- Devuelve EXACTAMENTE SÓLO el texto corregido.
+- Si el texto ya es correcto, devuélvelo identicamente.`,
+    user: `Corrige sólo la puntuación, ortografía y gramática del texto a continuación, manteniendo las palabras originales:\n\n`,
   },
 };
 
@@ -79,11 +73,8 @@ export async function correctTextWithAI(originalText: string, language: Supporte
       throw new Error("Llama 3 devolveu uma resposta vazia.");
     }
 
-    // Passo 2: Separate paragraphs by context change 
-    // Usamos o separador interno (supondo que ele não use IA, ou se usar teríamos que atualizá-lo e o separador)
-    const textWithParagraphs = await separateParagraphsByContext(content, language);
-
-    return textWithParagraphs;
+    // Passo 2: Retornamos o texto corrigido diretamente para evitar interpretações de contexto indesejadas
+    return content;
   } catch (error) {
     console.error("Error correcting text with Groq Llama 3:", error);
     throw new Error("Falha ao corrigir texto com IA");
