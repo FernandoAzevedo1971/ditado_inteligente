@@ -55,16 +55,29 @@ export async function transcribeAudioFile(audioBlob: Blob, language: SupportedLa
       fs.unlinkSync(tempFilePath);
       console.log(`[Transcription] Arquivo temporário removido.`);
     } catch (e) {
-      console.error(`[Transcription] Erro ao remover arquivo temporário:`, e);
+      console.warn(`[Transcription] Aviso: Erro não crítico ao remover arquivo temporário:`, e);
     }
 
     return result.text;
   } catch (error: any) {
-    console.error("[Transcription] Erro transcrevendo áudio com Groq Whisper:", error);
-    // Log detalhado do erro se disponível
+    console.error("[Transcription] ERRO CRÍTICO transcrevendo áudio com Groq Whisper:");
+    console.error(`- Mensagem: ${error.message}`);
+    console.error(`- Código: ${error.code || 'N/A'}`);
+    console.error(`- Tipo: ${error.type || 'N/A'}`);
+    
+    // Log detalhado do erro se for um erro de rede/API da Groq
     if (error.response) {
-      console.error("[Transcription] Detalhes da resposta de erro:", error.response.data);
+      console.error("[Transcription] Detalhes da resposta de erro da Groq:", {
+        status: error.response.status,
+        data: error.response.data,
+      });
+      throw new Error(`Erro na API Groq (${error.response.status}): ${JSON.stringify(error.response.data)}`);
     }
+
+    if (error.message.includes("413") || error.message.includes("payload too large")) {
+      throw new Error("O arquivo de áudio é muito grande para o servidor. Tente gravar um áudio mais curto.");
+    }
+
     throw new Error(`Falha ao transcrever o áudio: ${error.message}`);
   }
 }

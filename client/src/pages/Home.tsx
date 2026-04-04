@@ -10,6 +10,14 @@ import { useTranscriptionHistory } from "@/hooks/useTranscriptionHistory";
 import { History, LogOut, Loader2 } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { AudioLines, Sparkles } from "lucide-react";
 
 interface ProcessingState {
   transcription: string;
@@ -26,9 +34,9 @@ export default function Home() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingStep, setProcessingStep] = useState<ProcessingStep>("idle");
   const [showHistory, setShowHistory] = useState(false);
+  const [provider, setProvider] = useState<"groq" | "mistral">("groq");
 
   // Mutations
-  const transcribeMutation = trpc.audio.transcribe.useMutation();
   const correctMutation = trpc.text.correct.useMutation();
 
   const handleTranscriptionStart = async (audioBlob: Blob) => {
@@ -39,55 +47,73 @@ export default function Home() {
 
     setIsProcessing(true);
     setProcessingStep("transcribing");
+
     try {
-      // Convert blob to base64
-      const reader = new FileReader();
-      reader.onload = async () => {
-        const base64Audio = (reader.result as string).split(",")[1];
-        try {
-          // Transcribe audio (sem idioma especificado - detecção automática)
-          const transcriptionResult = await transcribeMutation.mutateAsync({
-            audioData: base64Audio,
-            language: "auto",
-          });
+      // 1. Verificação de tamanho (Vercel Payload Limit: 4.5MB)
+      // Como usamos FormData agora, o limite é o binário puro.
+      // 6MB é seguro para 3-5 minutos de áudio.
+      const MAX_BLOB_SIZE = 6 * 1024 * 1024; // 6MB
+      if (audioBlob.size > MAX_BLOB_SIZE) {
+        setIsProcessing(false);
+        setProcessingStep("idle");
+        toast.error("Áudio muito longo (> 6MB). Grave arquivos mais curtos.");
+        return;
+      }
 
-          const originalText = transcriptionResult.text;
-          
-          // Move to correction step
-          setProcessingStep("correcting");
+      // 2. Envio via FormData para evitar overhead de Base64
+      const formData = new FormData();
+      formData.append("file", audioBlob, "audio.webm");
+      formData.append("provider", provider);
+      formData.append("language", "pt");
 
-          // Correct text with AI (sem idioma especificado - detecção automática)
-          const correctionResult = await correctMutation.mutateAsync({
-            text: originalText,
-            language: "auto",
-          });
+      const response = await fetch("/api/audio/transcribe", {
+        method: "POST",
+        body: formData,
+      });
 
-          const correctedText = correctionResult.correctedText;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Falha na transcrição");
+      }
 
-          // Save to history
-          addRecord(originalText, correctedText, "auto");
+      const transcriptionResult = await response.json();
+      const originalText = transcriptionResult.text;
+      
+      // Move to correction step
+      setProcessingStep("correcting");
 
-          setProcessingState({
-            transcription: originalText,
-            corrected: correctedText,
-          });
-          
-          setProcessingStep("idle");
-          setIsProcessing(false);
-          toast.success("Transcrição e correção concluídas!");
-        } catch (error) {
-          setProcessingStep("idle");
-          setIsProcessing(false);
-          console.error("Error processing audio:", error);
-          toast.error("Erro ao processar áudio. Tente novamente.");
-        }
-      };
-      reader.readAsDataURL(audioBlob);
-    } catch (error) {
+      // Correct text with AI
+      const correctionResult = await correctMutation.mutateAsync({
+        text: originalText,
+        language: "auto",
+      });
+
+      const correctedText = correctionResult.correctedText;
+
+      // Save to history
+      addRecord(originalText, correctedText, "auto");
+
+      setProcessingState({
+        transcription: originalText,
+        corrected: correctedText,
+      });
+      
       setProcessingStep("idle");
       setIsProcessing(false);
-      console.error("Error reading audio:", error);
-      toast.error("Erro ao ler áudio. Tente novamente.");
+      toast.success("Transcrição e correção concluídas!");
+    } catch (error: any) {
+      setProcessingStep("idle");
+      setIsProcessing(false);
+      console.error("Error processing audio:", error);
+      
+      const errorMsg = error.message || "Erro desconhecido";
+      if (errorMsg.includes("413") || errorMsg.includes("large")) {
+        toast.error("Áudio muito grande para o servidor. Tente gravar menos de 3 minutos.");
+      } else if (errorMsg.includes("timeout") || errorMsg.includes("deadline")) {
+        toast.error("Tempo limite excedido. Tente uma frase mais curta.");
+      } else {
+        toast.error(`Erro: ${errorMsg}`);
+      }
     }
   };
 
@@ -143,10 +169,26 @@ export default function Home() {
         <h1 className="text-2xl font-black text-foreground tracking-tighter">
           Ditado Inteligente
         </h1>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
+          <Select value={provider} onValueChange={(v: any) => setProvider(v)}>
+            <SelectTrigger className="w-[140px] sm:w-[180px] bg-white/5 border-none h-10 px-3 transition-all hover:bg-white/10">
+              <SelectValue placeholder="Escolha a IA" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="groq" className="flex items-center gap-2">
+                <AudioLines className="w-4 h-4 text-orange-500" />
+                <span>Groq (Whisper)</span>
+              </SelectItem>
+              <SelectItem value="mistral" className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-blue-500" />
+                <span>Mistral (Voxtral)</span>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+
           <button
             onClick={() => setShowHistory(!showHistory)}
-            className="p-3 rounded-full transition-all hover:bg-white/5 text-muted-foreground hover:text-foreground"
+            className="p-2 sm:p-3 rounded-full transition-all hover:bg-white/5 text-muted-foreground hover:text-foreground"
           >
             <History className="w-6 h-6" />
           </button>

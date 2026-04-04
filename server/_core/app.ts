@@ -4,12 +4,57 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
+import multer from "multer";
+import os from "os";
+import path from "path";
+import fs from "fs";
+import { transcribeAudioFile } from "../transcription";
+import { transcribeWithMistral } from "../transcription-mistral";
 
 const app = express();
+
+// Configure multer for /tmp storage
+const upload = multer({ dest: os.tmpdir() });
 
 // Configure body parser with larger size limit for file uploads
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
+// Audio Transcription REST API (supports larger files than tRPC/JSON)
+app.post("/api/audio/transcribe", upload.single("file"), async (req: express.Request, res: express.Response) => {
+  try {
+    const multerReq = req as any;
+    if (!multerReq.file) {
+      return res.status(400).json({ error: "Nenhum arquivo de áudio enviado." });
+    }
+
+    const filePath = multerReq.file.path;
+    const provider = req.body.provider || "groq"; // groq | mistral
+    const language = req.body.language || "pt";
+
+    console.log(`[API] Transcrevendo com ${provider} (arquivo: ${multerReq.file.originalname})`);
+
+    let transcribedText = "";
+
+    if (provider === "mistral") {
+      transcribedText = await transcribeWithMistral(filePath, language);
+    } else {
+      const buffer = fs.readFileSync(filePath);
+      const blob = new Blob([buffer], { type: "audio/webm" });
+      transcribedText = await transcribeAudioFile(blob, language);
+    }
+
+    // Cleanup
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+
+    res.json({ text: transcribedText });
+  } catch (error: any) {
+    console.error("[API] Erro na transcrição:", error);
+    res.status(500).json({ error: error.message || "Erro interno no servidor" });
+  }
+});
 
 // OAuth callback under /api/oauth/callback
 registerOAuthRoutes(app);
