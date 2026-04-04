@@ -10,9 +10,9 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || "dummy" });
 export type SupportedLanguage = "pt" | "en" | "es";
 
 const LANGUAGE_PROMPTS: Record<SupportedLanguage, string> = {
-  pt: "Transcrever o texto ditado em português com precisão",
-  en: "Transcribe the spoken text in English accurately",
-  es: "Transcribir el texto hablado em español con precisión",
+  pt: "Transcrição literal e precisa, sem comentários adicionais.",
+  en: "Literal and accurate transcription, no extra comments.",
+  es: "Transcripción literal y precisa, sin comentarios adicionales.",
 };
 
 export async function transcribeAudioFile(audioBlob: Blob, language: SupportedLanguage = "pt"): Promise<string> {
@@ -22,7 +22,7 @@ export async function transcribeAudioFile(audioBlob: Blob, language: SupportedLa
   if (!process.env.GROQ_API_KEY || process.env.GROQ_API_KEY === "dummy") {
     console.warn("[Transcription] GROQ_API_KEY não encontrada. Usando mock.");
     return new Promise(resolve => {
-      setTimeout(() => resolve("Olá! Esta é uma transcrição simulada pelo modo de teste. Eu percebi que você ainda não configurou a sua chave GROQ_API_KEY no arquivo .env na nuvem do seu projeto. Quando colocar a chave lá, esta frase se tornará a transcrição rápida e real da sua voz!"), 2000);
+      setTimeout(() => resolve("Esta é uma transcrição de teste. Configure sua chave GROQ_API_KEY para transcrições reais."), 2000);
     });
   }
 
