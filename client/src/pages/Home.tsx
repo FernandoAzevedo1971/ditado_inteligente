@@ -71,13 +71,20 @@ export default function Home() {
         body: formData,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Falha na transcrição");
+      let responseData;
+      let errorText = "";
+      try {
+        errorText = await response.text();
+        responseData = JSON.parse(errorText);
+      } catch (e) {
+        throw new Error(`Erro no servidor: ${errorText.substring(0, 100)}`);
       }
 
-      const transcriptionResult = await response.json();
-      const originalText = transcriptionResult.text;
+      if (!response.ok) {
+        throw new Error(responseData?.error || "Falha na transcrição");
+      }
+
+      const originalText = responseData.text;
       
       // Move to correction step
       setProcessingStep("correcting");

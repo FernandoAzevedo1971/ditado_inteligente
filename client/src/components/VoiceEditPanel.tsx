@@ -54,18 +54,31 @@ export default function VoiceEditPanel({
 
     setIsProcessing(true);
     try {
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const audioData = e.target?.result as string;
-        const base64Audio = audioData.split(",")[1];
+      // Usando o endpoint REST com FormData em vez do TRPC para evitar limite de payload de JSON (Base64) e melhorar o tratamento de erro
+      const formData = new FormData();
+      formData.append("file", audio, "audio.webm");
+      formData.append("provider", "groq");
+      formData.append("language", language);
 
-        // Transcrever as correções
-        const transcriptionResult = await transcribeMutation.mutateAsync({
-          audioData: base64Audio,
-          language: (language as "pt" | "en" | "es") || "pt",
-        });
+      const response = await fetch("/api/audio/transcribe", {
+        method: "POST",
+        body: formData,
+      });
 
-        const voiceCorrections = transcriptionResult.text;
+      let responseData;
+      let errorText = "";
+      try {
+        errorText = await response.text();
+        responseData = JSON.parse(errorText);
+      } catch (e) {
+        throw new Error(`Erro no servidor: ${errorText.substring(0, 100)}`);
+      }
+
+      if (!response.ok) {
+        throw new Error(responseData?.error || "Falha na transcrição");
+      }
+
+      const voiceCorrections = responseData.text;
 
         if (!voiceCorrections.trim()) {
           toast.error("Nenhuma correção foi detectada. Tente novamente.");
@@ -84,11 +97,9 @@ export default function VoiceEditPanel({
         toast.success("Correções aplicadas com sucesso!");
         setIsProcessing(false);
         onClose();
-      };
-      reader.readAsDataURL(audio);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Erro ao processar correções:", err);
-      toast.error("Erro ao aplicar correções. Tente novamente.");
+      toast.error(err?.message || "Erro ao aplicar correções. Tente novamente.");
       setIsProcessing(false);
     }
   };
