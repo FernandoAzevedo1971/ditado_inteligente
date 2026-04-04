@@ -165,23 +165,23 @@ export default function Home() {
   return (
      <div className="min-h-screen bg-background">
       {/* Header - Minimal and Transparent */}
-      <div className="flex items-center justify-between px-6 py-6 bg-transparent">
-        <h1 className="text-2xl font-black text-foreground tracking-tighter">
+      <div className="flex items-center justify-between px-4 py-4 sm:px-6 sm:py-6 bg-transparent">
+        <h1 className="text-xl sm:text-2xl font-black text-foreground tracking-tighter shrink-0">
           Ditado Inteligente
         </h1>
-        <div className="flex items-center gap-2 sm:gap-4">
+        <div className="flex items-center gap-1.5 sm:gap-4">
           <Select value={provider} onValueChange={(v: any) => setProvider(v)}>
-            <SelectTrigger className="w-[140px] sm:w-[180px] bg-white/5 border-none h-10 px-3 transition-all hover:bg-white/10">
-              <SelectValue placeholder="Escolha a IA" />
+            <SelectTrigger className="w-[115px] sm:w-[180px] bg-white/5 border-none h-9 sm:h-10 px-2 sm:px-3 transition-all hover:bg-white/10 text-xs sm:text-sm">
+              <SelectValue placeholder="IA" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="groq" className="flex items-center gap-2">
-                <AudioLines className="w-4 h-4 text-orange-500" />
-                <span>Groq (Whisper)</span>
+                <AudioLines className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-500" />
+                <span className="text-xs sm:text-sm">Groq (Whisper)</span>
               </SelectItem>
               <SelectItem value="mistral" className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-blue-500" />
-                <span>Mistral (Voxtral)</span>
+                <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-500" />
+                <span className="text-xs sm:text-sm">Mistral (Voxtral)</span>
               </SelectItem>
             </SelectContent>
           </Select>
@@ -190,13 +190,13 @@ export default function Home() {
             onClick={() => setShowHistory(!showHistory)}
             className="p-2 sm:p-3 rounded-full transition-all hover:bg-white/5 text-muted-foreground hover:text-foreground"
           >
-            <History className="w-6 h-6" />
+            <History className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
           <button
             onClick={logout}
-            className="p-3 rounded-full transition-all hover:bg-white/5 text-muted-foreground hover:text-foreground"
+            className="p-2 sm:p-3 rounded-full transition-all hover:bg-white/5 text-muted-foreground hover:text-foreground"
           >
-            <LogOut className="w-6 h-6" />
+            <LogOut className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         </div>
       </div>

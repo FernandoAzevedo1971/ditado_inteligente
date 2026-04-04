@@ -49,13 +49,13 @@ export function HistoryPanel() {
   return (
     <div className="space-y-3">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-bold text-foreground">Histórico ({history.length})</h3>
+        <h3 className="text-lg sm:text-xl font-bold text-foreground">Histórico ({history.length})</h3>
         {history.length > 0 && (
           <Button
             onClick={clearHistory}
             variant="outline"
             size="sm"
-            className="text-red-500 border-red-200 hover:bg-red-500/10 dark:border-red-900"
+            className="text-red-500 border-red-200 hover:bg-red-500/10 dark:border-red-900 text-xs sm:text-sm h-8 sm:h-9"
           >
             Limpar Tudo
           </Button>
@@ -63,7 +63,7 @@ export function HistoryPanel() {
       </div>
 
       {history.map((record) => (
-        <Card key={record.id} className="p-4 bg-card text-card-foreground shadow-md border border-border rounded-lg">
+        <Card key={record.id} className="p-3 sm:p-4 bg-card text-card-foreground shadow-md border border-border rounded-lg">
           <div
             onClick={() => setExpandedId(expandedId === record.id ? null : record.id)}
             className="cursor-pointer flex items-start justify-between gap-3"

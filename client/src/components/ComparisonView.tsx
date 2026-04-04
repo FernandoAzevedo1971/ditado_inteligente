@@ -51,16 +51,16 @@ export function ComparisonView({
           {/* Header - Transparent and minimal */}
           <div className="flex items-center justify-between pb-4 border-b border-white/5">
             <div>
-              <h2 className="text-3xl font-black text-foreground tracking-tight">
+              <h2 className="text-xl sm:text-3xl font-black text-foreground tracking-tight">
                 Análise do Ditado
               </h2>
-              <p className="text-muted-foreground font-medium mt-1">Veja como a IA aprimorou seu texto</p>
+              <p className="text-sm sm:text-base text-muted-foreground font-medium mt-1">Veja como a IA aprimorou seu texto</p>
             </div>
             <button
               onClick={onClose}
-              className="p-3 text-muted-foreground hover:text-foreground hover:bg-white/5 rounded-full transition-all hover:rotate-90 duration-300"
+              className="p-2 sm:p-3 text-muted-foreground hover:text-foreground hover:bg-white/5 rounded-full transition-all hover:rotate-90 duration-300"
             >
-              <X className="w-8 h-8" />
+              <X className="w-6 h-6 sm:w-8 sm:h-8" />
             </button>
           </div>
 
@@ -74,7 +74,7 @@ export function ComparisonView({
                 </div>
               </div>
               <div className="p-2 border-l-2 border-zinc-800">
-                <p className="text-muted-foreground text-lg leading-relaxed font-medium whitespace-pre-wrap italic">
+                <p className="text-muted-foreground text-base sm:text-lg leading-relaxed font-medium whitespace-pre-wrap italic">
                   "{originalText}"
                 </p>
               </div>
@@ -88,7 +88,7 @@ export function ComparisonView({
                 </div>
               </div>
               <div className="p-2 border-l-2 border-blue-500/50">
-                <p className="text-foreground text-2xl leading-snug font-bold whitespace-pre-wrap">
+                <p className="text-xl sm:text-2xl text-foreground leading-snug font-bold whitespace-pre-wrap">
                   {currentCorrected}
                 </p>
               </div>
@@ -96,20 +96,20 @@ export function ComparisonView({
           </div>
 
           {/* Action Buttons - Horizontal list of pill buttons */}
-          <div className="pt-10 border-t border-white/5">
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
+          <div className="pt-6 sm:pt-10 border-t border-white/5">
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center md:justify-start gap-3 sm:gap-4">
               {/* Copiar Texto */}
               <button
                 onClick={handleCopy}
-                className="flex items-center gap-3 px-6 py-4 text-base font-bold rounded-2xl transition-all duration-300 bg-white text-black hover:bg-zinc-200 active:scale-95 shadow-lg shadow-white/5"
+                className="flex items-center justify-center sm:justify-start gap-2 sm:gap-3 px-4 py-3 sm:px-6 sm:py-4 text-sm sm:text-base font-bold rounded-xl sm:rounded-2xl transition-all duration-300 bg-white text-black hover:bg-zinc-200 active:scale-95 shadow-lg shadow-white/5"
               >
                 {copied ? (
                   <>
-                    <Check className="w-5 h-5" /> Copiado!
+                    <Check className="w-4 h-4 sm:w-5 sm:h-5" /> Copiado!
                   </>
                 ) : (
                   <>
-                    <Copy className="w-5 h-5" /> Copiar Texto
+                    <Copy className="w-4 h-4 sm:w-5 sm:h-5" /> Copiar
                   </>
                 )}
               </button>
@@ -117,25 +117,25 @@ export function ComparisonView({
               {/* Editar por Voz */}
               <button
                 onClick={() => setShowVoiceEdit(true)}
-                className="flex items-center gap-3 px-6 py-4 text-base font-bold rounded-2xl transition-all duration-300 bg-zinc-800 text-white hover:bg-zinc-700 active:scale-95 border border-white/5"
+                className="flex items-center justify-center sm:justify-start gap-2 sm:gap-3 px-4 py-3 sm:px-6 sm:py-4 text-sm sm:text-base font-bold rounded-xl sm:rounded-2xl transition-all duration-300 bg-zinc-800 text-white hover:bg-zinc-700 active:scale-95 border border-white/5"
               >
-                <Mic className="w-5 h-5 text-purple-400" /> Editar com IA
+                <Mic className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" /> Editar
               </button>
 
               {/* WhatsApp */}
               <button
                 onClick={handleWhatsApp}
-                className="flex items-center gap-3 px-6 py-4 text-base font-bold rounded-2xl transition-all duration-300 bg-emerald-600/10 text-emerald-500 border border-emerald-500/20 hover:bg-emerald-600/20 active:scale-95"
+                className="flex items-center justify-center sm:justify-start gap-2 sm:gap-3 px-4 py-3 sm:px-6 sm:py-4 text-sm sm:text-base font-bold rounded-xl sm:rounded-2xl transition-all duration-300 bg-emerald-600/10 text-emerald-500 border border-emerald-500/20 hover:bg-emerald-600/20 active:scale-95"
               >
-                <MessageCircle className="w-5 h-5" /> Compartilhar
+                <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" /> Enviar
               </button>
 
               {/* Nova Gravação */}
               <button
                 onClick={onClose}
-                className="flex items-center gap-3 px-6 py-4 text-base font-bold rounded-2xl transition-all duration-300 text-muted-foreground hover:text-foreground hover:bg-white/5 active:scale-95"
+                className="flex items-center justify-center sm:justify-start gap-2 sm:gap-3 px-4 py-3 sm:px-6 sm:py-4 text-sm sm:text-base font-bold rounded-xl sm:rounded-2xl transition-all duration-300 text-muted-foreground hover:text-foreground hover:bg-white/5 active:scale-95"
               >
-                <RotateCcw className="w-5 h-5" /> Novo
+                <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5" /> Novo
               </button>
             </div>
           </div>

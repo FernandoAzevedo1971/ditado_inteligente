@@ -77,19 +77,19 @@ export function RecordingInterface({
         {/* Main Interface Content (No Card/Frame) */}
         <div className="p-5 flex flex-col items-center">
           {/* Recording Status */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-extrabold mb-3 text-foreground tracking-tight">
+          <div className="text-center mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-4xl font-extrabold mb-2 sm:mb-3 text-foreground tracking-tight">
               {isRecording ? "Gravando..." : audioBlob ? "Processando..." : "Ditado Inteligente"}
             </h1>
-            <p className="text-lg text-muted-foreground font-medium">
+            <p className="text-base sm:text-lg text-muted-foreground font-medium">
               {isRecording ? "Fale claramente" : isProcessing ? "Aguarde..." : "Toque no ícone para começar"}
             </p>
           </div>
 
           {/* Recording Time */}
           {isRecording && (
-            <div className="text-center mb-8">
-              <div className="text-6xl font-mono font-black text-blue-500 animate-pulse">
+            <div className="text-center mb-6 sm:mb-8">
+              <div className="text-5xl sm:text-6xl font-mono font-black text-blue-500 animate-pulse">
                 {formatTime(recordingTime)}
               </div>
             </div>
@@ -103,7 +103,7 @@ export function RecordingInterface({
           )}
 
           {/* Main Recording Button - Larger with Volume Indicator */}
-          <div className="flex justify-center mb-10 relative h-48 items-center">
+          <div className="flex justify-center mb-8 sm:mb-10 relative h-40 sm:h-48 items-center">
             {/* Volume Indicator Rings */}
             {isRecording && (
               <>
@@ -111,8 +111,8 @@ export function RecordingInterface({
                 <div
                   className={`absolute rounded-full border-4 ${getVolumeColor()} transition-all duration-100 animate-ping`}
                   style={{
-                    width: `${getVolumeSize() + 60}px`,
-                    height: `${getVolumeSize() + 60}px`,
+                    width: `${getVolumeSize() + (window.innerWidth < 640 ? 40 : 60)}px`,
+                    height: `${getVolumeSize() + (window.innerWidth < 640 ? 40 : 60)}px`,
                     opacity: 0.15,
                   }}
                 />
@@ -120,8 +120,8 @@ export function RecordingInterface({
                 <div
                   className={`absolute rounded-full border-2 ${getVolumeColor()} transition-all duration-100 opacity-40`}
                   style={{
-                    width: `${getVolumeSize() + 30}px`,
-                    height: `${getVolumeSize() + 30}px`,
+                    width: `${getVolumeSize() + (window.innerWidth < 640 ? 20 : 30)}px`,
+                    height: `${getVolumeSize() + (window.innerWidth < 640 ? 20 : 30)}px`,
                   }}
                 />
               </>
@@ -130,35 +130,35 @@ export function RecordingInterface({
             {!isRecording && !audioBlob ? (
               <button
                 onClick={startRecording}
-                className="w-36 h-36 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-[0_0_40px_rgba(59,130,246,0.5)] hover:shadow-[0_0_60px_rgba(59,130,246,0.8)] transition-all transform hover:scale-105 flex items-center justify-center relative z-10 active:scale-95"
+                className="w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-[0_0_40px_rgba(59,130,246,0.5)] hover:shadow-[0_0_60px_rgba(59,130,246,0.8)] transition-all transform hover:scale-105 flex items-center justify-center relative z-10 active:scale-95"
               >
                 <div className="absolute inset-0 rounded-full bg-blue-400/20 animate-pulse -z-10" />
-                <Mic className="w-20 h-20" />
+                <Mic className="w-14 h-14 sm:w-20 sm:h-20" />
               </button>
             ) : isRecording ? (
               <button
                 onClick={stopRecording}
-                className="w-36 h-36 rounded-full bg-gradient-to-br from-red-500 to-red-700 text-white shadow-[0_0_40px_rgba(239,68,68,0.5)] hover:shadow-[0_0_60px_rgba(239,68,68,0.8)] transition-all transform hover:scale-105 flex items-center justify-center relative z-10 active:scale-95"
+                className="w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-gradient-to-br from-red-500 to-red-700 text-white shadow-[0_0_40px_rgba(239,68,68,0.5)] hover:shadow-[0_0_60px_rgba(239,68,239,0.8)] transition-all transform hover:scale-105 flex items-center justify-center relative z-10 active:scale-95"
               >
-                <Square className="w-16 h-16 fill-current" />
+                <Square className="w-12 h-12 sm:w-16 sm:h-16 fill-current" />
               </button>
             ) : audioBlob && !isSubmitting ? (
               <button
                 onClick={handleManualSubmit}
-                className="w-36 h-36 rounded-full bg-gradient-to-br from-green-500 to-green-700 text-white shadow-[0_0_40px_rgba(34,197,94,0.5)] hover:shadow-[0_0_60px_rgba(34,197,94,0.8)] transition-all transform hover:scale-105 flex items-center justify-center relative z-10 active:scale-95"
+                className="w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-gradient-to-br from-green-500 to-green-700 text-white shadow-[0_0_40px_rgba(34,197,94,0.5)] hover:shadow-[0_0_60px_rgba(34,197,94,0.8)] transition-all transform hover:scale-105 flex items-center justify-center relative z-10 active:scale-95"
               >
-                <Mic className="w-20 h-20" />
+                <Mic className="w-14 h-14 sm:w-20 sm:h-20" />
               </button>
             ) : (
-              <div className="w-36 h-36 rounded-full bg-zinc-800 text-zinc-500 flex items-center justify-center relative z-10">
-                <Loader2 className="w-20 h-20 animate-spin" />
+              <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-zinc-800 text-zinc-500 flex items-center justify-center relative z-10">
+                <Loader2 className="w-14 h-14 sm:w-20 sm:h-20 animate-spin" />
               </div>
             )}
           </div>
 
           {/* Instructions and Status Text */}
           <div className="text-center">
-            <p className="text-lg font-bold text-foreground mb-1">
+            <p className="text-base sm:text-lg font-bold text-foreground mb-1">
               {isRecording
                 ? "🎤 Gravando Áudio"
                 : audioBlob && !isRecording && !isSubmitting
@@ -167,7 +167,7 @@ export function RecordingInterface({
                     ? "⏳ Quase pronto..."
                     : "Pressione para falar"}
             </p>
-            <p className="text-sm text-muted-foreground font-medium">
+            <p className="text-xs sm:text-sm text-muted-foreground font-medium">
               {!isRecording && !audioBlob && "Inicie um novo ditado inteligente agora"}
               {isRecording && `Nível de captação: ${amplitude < 0.3 ? "Baixo" : amplitude < 0.6 ? "Médio" : "Excelente"}`}
             </p>
