@@ -9,7 +9,7 @@ export interface TranscriptionRecord {
 }
 
 const STORAGE_KEY = "voice_text_corrector_history";
-const MAX_HISTORY = 10;
+const MAX_HISTORY = 20;
 
 export function useTranscriptionHistory() {
   const [history, setHistory] = useState<TranscriptionRecord[]>([]);

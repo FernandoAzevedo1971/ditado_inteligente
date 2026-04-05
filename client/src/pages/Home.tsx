@@ -179,29 +179,45 @@ export default function Home() {
 
       {/* Header - Glassmorphism & Minimal */}
       <div className="flex items-center justify-between px-6 py-8 bg-transparent relative z-20">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-             <AudioLines className="w-6 h-6 text-white" />
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+              <AudioLines className="w-6 h-6 text-white" />
+            </div>
+            <h1 className="text-2xl font-black text-foreground tracking-tighter uppercase">
+              Ditado <span className="text-indigo-500">Inteligente</span>
+            </h1>
           </div>
-          <h1 className="text-2xl font-black text-foreground tracking-tighter uppercase">
-            Luvia <span className="text-indigo-500">IA</span>
-          </h1>
+
+          <div className="flex items-center gap-1">
+            <Select value={provider} onValueChange={(v: any) => setProvider(v)}>
+              <SelectTrigger className="glass-dark border-white/5 h-8 px-3 rounded-lg transition-all hover:bg-white/10 text-[10px] font-bold uppercase tracking-widest text-indigo-200 w-auto min-w-[140px]">
+                <SelectValue placeholder="Sintonizador" />
+              </SelectTrigger>
+              <SelectContent className="glass-card border-white/10">
+                <SelectItem value="groq" className="flex items-center gap-2 focus:bg-indigo-500/20">
+                  <span className="text-[10px] font-bold">Groq Ultra-Fast</span>
+                </SelectItem>
+                <SelectItem value="mistral" className="flex items-center gap-2 focus:bg-indigo-500/20">
+                  <span className="text-[10px] font-bold">Mistral Pro</span>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-        
-        <div className="flex items-center gap-4">
-          <Select value={provider} onValueChange={(v: any) => setProvider(v)}>
-            <SelectTrigger className="glass-dark border-white/5 h-11 px-4 rounded-xl transition-all hover:bg-white/10 text-xs font-bold uppercase tracking-widest text-indigo-200">
-              <SelectValue placeholder="Sintonizador" />
-            </SelectTrigger>
-            <SelectContent className="glass-card border-white/10">
-              <SelectItem value="groq" className="flex items-center gap-2 focus:bg-indigo-500/20">
-                <span className="text-xs font-bold">Groq Ultra-Fast</span>
-              </SelectItem>
-              <SelectItem value="mistral" className="flex items-center gap-2 focus:bg-indigo-500/20">
-                <span className="text-xs font-bold">Mistral Pro</span>
-              </SelectItem>
-            </SelectContent>
-          </Select>
+
+        <div className="flex items-center gap-2 sm:gap-4">
+          <button
+            onClick={() => setShowHistory(!showHistory)}
+            className={`p-3 rounded-xl transition-all border border-white/5 ${
+              showHistory 
+                ? "bg-indigo-500/20 text-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.2)]" 
+                : "glass-dark hover:bg-white/10 text-muted-foreground hover:text-indigo-400"
+            }`}
+            title="Histórico"
+          >
+            <History className="w-5 h-5" />
+          </button>
 
           <button
             onClick={logout}
@@ -215,7 +231,21 @@ export default function Home() {
 
       {/* Main Content Area */}
       <main className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-140px)]">
-        {processingState ? (
+        {showHistory ? (
+          <div className="w-full max-w-2xl mx-auto px-4 py-8 animate-in slide-in-from-bottom-4 duration-500">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-3xl font-black text-foreground tracking-tighter uppercase">Anteriores</h2>
+              <Button 
+                variant="ghost" 
+                onClick={() => setShowHistory(false)}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                Voltar ao Gravador
+              </Button>
+            </div>
+            <HistoryPanel />
+          </div>
+        ) : processingState ? (
           <ComparisonView
             originalText={processingState.transcription}
             correctedText={processingState.corrected}
@@ -243,12 +273,10 @@ export default function Home() {
                 
                 <div className="text-center space-y-3">
                   <h2 className="text-3xl font-black tracking-tighter text-glow-primary uppercase">
-                    {processingStep === "transcribing" ? "Escutando..." : "Cristalizando..."}
+                    Transcrevendo
                   </h2>
                   <p className="text-indigo-200/50 font-medium tracking-wide">
-                    {processingStep === "transcribing" 
-                      ? "A IA está processando sua voz em tempo real." 
-                      : "Refinando gramática, pontuação e clareza."}
+                    acrescentando pontuação, parágrafos e corrigindo contexto
                   </p>
                 </div>
               </div>

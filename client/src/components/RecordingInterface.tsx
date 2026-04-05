@@ -82,7 +82,7 @@ export function RecordingInterface({
           {/* Recording Status */}
           <div className="mb-10">
             <h1 className="text-3xl sm:text-5xl font-black mb-3 text-foreground tracking-tighter text-glow-primary">
-              {isRecording ? "LUVIA IA" : audioBlob ? "Sintonizando..." : "Ditado Inteligente"}
+              {isRecording ? "Transcrevendo..." : audioBlob ? "Sintonizando..." : "Ditado Inteligente"}
             </h1>
             <p className="text-base sm:text-xl text-indigo-200/50 font-medium tracking-wide">
               {isRecording ? "Capturando sua voz..." : isProcessing ? "Refinando texto..." : "Toque para iniciar a magia"}
@@ -141,7 +141,7 @@ export function RecordingInterface({
           <div className="max-w-xs mx-auto">
             <p className="text-sm sm:text-base font-bold text-indigo-200/70 mb-2 uppercase tracking-[0.2em]">
               {isRecording
-                ? "Ativo"
+                ? "Gravando"
                 : audioBlob && !isRecording && !isSubmitting
                   ? "✓ Pronto"
                   : isSubmitting
