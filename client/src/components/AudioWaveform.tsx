@@ -60,38 +60,48 @@ export function AudioWaveform({ isRecording, audioStream }: AudioWaveformProps) 
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Draw vertical bars
-      const barWidth = 6;
-      const barSpacing = 2;
+      const barWidth = 4; // Slimmer bars
+      const barSpacing = 3;
       const totalBarWidth = barWidth + barSpacing;
       const centerY = canvas.height / 2;
-      const maxBarHeight = centerY - 4;
+      const maxBarHeight = (centerY - 4) * 0.4; // Reduzindo para 40% da altura original para ser sutil
 
-      ctx.fillStyle = "rgb(59, 130, 246)";
-      ctx.lineCap = "round";
+      // Create glowing gradient for bars
+      const barGradient = ctx.createLinearGradient(0, centerY - maxBarHeight, 0, centerY + maxBarHeight);
+      barGradient.addColorStop(0, "rgba(99, 102, 241, 0.2)");
+      barGradient.addColorStop(0.5, "rgba(99, 102, 241, 1)");
+      barGradient.addColorStop(1, "rgba(99, 102, 241, 0.2)");
+
+      ctx.fillStyle = barGradient;
 
       barsRef.current.forEach((value, i) => {
-        // Calculate x position with scroll offset
         const x = (i * totalBarWidth) - (scrollOffsetRef.current % (totalBarWidth * barsRef.current.length));
 
-        // Only draw bars that are visible
         if (x + barWidth > 0 && x < canvas.width) {
-          const barHeight = value * maxBarHeight;
+          const barHeight = Math.max(2, value * maxBarHeight); // Garantindo altura mínima sutil
 
-          // Draw top bar (above center)
-          ctx.fillRect(x, centerY - barHeight, barWidth, barHeight);
+          // Draw top bar
+          ctx.beginPath();
+          ctx.roundRect(x, centerY - barHeight, barWidth, barHeight, 2);
+          ctx.fill();
 
-          // Draw bottom bar (below center - mirror)
-          ctx.fillRect(x, centerY, barWidth, barHeight);
+          // Draw bottom bar (mirror)
+          ctx.beginPath();
+          ctx.roundRect(x, centerY, barWidth, barHeight, 2);
+          ctx.fill();
         }
       });
 
-      // Draw center line
-      ctx.strokeStyle = "rgba(59, 130, 246, 0.2)";
+      // Draw subtle glow line
+      ctx.strokeStyle = "rgba(99, 102, 241, 0.4)";
       ctx.lineWidth = 1;
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = "rgba(99, 102, 241, 0.5)";
       ctx.beginPath();
       ctx.moveTo(0, centerY);
       ctx.lineTo(canvas.width, centerY);
       ctx.stroke();
+      ctx.shadowBlur = 0; // Reset shadow
 
       animationRef.current = requestAnimationFrame(draw);
     };
@@ -109,16 +119,21 @@ export function AudioWaveform({ isRecording, audioStream }: AudioWaveformProps) 
   }, [isRecording, audioStream]);
 
   return (
-    <div className="flex items-center justify-center gap-3 py-4 w-full">
-      <Volume2 className="w-6 h-6 text-blue-600 flex-shrink-0" />
-      <div className="flex-1 max-w-md h-16 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg overflow-hidden border border-blue-200 shadow-sm">
+    <div className="flex items-center justify-center gap-3 py-6 w-full animate-in fade-in duration-700">
+      <div className="flex-1 max-w-md h-20 glass-card overflow-hidden relative group">
+        <div className="absolute inset-0 premium-gradient opacity-50 transition-opacity group-hover:opacity-70" />
         <canvas
           ref={canvasRef}
-          width={320}
-          height={64}
-          className="w-full h-full"
+          width={400}
+          height={80}
+          className="w-full h-full relative z-10"
           style={{ display: "block" }}
         />
+        {!isRecording && (
+          <div className="absolute inset-0 flex items-center justify-center text-indigo-300/40 text-sm font-medium tracking-widest uppercase">
+            Aguardando áudio...
+          </div>
+        )}
       </div>
     </div>
   );

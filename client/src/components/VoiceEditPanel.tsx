@@ -105,74 +105,79 @@ export default function VoiceEditPanel({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-card text-card-foreground rounded-2xl shadow-2xl border border-border max-w-md w-full p-6">
-        <h2 className="text-xl font-bold mb-4">
-          Editar com Voz
-        </h2>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-[100] p-4 animate-in fade-in duration-300">
+      <div className="glass-card max-w-md w-full p-8 sm:p-10 border-white/10 shadow-[0_0_80px_rgba(99,102,241,0.2)] relative overflow-hidden">
+        {/* Background Glow */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-[50px] rounded-full" />
+        
+        <div className="relative z-10 text-center">
+          <h2 className="text-2xl sm:text-3xl font-black mb-2 text-foreground tracking-tighter text-glow-primary uppercase">
+            REFINE POR VOZ
+          </h2>
+          <p className="text-sm sm:text-base text-indigo-200/50 font-medium tracking-wide mb-8">
+            {isRecording
+              ? "Diga o que você deseja alterar..."
+              : "Sintonizando correções..."}
+          </p>
 
-        <p className="text-sm text-muted-foreground mb-6">
-          {isRecording
-            ? "Gravando... Dite as correções necessárias"
-            : "Processando suas correções..."}
-        </p>
+          {/* Audio Waveform Visualization */}
+          <div className="w-full mb-10 h-24 flex items-center justify-center">
+            {isRecording && mediaStream ? (
+              <AudioWaveform isRecording={isRecording} audioStream={mediaStream} />
+            ) : (
+                <div className="flex items-center gap-2">
+                    <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+                    <span className="text-indigo-400 font-bold uppercase tracking-widest text-xs">Processando</span>
+                </div>
+            )}
+          </div>
 
-        {/* Audio Waveform Visualization */}
-        {isRecording && mediaStream && (
-          <AudioWaveform isRecording={isRecording} audioStream={mediaStream} />
-        )}
+          {/* Action Button */}
+          <div className="flex justify-center mb-10">
+            {isRecording ? (
+              <button
+                onClick={handleStopRecording}
+                className="w-24 h-24 rounded-full bg-gradient-to-br from-red-500 to-rose-700 text-white shadow-xl shadow-rose-500/20 flex items-center justify-center animate-pulse-glow border-4 border-white/10 active:scale-95 transition-all"
+                title="Parar Gravação"
+              >
+                <Square className="w-10 h-10 fill-current" />
+              </button>
+            ) : (
+              <div className="w-24 h-24 rounded-full glass-dark flex items-center justify-center border-2 border-indigo-500/30">
+                <Check className="w-12 h-12 text-indigo-400" />
+              </div>
+            )}
+          </div>
 
-        {/* Recording Status */}
-        <div className="flex justify-center mb-6">
-          {isRecording ? (
-            <button
-              onClick={handleStopRecording}
-              className="w-20 h-20 rounded-full bg-red-600 hover:bg-red-700 flex items-center justify-center shadow-lg animate-pulse transition-colors cursor-pointer"
-              title="Clique para parar a gravação"
-            >
-              <Square className="w-8 h-8 text-white" />
-            </button>
-          ) : (
-            <div className="w-20 h-20 rounded-full bg-blue-600 flex items-center justify-center shadow-lg">
-              <Check className="w-8 h-8 text-white" />
+          {/* Feedback Messages */}
+          {recordingError && (
+            <div className="glass-dark border-red-500/20 rounded-xl p-4 mb-6 flex items-start gap-3 text-left">
+              <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-red-200/80">{recordingError}</p>
             </div>
           )}
+
+          {isProcessing && !isRecording && (
+            <div className="space-y-4">
+               <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+                    <div className="h-full bg-indigo-500 animate-progress-loading" />
+               </div>
+               <p className="text-xs font-black text-indigo-400 uppercase tracking-[0.2em] animate-pulse">
+                Sincronizando com a IA...
+               </p>
+            </div>
+          )}
+
+          {/* Close Button */}
+          {!isProcessing && (
+            <button
+              onClick={onClose}
+              className="mt-4 px-6 py-3 text-sm font-bold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-widest"
+            >
+              Cancelar
+            </button>
+          )}
         </div>
-
-        {/* Status Messages */}
-        {recordingError && (
-          <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-4 flex items-start gap-2">
-            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-red-600 dark:text-red-400">{recordingError}</p>
-          </div>
-        )}
-
-        {isProcessing && (
-          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mb-4 flex items-center gap-2">
-            <Loader2 className="w-5 h-5 text-primary animate-spin" />
-            <p className="text-sm text-primary">Processando correções...</p>
-          </div>
-        )}
-
-        {/* Stop Recording Button */}
-        {isRecording && (
-          <button
-            onClick={handleStopRecording}
-            className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors mb-4"
-          >
-            Parar Gravação
-          </button>
-        )}
-
-        {/* Close Button */}
-        {!isRecording && !isProcessing && (
-          <button
-            onClick={onClose}
-            className="w-full bg-secondary hover:bg-secondary/80 text-secondary-foreground font-medium py-2 px-4 rounded-lg transition-colors"
-          >
-            Fechar
-          </button>
-        )}
       </div>
     </div>
   );

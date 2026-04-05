@@ -63,114 +63,96 @@ export function RecordingInterface({
   };
 
   return (
-    <div className="w-full flex flex-col items-center justify-center px-3 py-4">
-      <div className="w-full max-w-md">
+    <div className="w-full flex flex-col items-center justify-center px-4 py-8 animate-in fade-in zoom-in duration-1000">
+      <div className="w-full max-w-lg glass-card p-8 sm:p-12 relative overflow-hidden">
+        {/* Background Decorative Glows */}
+        <div className="absolute -top-24 -left-24 w-48 h-48 bg-indigo-600/10 rounded-full blur-3xl" />
+        <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-blue-600/10 rounded-full blur-3xl" />
+
         {/* Error Message */}
         {error && (
-          <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg flex gap-2">
-            <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-red-700">{error}</p>
+          <div className="mb-6 p-4 glass-dark border-red-500/20 rounded-xl flex gap-3 animate-in slide-in-from-top-2">
+            <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-red-200/80">{error}</p>
           </div>
         )}
 
-        {/* Main Card */}
-        {/* Main Interface Content (No Card/Frame) */}
-        <div className="p-5 flex flex-col items-center">
+        {/* Main Interface Content */}
+        <div className="flex flex-col items-center relative z-10 text-center">
           {/* Recording Status */}
-          <div className="text-center mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-4xl font-extrabold mb-2 sm:mb-3 text-foreground tracking-tight">
-              {isRecording ? "Gravando..." : audioBlob ? "Processando..." : "Ditado Inteligente"}
+          <div className="mb-10">
+            <h1 className="text-3xl sm:text-5xl font-black mb-3 text-foreground tracking-tighter text-glow-primary">
+              {isRecording ? "LUVIA IA" : audioBlob ? "Sintonizando..." : "Ditado Inteligente"}
             </h1>
-            <p className="text-base sm:text-lg text-muted-foreground font-medium">
-              {isRecording ? "Fale claramente" : isProcessing ? "Aguarde..." : "Toque no ícone para começar"}
+            <p className="text-base sm:text-xl text-indigo-200/50 font-medium tracking-wide">
+              {isRecording ? "Capturando sua voz..." : isProcessing ? "Refinando texto..." : "Toque para iniciar a magia"}
             </p>
           </div>
 
+          {/* Audio Waveform Visualization - Full height background style */}
+          {isRecording && mediaStream && (
+            <div className="w-full mb-10 h-24 flex items-center justify-center">
+              <AudioWaveform isRecording={isRecording} audioStream={mediaStream} />
+            </div>
+          )}
+
           {/* Recording Time */}
           {isRecording && (
-            <div className="text-center mb-6 sm:mb-8">
-              <div className="text-5xl sm:text-6xl font-mono font-black text-blue-500 animate-pulse">
+            <div className="mb-10">
+              <div className="text-6xl sm:text-7xl font-mono font-black text-indigo-400/80 tracking-tighter transition-all">
                 {formatTime(recordingTime)}
               </div>
             </div>
           )}
 
-          {/* Audio Waveform Visualization */}
-          {isRecording && mediaStream && (
-            <div className="w-full max-w-xs mb-8 opacity-80">
-              <AudioWaveform isRecording={isRecording} audioStream={mediaStream} />
-            </div>
-          )}
-
-          {/* Main Recording Button - Larger with Volume Indicator */}
-          <div className="flex justify-center mb-8 sm:mb-10 relative h-40 sm:h-48 items-center">
-            {/* Volume Indicator Rings */}
-            {isRecording && (
-              <>
-                {/* Outer ring */}
-                <div
-                  className={`absolute rounded-full border-4 ${getVolumeColor()} transition-all duration-100 animate-ping`}
-                  style={{
-                    width: `${getVolumeSize() + (window.innerWidth < 640 ? 40 : 60)}px`,
-                    height: `${getVolumeSize() + (window.innerWidth < 640 ? 40 : 60)}px`,
-                    opacity: 0.15,
-                  }}
-                />
-                {/* Middle ring */}
-                <div
-                  className={`absolute rounded-full border-2 ${getVolumeColor()} transition-all duration-100 opacity-40`}
-                  style={{
-                    width: `${getVolumeSize() + (window.innerWidth < 640 ? 20 : 30)}px`,
-                    height: `${getVolumeSize() + (window.innerWidth < 640 ? 20 : 30)}px`,
-                  }}
-                />
-              </>
-            )}
-
+          {/* Main Recording Button */}
+          <div className="flex justify-center mb-12 relative items-center">
             {!isRecording && !audioBlob ? (
               <button
                 onClick={startRecording}
-                className="w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-[0_0_40px_rgba(59,130,246,0.5)] hover:shadow-[0_0_60px_rgba(59,130,246,0.8)] transition-all transform hover:scale-105 flex items-center justify-center relative z-10 active:scale-95"
+                className="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-gradient-to-br from-indigo-500 to-blue-700 text-white shadow-2xl shadow-indigo-500/40 hover:scale-105 active:scale-95 transition-all flex items-center justify-center relative group overflow-hidden"
               >
-                <div className="absolute inset-0 rounded-full bg-blue-400/20 animate-pulse -z-10" />
-                <Mic className="w-14 h-14 sm:w-20 sm:h-20" />
+                <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <Mic className="w-16 h-16 sm:w-24 sm:h-24" />
+                <div className="absolute inset-0 rounded-full border-4 border-white/10 animate-pulse" />
               </button>
             ) : isRecording ? (
               <button
                 onClick={stopRecording}
-                className="w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-gradient-to-br from-red-500 to-red-700 text-white shadow-[0_0_40px_rgba(239,68,68,0.5)] hover:shadow-[0_0_60px_rgba(239,68,239,0.8)] transition-all transform hover:scale-105 flex items-center justify-center relative z-10 active:scale-95"
+                className="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-gradient-to-br from-red-500/80 to-rose-700/80 text-white animate-pulse-glow flex items-center justify-center relative z-10 active:scale-95 border-4 border-white/20"
               >
-                <Square className="w-12 h-12 sm:w-16 sm:h-16 fill-current" />
+                <Square className="w-14 h-14 sm:w-20 sm:h-20 fill-current" />
               </button>
-            ) : audioBlob && !isSubmitting ? (
+            ) : isSubmitting || isProcessing ? (
+              <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full glass-dark flex items-center justify-center border-2 border-indigo-500/30">
+                <Loader2 className="w-16 h-16 sm:w-24 sm:h-24 text-indigo-400 animate-spin" />
+              </div>
+            ) : (
               <button
                 onClick={handleManualSubmit}
-                className="w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-gradient-to-br from-green-500 to-green-700 text-white shadow-[0_0_40px_rgba(34,197,94,0.5)] hover:shadow-[0_0_60px_rgba(34,197,94,0.8)] transition-all transform hover:scale-105 flex items-center justify-center relative z-10 active:scale-95"
+                className="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-2xl shadow-emerald-500/40 hover:scale-105 active:scale-95 transition-all flex items-center justify-center"
               >
-                <Mic className="w-14 h-14 sm:w-20 sm:h-20" />
+                <Mic className="w-16 h-16 sm:w-24 sm:h-24" />
               </button>
-            ) : (
-              <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-zinc-800 text-zinc-500 flex items-center justify-center relative z-10">
-                <Loader2 className="w-14 h-14 sm:w-20 sm:h-20 animate-spin" />
-              </div>
             )}
           </div>
 
           {/* Instructions and Status Text */}
-          <div className="text-center">
-            <p className="text-base sm:text-lg font-bold text-foreground mb-1">
+          <div className="max-w-xs mx-auto">
+            <p className="text-sm sm:text-base font-bold text-indigo-200/70 mb-2 uppercase tracking-[0.2em]">
               {isRecording
-                ? "🎤 Gravando Áudio"
+                ? "Ativo"
                 : audioBlob && !isRecording && !isSubmitting
-                  ? "✓ Processando..."
+                  ? "✓ Pronto"
                   : isSubmitting
-                    ? "⏳ Quase pronto..."
-                    : "Pressione para falar"}
+                    ? "⏳ Transcrevendo"
+                    : "Pressione para Ditar"}
             </p>
-            <p className="text-xs sm:text-sm text-muted-foreground font-medium">
-              {!isRecording && !audioBlob && "Inicie um novo ditado inteligente agora"}
-              {isRecording && `Nível de captação: ${amplitude < 0.3 ? "Baixo" : amplitude < 0.6 ? "Médio" : "Excelente"}`}
-            </p>
+            {!isRecording && !audioBlob && (
+              <p className="text-xs text-muted-foreground leading-relaxed italic">
+                Sua voz será convertida em texto profissional instantaneamente.
+              </p>
+            )}
           </div>
         </div>
       </div>

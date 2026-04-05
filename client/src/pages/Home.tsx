@@ -170,47 +170,51 @@ export default function Home() {
   }
 
   return (
-     <div className="min-h-screen bg-background">
-      {/* Header - Minimal and Transparent */}
-      <div className="flex items-center justify-between px-4 py-4 sm:px-6 sm:py-6 bg-transparent">
-        <h1 className="text-xl sm:text-2xl font-black text-foreground tracking-tighter shrink-0">
-          Ditado Inteligente
-        </h1>
-        <div className="flex items-center gap-1.5 sm:gap-4">
+    <div className="min-h-screen bg-background overflow-x-hidden">
+      {/* Ambient Background Elements */}
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }} />
+      </div>
+
+      {/* Header - Glassmorphism & Minimal */}
+      <div className="flex items-center justify-between px-6 py-8 bg-transparent relative z-20">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+             <AudioLines className="w-6 h-6 text-white" />
+          </div>
+          <h1 className="text-2xl font-black text-foreground tracking-tighter uppercase">
+            Luvia <span className="text-indigo-500">IA</span>
+          </h1>
+        </div>
+        
+        <div className="flex items-center gap-4">
           <Select value={provider} onValueChange={(v: any) => setProvider(v)}>
-            <SelectTrigger className="w-[115px] sm:w-[180px] bg-white/5 border-none h-9 sm:h-10 px-2 sm:px-3 transition-all hover:bg-white/10 text-xs sm:text-sm">
-              <SelectValue placeholder="IA" />
+            <SelectTrigger className="glass-dark border-white/5 h-11 px-4 rounded-xl transition-all hover:bg-white/10 text-xs font-bold uppercase tracking-widest text-indigo-200">
+              <SelectValue placeholder="Sintonizador" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="groq" className="flex items-center gap-2">
-                <AudioLines className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-500" />
-                <span className="text-xs sm:text-sm">Groq (Whisper)</span>
+            <SelectContent className="glass-card border-white/10">
+              <SelectItem value="groq" className="flex items-center gap-2 focus:bg-indigo-500/20">
+                <span className="text-xs font-bold">Groq Ultra-Fast</span>
               </SelectItem>
-              <SelectItem value="mistral" className="flex items-center gap-2">
-                <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-500" />
-                <span className="text-xs sm:text-sm">Mistral (Voxtral)</span>
+              <SelectItem value="mistral" className="flex items-center gap-2 focus:bg-indigo-500/20">
+                <span className="text-xs font-bold">Mistral Pro</span>
               </SelectItem>
             </SelectContent>
           </Select>
 
           <button
-            onClick={() => setShowHistory(!showHistory)}
-            className="p-2 sm:p-3 rounded-full transition-all hover:bg-white/5 text-muted-foreground hover:text-foreground"
-          >
-            <History className="w-5 h-5 sm:w-6 sm:h-6" />
-          </button>
-          <button
             onClick={logout}
-            className="p-2 sm:p-3 rounded-full transition-all hover:bg-white/5 text-muted-foreground hover:text-foreground"
+            className="p-3 rounded-xl transition-all glass-dark hover:bg-red-500/10 text-muted-foreground hover:text-red-400 border border-white/5"
+            title="Sair"
           >
-            <LogOut className="w-5 h-5 sm:w-6 sm:h-6" />
+            <LogOut className="w-5 h-5" />
           </button>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="relative">
-        {/* Recording or Results */}
+      {/* Main Content Area */}
+      <main className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-140px)]">
         {processingState ? (
           <ComparisonView
             originalText={processingState.transcription}
@@ -219,49 +223,39 @@ export default function Home() {
             onClose={handleReset}
           />
         ) : (
-          <RecordingInterface
-            onTranscriptionStart={handleTranscriptionStart}
-            isProcessing={isProcessing}
-          />
+          <div className="w-full max-w-4xl mx-auto flex items-center justify-center">
+            <RecordingInterface
+              onTranscriptionStart={handleTranscriptionStart}
+              isProcessing={isProcessing}
+            />
+          </div>
         )}
 
-        {/* Processing Overlay */}
+        {/* Processing Overlay - Premium Blur */}
         {isProcessing && (
-          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-40">
-             <div className="rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4 bg-card text-card-foreground">
-              <div className="flex flex-col items-center gap-4">
-                <Loader2 className="w-12 h-12 animate-spin text-primary" />
-                <div className="text-center">
-                  {processingStep === "transcribing" ? (
-                    <>
-                      <h2 className="text-2xl font-bold mb-2">
-                        Transcrevendo com IA
-                      </h2>
-                      <p className="text-muted-foreground">
-                        Convertendo seu áudio em texto...
-                      </p>
-                    </>
-                  ) : processingStep === "correcting" ? (
-                    <>
-                      <h2 className="text-2xl font-bold mb-2">
-                        Corrigindo com IA
-                      </h2>
-                      <p className="text-muted-foreground">
-                        Aplicando pontuação, gramática e parágrafos...
-                      </p>
-                    </>
-                  ) : null}
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 animate-in fade-in duration-500">
+             <div className="glass-card p-12 max-w-md w-full mx-4 border-white/10 shadow-[0_0_100px_rgba(99,102,241,0.2)]">
+              <div className="flex flex-col items-center gap-8">
+                <div className="relative">
+                  <Loader2 className="w-16 h-16 animate-spin text-indigo-500" />
+                  <div className="absolute inset-0 blur-xl bg-indigo-500/20 animate-pulse" />
+                </div>
+                
+                <div className="text-center space-y-3">
+                  <h2 className="text-3xl font-black tracking-tighter text-glow-primary uppercase">
+                    {processingStep === "transcribing" ? "Escutando..." : "Cristalizando..."}
+                  </h2>
+                  <p className="text-indigo-200/50 font-medium tracking-wide">
+                    {processingStep === "transcribing" 
+                      ? "A IA está processando sua voz em tempo real." 
+                      : "Refinando gramática, pontuação e clareza."}
+                  </p>
                 </div>
               </div>
             </div>
           </div>
         )}
-
-        {/* History Panel */}
-        {showHistory && (
-          <HistoryPanel />
-        )}
-      </div>
+      </main>
     </div>
   );
 }
