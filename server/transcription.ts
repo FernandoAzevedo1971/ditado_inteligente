@@ -15,7 +15,7 @@ const LANGUAGE_PROMPTS: Record<SupportedLanguage, string> = {
   es: "Transcripción literal y precisa, sin comentarios adicionales.",
 };
 
-export async function transcribeAudioFile(audioBlob: Blob, language: SupportedLanguage = "pt"): Promise<string> {
+export async function transcribeAudioFile(filePath: string, language: SupportedLanguage = "pt"): Promise<string> {
   console.log(`[Transcription] Iniciando transcrição. Idioma: ${language}`);
   
   // --- MOCK TEMPORÁRIO PARA TESTE SEM CHAVE ---
@@ -27,21 +27,14 @@ export async function transcribeAudioFile(audioBlob: Blob, language: SupportedLa
   }
 
   try {
-    // 1. Converte o áudio que vem do navegador (Web Blob) para Buffer do Node
-    const arrayBuffer = await audioBlob.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    console.log(`[Transcription] Buffer de áudio criado. Tamanho: ${buffer.length} bytes`);
-    
-    // 2. Salva em um arquivo temporário (pois a API do Whisper precisa ser lida como arquivo real no disco em Node)
-    const tempDir = os.tmpdir();
-    const tempFilePath = path.join(tempDir, `audio-${Date.now()}.webm`);
-    console.log(`[Transcription] Salvando arquivo temporário em: ${tempFilePath}`);
-    fs.writeFileSync(tempFilePath, buffer);
+    if (!fs.existsSync(filePath)) {
+      throw new Error("Arquivo de áudio não encontrado no servidor.");
+    }
 
     // 3. Envia o arquivo de áudio real para o Whisper v3 no Groq Cloud
-    console.log(`[Transcription] Enviando para Groq Whisper (modelo: whisper-large-v3)...`);
+    console.log(`[Transcription] Enviando para Groq Whisper (modelo: whisper-large-v3, arquivo: ${filePath})...`);
     const result = await groq.audio.transcriptions.create({
-      file: fs.createReadStream(tempFilePath),
+      file: fs.createReadStream(filePath),
       model: "whisper-large-v3",
       prompt: LANGUAGE_PROMPTS[language],
       response_format: "json",
@@ -49,14 +42,6 @@ export async function transcribeAudioFile(audioBlob: Blob, language: SupportedLa
     });
 
     console.log(`[Transcription] Sucesso! Texto transcrito: "${result.text.substring(0, 50)}..."`);
-
-    // 4. Apaga o arquivo temporário por segurança
-    try {
-      fs.unlinkSync(tempFilePath);
-      console.log(`[Transcription] Arquivo temporário removido.`);
-    } catch (e) {
-      console.warn(`[Transcription] Aviso: Erro não crítico ao remover arquivo temporário:`, e);
-    }
 
     return result.text;
   } catch (error: any) {

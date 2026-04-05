@@ -39,9 +39,7 @@ app.post("/api/audio/transcribe", upload.single("file"), async (req: express.Req
     if (provider === "mistral") {
       transcribedText = await transcribeWithMistral(filePath, language);
     } else {
-      const buffer = fs.readFileSync(filePath);
-      const blob = new Blob([buffer], { type: "audio/webm" });
-      transcribedText = await transcribeAudioFile(blob, language);
+      transcribedText = await transcribeAudioFile(filePath, language);
     }
 
     // Cleanup

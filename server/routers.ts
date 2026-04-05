@@ -23,11 +23,17 @@ export const appRouter = router({
           : input.audioData;
         
         const buffer = Buffer.from(base64Data, 'base64');
-        const blob = new Blob([buffer], { type: "audio/webm" });
+        const os = require('os');
+        const path = require('path');
+        const fs = require('fs');
+        const tempFilePath = path.join(os.tmpdir(), `audio-trpc-${Date.now()}.webm`);
+        fs.writeFileSync(tempFilePath, buffer);
 
         // Se language é "auto", deixa undefined para detecção automática
         const lang = input.language === "auto" ? undefined : (input.language as SupportedLanguage);
-        const transcribedText = await transcribeAudioFile(blob, lang);
+        const transcribedText = await transcribeAudioFile(tempFilePath, lang);
+        
+        fs.unlinkSync(tempFilePath);
         return { text: transcribedText };
       }),
   }),
