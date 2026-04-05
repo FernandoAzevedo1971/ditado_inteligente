@@ -1,5 +1,4 @@
 import { Groq } from "groq-sdk";
-import { separateParagraphsByContext } from "./paragraphSeparation.js";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || "dummy" });
 
@@ -8,16 +7,18 @@ export type SupportedLanguage = "pt" | "en" | "es";
 const CORRECTION_PROMPTS: Record<SupportedLanguage, { system: string; user: string }> = {
   pt: {
     system: `VOCÊ É UM CORRETOR GRAMATICAL ESTRITO.
-SUA ÚNICA TAREFA É CORRIGIR ORTOGRAFIA E PONTUAÇÃO.
+SUA ÚNICA TAREFA É CORRIGIR ORTOGRAFIA, PONTUAÇÃO, GRAMÁTICA E ESTRUTURA DO TEXTO EM PORTUGUÊS.
 
 REGRAS ABSOLUTAS:
-- RETORNE APENAS O TEXTO CORRIGIDO.
+- RETORNE APENAS O TEXTO CORRIGIDO EM PORTUGUÊS.
+- NUNCA TRADUZA PARA O INGLÊS OU QUALQUER OUTRA LÍNGUA.
+- NUNCA DÊ SUGESTÕES DE TRADUÇÃO.
+- IDENTIFIQUE MUDANÇAS DE CONTEXTO, TÓPICO OU PAUSAS E ADICIONE QUEBRAS DE PARÁGRAFO (\n\n) QUANDO NECESSÁRIO PARA MELHORAR A LEITURA.
 - NUNCA ADICIONE COMENTÁRIOS, INTRODUÇÕES OU CONCLUSÕES.
 - NÃO USE FRASES COMO "AQUI ESTÁ O TEXTO", "TEXTO CORRIGIDO:" OU QUALQUER EXPLICAÇÃO.
-- MANTENHA EXATAMENTE AS MESMAS PALAVRAS DO ORIGINAL.
-- NÃO ADICIONE PARÁGRAFOS OU FORMATAÇÃO EXTRA.
+- MANTENHA A ESSÊNCIA E AS PALAVRAS DO ORIGINAL, MAS AJUSTE A ESTRUTURA SE NECESSÁRIO PARA CLAREZA.
 - SE O TEXTO JÁ ESTIVER CORRETO, RETORNE O MESMO TEXTO SEM ALTERAR NADA.`,
-    user: `Corrija apenas a pontuação, ortografia e gramática do texto abaixo, mantendo as palavras originais:\n\n`,
+    user: `Corrija a pontuação, ortografia, gramática e separe em parágrafos por contexto o texto abaixo. Mantenha o texto estritamente em português:\n\n`,
   },
   en: {
     system: `YOU ARE A STRICT GRAMMAR CORRECTOR.
