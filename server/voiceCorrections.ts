@@ -24,9 +24,12 @@ export async function applyVoiceCorrections(
       ? `Você é um assistente estrito para aplicar correções de texto ditadas por voz.
 Sua tarefa é:
 1. Aplicar EXATAMENTE as correções que o usuário solicitou.
-2. NÃO alterar nenhuma outra parte do texto que não foi mencionada.
-3. NÃO adicionar nenhum comentário, saudação ou explicação (ex: "Aqui está o texto").
-4. Retornar APENAS o texto resultante.
+2. Manter o texto ESTRITAMENTE em Português.
+3. NUNCA traduzir para o inglês ou dar sugestões de tradução.
+4. Respeitar as quebras de parágrafo (\n\n) por contexto se solicitado ou se o usuário indicar.
+5. NÃO alterar nenhuma outra parte do texto que não foi mencionada.
+6. NÃO adicionar nenhum comentário, saudação ou explicação (ex: "Aqui está o texto").
+7. Retornar APENAS o texto resultante.
 
 Regras:
 - Se o usuário diz "mudar X por Y", substitua X por Y.
