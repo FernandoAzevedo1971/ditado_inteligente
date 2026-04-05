@@ -1,6 +1,6 @@
 import { Mistral } from "@mistralai/mistralai";
 import fs from "fs";
-import { SupportedLanguage } from "./transcription";
+import { SupportedLanguage } from "./transcription.js";
 
 // Instancia o cliente Mistral usando a chave nas variáveis de ambiente
 const mistral = new Mistral({ apiKey: process.env.MISTRAL_API_KEY || "dummy" });

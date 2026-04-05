@@ -1,21 +1,21 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { transcribeAudioFile } from "./transcription";
-import { correctTextWithAI } from "./textCorrection";
+import { transcribeAudioFile } from "./transcription.js";
+import { correctTextWithAI } from "./textCorrection.js";
 
 // Mock all external dependencies
-vi.mock("./storage", () => ({
+vi.mock("./storage.js", () => ({
   storagePut: vi.fn().mockResolvedValue({
     url: "https://example.com/audio.webm",
   }),
 }));
 
-vi.mock("./_core/voiceTranscription", () => ({
+vi.mock("./_core/voiceTranscription.js", () => ({
   transcribeAudio: vi.fn().mockResolvedValue({
     text: "Este é um texto de teste",
   }),
 }));
 
-vi.mock("./_core/llm", () => ({
+vi.mock("./_core/llm.js", () => ({
   invokeLLM: vi.fn().mockResolvedValue({
     choices: [
       {
@@ -27,7 +27,7 @@ vi.mock("./_core/llm", () => ({
   }),
 }));
 
-vi.mock("./paragraphSeparation", () => ({
+vi.mock("./paragraphSeparation.js", () => ({
   separateParagraphsByContext: vi.fn((text) => Promise.resolve(text)),
 }));
 

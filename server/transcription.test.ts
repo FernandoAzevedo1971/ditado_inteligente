@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { transcribeAudioFile } from "./transcription";
+import { transcribeAudioFile } from "./transcription.js";
+import { correctTextWithAI } from "./textCorrection.js";
 
 // Mock the dependencies
-vi.mock("./storage", () => ({
+vi.mock("./storage.js", () => ({
   storagePut: vi.fn().mockResolvedValue({
     url: "https://example.com/audio.webm",
   }),

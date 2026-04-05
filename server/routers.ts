@@ -1,9 +1,12 @@
-import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, router } from "./_core/trpc";
+import { systemRouter } from "./_core/systemRouter.js";
+import { publicProcedure, router } from "./_core/trpc.js";
 import { z } from "zod";
-import { transcribeAudioFile, type SupportedLanguage } from "./transcription";
-import { correctTextWithAI, type SupportedLanguage as CorrectionLanguage } from "./textCorrection";
-import { applyVoiceCorrections } from "./voiceCorrections";
+import { transcribeAudioFile, type SupportedLanguage } from "./transcription.js";
+import { correctTextWithAI, type SupportedLanguage as CorrectionLanguage } from "./textCorrection.js";
+import { applyVoiceCorrections } from "./voiceCorrections.js";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 
 const LANGUAGE_ENUM = z.enum(["pt", "en", "es", "auto"]);
 
@@ -23,9 +26,6 @@ export const appRouter = router({
           : input.audioData;
         
         const buffer = Buffer.from(base64Data, 'base64');
-        const os = require('os');
-        const path = require('path');
-        const fs = require('fs');
         const tempFilePath = path.join(os.tmpdir(), `audio-trpc-${Date.now()}.webm`);
         fs.writeFileSync(tempFilePath, buffer);
 

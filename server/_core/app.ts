@@ -1,15 +1,15 @@
 import "dotenv/config";
 import express from "express";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
-import { registerOAuthRoutes } from "./oauth";
-import { appRouter } from "../routers";
-import { createContext } from "./context";
+import { registerOAuthRoutes } from "./oauth.js";
+import { appRouter } from "../routers.js";
+import { createContext } from "./context.js";
 import multer from "multer";
 import os from "os";
 import path from "path";
 import fs from "fs";
-import { transcribeAudioFile } from "../transcription";
-import { transcribeWithMistral } from "../transcription-mistral";
+import { transcribeAudioFile } from "../transcription.js";
+import { transcribeWithMistral } from "../transcription-mistral.js";
 
 const app = express();
 

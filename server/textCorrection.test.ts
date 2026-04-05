@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { correctTextWithAI } from "./textCorrection";
+import { transcribeAudioFile } from "./transcription.js";
+import { correctTextWithAI } from "./textCorrection.js";
 
 // Mock the LLM
-vi.mock("./_core/llm", () => ({
+vi.mock("./_core/llm.js", () => ({
   invokeLLM: vi.fn().mockResolvedValue({
     choices: [
       {

@@ -1,5 +1,5 @@
 import { Groq } from "groq-sdk";
-import { separateParagraphsByContext } from "./paragraphSeparation";
+import { separateParagraphsByContext } from "./paragraphSeparation.js";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || "dummy" });
 
