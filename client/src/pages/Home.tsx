@@ -180,7 +180,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
+    <div className="h-[100dvh] flex flex-col bg-background overflow-x-hidden relative">
       {/* Ambient Background Elements */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px] animate-pulse" />
@@ -191,7 +191,7 @@ export default function Home() {
       </div>
 
       {/* Header - Glassmorphism & Minimal */}
-      <div className="flex items-center justify-between px-4 py-2 sm:px-6 sm:py-3 bg-transparent relative z-20">
+      <header className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 py-2 sm:px-6 sm:py-3 bg-transparent">
         <div className="flex flex-col gap-1.5 sm:gap-2">
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
@@ -246,11 +246,17 @@ export default function Home() {
             <LogOut className="w-5 h-5" />
           </button>
         </div>
-      </div>
+      </header>
 
       {/* Main Content Area */}
       <main
-        className={`relative z-10 flex flex-col items-center ${processingState ? "justify-start pt-0 h-[calc(100vh-70px)]" : showHistory ? "justify-start pt-2 h-[calc(100vh-70px)]" : "justify-center min-h-[calc(100vh-70px)]"} w-full`}
+        className={`relative z-10 flex-1 flex flex-col items-center ${
+          processingState 
+            ? "justify-start pt-0" 
+            : showHistory 
+              ? "justify-start pt-2" 
+              : "justify-center"
+        } w-full`}
       >
         {showHistory ? (
           <div className="w-full max-w-2xl mx-auto px-4 py-8 animate-in slide-in-from-bottom-4 duration-500">

@@ -126,33 +126,33 @@ export function RecordingInterface({
           )}
 
           {/* Main Recording Button */}
-          <div className="flex justify-center mb-4 relative items-center">
+          <div className="flex justify-center mb-6 relative items-center">
             {!isRecording && !audioBlob ? (
               <button
                 onClick={startRecording}
-                className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-indigo-500 to-blue-700 text-white shadow-2xl shadow-indigo-500/40 hover:scale-105 active:scale-95 transition-all flex items-center justify-center relative group overflow-hidden"
+                className="w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-gradient-to-br from-indigo-500 to-blue-700 text-white shadow-2xl shadow-indigo-500/40 hover:scale-105 active:scale-95 transition-all flex items-center justify-center relative group overflow-hidden"
               >
                 <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <Mic className="w-10 h-10 sm:w-14 sm:h-14" />
+                <Mic className="w-[70px] h-[70px] sm:w-[98px] sm:h-[98px]" />
                 <div className="absolute inset-0 rounded-full border-4 border-white/10 animate-pulse" />
               </button>
             ) : isRecording ? (
               <button
                 onClick={stopRecording}
-                className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-red-500/80 to-rose-700/80 text-white animate-pulse-glow flex items-center justify-center relative z-10 active:scale-95 border-4 border-white/20"
+                className="w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-gradient-to-br from-red-500/80 to-rose-700/80 text-white animate-pulse-glow flex items-center justify-center relative z-10 active:scale-95 border-4 border-white/20"
               >
-                <Square className="w-8 h-8 sm:w-10 sm:h-10 fill-current" />
+                <Square className="w-16 h-16 sm:w-20 sm:h-20 fill-current" />
               </button>
             ) : isSubmitting || isProcessing ? (
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full glass-dark flex items-center justify-center border-2 border-indigo-500/30">
-                <Loader2 className="w-8 h-8 sm:w-12 sm:h-12 text-indigo-400 animate-spin" />
+              <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full glass-dark flex items-center justify-center border-2 border-indigo-500/30">
+                <Loader2 className="w-16 h-16 sm:w-22 sm:h-22 text-indigo-400 animate-spin" />
               </div>
             ) : (
               <button
                 onClick={handleManualSubmit}
-                className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-2xl shadow-emerald-500/40 hover:scale-105 active:scale-95 transition-all flex items-center justify-center"
+                className="w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-2xl shadow-emerald-500/40 hover:scale-105 active:scale-95 transition-all flex items-center justify-center"
               >
-                <Mic className="w-10 h-10 sm:w-14 sm:h-14" />
+                <Mic className="w-[70px] h-[70px] sm:w-[98px] sm:h-[98px]" />
               </button>
             )}
           </div>
