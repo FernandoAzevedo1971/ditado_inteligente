@@ -9,7 +9,6 @@ import os from "os";
 import path from "path";
 import fs from "fs";
 import { transcribeAudioFile } from "../transcription.js";
-import { transcribeWithMistral } from "../transcription-mistral.js";
 
 const app = express();
 
@@ -32,18 +31,8 @@ app.post("/api/audio/transcribe", upload.single("file"), async (req: express.Req
     const filePath = originalFilePath + ".webm";
     fs.renameSync(originalFilePath, filePath);
 
-    const provider = req.body.provider || "groq"; // groq | mistral
     const language = req.body.language || "pt";
-
-    console.log(`[API] Transcrevendo com ${provider} (arquivo: ${multerReq.file.originalname})`);
-
-    let transcribedText = "";
-
-    if (provider === "mistral") {
-      transcribedText = await transcribeWithMistral(filePath, language);
-    } else {
-      transcribedText = await transcribeAudioFile(filePath, language);
-    }
+    const transcribedText = await transcribeAudioFile(filePath, language);
 
     // Cleanup
     if (fs.existsSync(filePath)) {

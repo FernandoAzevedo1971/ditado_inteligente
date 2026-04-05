@@ -10,13 +10,6 @@ import { useTranscriptionHistory } from "@/hooks/useTranscriptionHistory";
 import { History, LogOut, Loader2 } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { AudioLines, Sparkles } from "lucide-react";
 
 interface ProcessingState {
@@ -35,7 +28,6 @@ export default function Home() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingStep, setProcessingStep] = useState<ProcessingStep>("idle");
   const [showHistory, setShowHistory] = useState(false);
-  const [provider, setProvider] = useState<"groq" | "mistral">("groq");
 
   // Mutations
   const correctMutation = trpc.text.correct.useMutation();
@@ -64,7 +56,7 @@ export default function Home() {
       // 2. Envio via FormData para evitar overhead de Base64
       const formData = new FormData();
       formData.append("file", audioBlob, "audio.webm");
-      formData.append("provider", provider);
+      formData.append("provider", "groq");
       formData.append("language", "pt");
 
       const response = await fetch("/api/audio/transcribe", {
@@ -203,25 +195,9 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-1">
-            <Select value={provider} onValueChange={(v: any) => setProvider(v)}>
-              <SelectTrigger className="glass-dark border-white/5 h-8 px-3 rounded-lg transition-all hover:bg-white/10 text-[10px] font-bold tracking-widest text-indigo-200 w-auto min-w-[140px]">
-                <SelectValue placeholder="Sintonizador" />
-              </SelectTrigger>
-              <SelectContent className="glass-card border-white/10">
-                <SelectItem
-                  value="groq"
-                  className="flex items-center gap-2 focus:bg-indigo-500/20"
-                >
-                  <span className="text-[10px] font-bold">Groq Ultra-Fast</span>
-                </SelectItem>
-                <SelectItem
-                  value="mistral"
-                  className="flex items-center gap-2 focus:bg-indigo-500/20"
-                >
-                  <span className="text-[10px] font-bold">Mistral Pro</span>
-                </SelectItem>
-              </SelectContent>
-            </Select>
+            <span className="text-[10px] font-bold tracking-widest text-indigo-200/50 uppercase">
+              Groq Ultra-Fast Whisper
+            </span>
           </div>
         </div>
 
