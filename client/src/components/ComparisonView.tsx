@@ -5,7 +5,6 @@ import {
   X,
   Mic,
   MessageCircle,
-  RotateCcw,
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
@@ -131,6 +130,13 @@ export function ComparisonView({
 
           <div className="pt-1 flex flex-wrap items-center justify-center gap-1.5 sm:gap-3 shrink-0">
             <button
+              onClick={handleWhatsApp}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-black rounded-lg transition-all duration-300 bg-emerald-500 text-white hover:bg-emerald-400 hover:scale-105 active:scale-95 shadow-lg shadow-emerald-500/20"
+            >
+              <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
+            </button>
+
+            <button
               onClick={handleCopy}
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-black rounded-lg transition-all duration-300 bg-white text-black hover:bg-indigo-50 hover:scale-105 active:scale-95 shadow-xl"
             >
@@ -149,19 +155,12 @@ export function ComparisonView({
               onClick={() => setShowVoiceEdit(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-black rounded-lg transition-all duration-300 glass-card text-white hover:bg-white/10 hover:scale-105 active:scale-95 border border-white/20"
             >
-              <RotateCcw className="w-3.5 h-3.5 text-indigo-400" /> Refinar
-            </button>
-
-            <button
-              onClick={handleWhatsApp}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-black rounded-lg transition-all duration-300 bg-emerald-500 text-white hover:bg-emerald-400 hover:scale-105 active:scale-95 shadow-lg shadow-emerald-500/20"
-            >
-              <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
+              <Mic className="w-3.5 h-3.5 text-indigo-400" /> Editar com voz
             </button>
 
             <button
               onClick={onClose}
-              className="px-3 py-1.5 text-[10px] font-bold text-muted-foreground hover:text-foreground transition-colors tracking-widest"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-black rounded-lg transition-all duration-300 glass-dark text-muted-foreground hover:text-foreground hover:bg-white/10 hover:scale-105 active:scale-95 border border-white/10"
             >
               Nova gravação
             </button>

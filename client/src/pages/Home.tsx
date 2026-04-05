@@ -183,44 +183,47 @@ export default function Home() {
       </div>
 
       {/* Header - Glassmorphism & Minimal */}
-      <header className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 py-2 sm:px-6 sm:py-3 bg-transparent">
-        <div className="flex flex-col gap-1.5 sm:gap-2">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-              <AudioLines className="w-6 h-6 text-white" />
+      <header className="absolute top-0 left-0 right-0 z-20 px-4 pt-2 pb-1 sm:px-6 sm:pt-3 bg-transparent">
+        <div className="flex items-center justify-between">
+          {/* Logo + Title na mesma linha */}
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+              <AudioLines className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-[29px] font-black text-foreground tracking-tighter">
+            <h1 className="text-[22px] sm:text-[26px] font-black text-foreground tracking-tighter whitespace-nowrap">
               Ditado <span className="text-indigo-500">inteligente</span>
             </h1>
           </div>
 
-          <div className="flex items-center gap-1">
-            <span className="text-[10px] font-bold tracking-widest text-indigo-200/50 uppercase">
-              Groq Ultra-Fast Whisper
-            </span>
+          {/* Ícones alinhados à direita */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-3">
+            <button
+              onClick={() => setShowHistory(!showHistory)}
+              className={`p-2.5 rounded-xl transition-all border border-white/5 ${
+                showHistory
+                  ? "bg-indigo-500/20 text-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.2)]"
+                  : "glass-dark hover:bg-white/10 text-muted-foreground hover:text-indigo-400"
+              }`}
+              title="Histórico"
+            >
+              <History className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
+
+            <button
+              onClick={logout}
+              className="p-2.5 rounded-xl transition-all glass-dark hover:bg-red-500/10 text-muted-foreground hover:text-red-400 border border-white/5"
+              title="Sair"
+            >
+              <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-4">
-          <button
-            onClick={() => setShowHistory(!showHistory)}
-            className={`p-3 rounded-xl transition-all border border-white/5 ${
-              showHistory
-                ? "bg-indigo-500/20 text-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.2)]"
-                : "glass-dark hover:bg-white/10 text-muted-foreground hover:text-indigo-400"
-            }`}
-            title="Histórico"
-          >
-            <History className="w-5 h-5" />
-          </button>
-
-          <button
-            onClick={logout}
-            className="p-3 rounded-xl transition-all glass-dark hover:bg-red-500/10 text-muted-foreground hover:text-red-400 border border-white/5"
-            title="Sair"
-          >
-            <LogOut className="w-5 h-5" />
-          </button>
+        {/* Subtitle badge abaixo */}
+        <div className="mt-0.5 ml-11 sm:ml-12">
+          <span className="text-[10px] font-bold tracking-widest text-indigo-200/40 uppercase">
+            Groq Ultra-Fast Whisper
+          </span>
         </div>
       </header>
 
