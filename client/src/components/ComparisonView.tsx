@@ -75,10 +75,10 @@ export function ComparisonView({
 
   return (
     <>
-      <div className="w-full max-w-4xl mx-auto p-1 md:p-2 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-        <div className="space-y-2">
-          <div className="flex items-center justify-between pb-1">
-            <h2 className="text-lg sm:text-xl font-black text-foreground tracking-tighter text-glow-primary">
+      <div className="w-full h-full max-w-4xl mx-auto px-2 py-0 sm:p-2 animate-in fade-in slide-in-from-bottom-8 duration-1000 flex flex-col">
+        <div className="space-y-1.5 flex flex-col flex-1 overflow-hidden">
+          <div className="flex items-center justify-between pb-0 shrink-0">
+            <h2 className="text-base sm:text-lg font-black text-foreground tracking-tighter text-glow-primary">
               Texto aprimorado
             </h2>
             <button
@@ -89,15 +89,15 @@ export function ComparisonView({
             </button>
           </div>
 
-          <div className="glass-dark p-1.5 sm:p-2 rounded-lg border border-white/10 relative overflow-hidden">
+          <div className="glass-dark p-1 sm:p-1.5 rounded-lg border border-white/10 relative overflow-hidden shrink-0">
             <div
               onClick={() => setShowOriginalText(!showOriginalText)}
               className="flex items-center justify-between cursor-pointer"
             >
               <div className="flex items-center gap-2">
                 <Mic className="w-3.5 h-3.5 text-slate-400" />
-                <span className="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 text-[9px] font-black uppercase tracking-[0.2em] border border-white/5">
-                  Texto Original
+                <span className="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 text-[9px] font-black tracking-[0.2em] border border-white/5">
+                  Texto original
                 </span>
               </div>
               <button className="p-0.5 hover:bg-white/10 rounded transition-colors flex-shrink-0">
@@ -115,32 +115,32 @@ export function ComparisonView({
             )}
           </div>
 
-          <div className="glass-card p-2 sm:p-3 rounded-lg border-l-4 border-indigo-500 relative shadow-[0_0_50px_rgba(79,70,229,0.1)]">
-            <div className="absolute top-0 right-0 p-2 opacity-10">
+          <div className="glass-card justify-start p-2 sm:p-3 rounded-lg border-l-4 border-indigo-500 relative shadow-[0_0_50px_rgba(79,70,229,0.1)] flex flex-col flex-1 overflow-hidden min-h-0">
+            <div className="absolute top-0 right-0 p-2 opacity-10 shrink-0">
               <Check className="w-8 h-8 text-indigo-400" />
             </div>
-            <div className="flex items-center gap-2 mb-1.5">
-              <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[9px] font-black uppercase tracking-[0.2em] border border-indigo-500/30">
-                Transcrição Corrigida
+            <div className="flex items-center gap-2 mb-1.5 shrink-0">
+              <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[9px] font-black tracking-[0.2em] border border-indigo-500/30">
+                Transcrição corrigida
               </span>
             </div>
-            <div className="text-sm sm:text-base text-foreground leading-[1.3] font-bold tracking-tight max-h-28 overflow-y-auto">
+            <div className="text-sm sm:text-base text-foreground leading-[1.3] font-bold tracking-tight overflow-y-auto flex-1 pb-1">
               {getDiff(originalText, currentCorrected)}
             </div>
           </div>
 
-          <div className="pt-1 flex flex-wrap items-center justify-center gap-1.5 sm:gap-3">
+          <div className="pt-1 flex flex-wrap items-center justify-center gap-1.5 sm:gap-3 shrink-0">
             <button
               onClick={handleCopy}
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-black rounded-lg transition-all duration-300 bg-white text-black hover:bg-indigo-50 hover:scale-105 active:scale-95 shadow-xl"
             >
               {copied ? (
                 <>
-                  <Check className="w-3.5 h-3.5" /> COPIADO
+                  <Check className="w-3.5 h-3.5" /> Copiado
                 </>
               ) : (
                 <>
-                  <Copy className="w-3.5 h-3.5" /> COPIAR
+                  <Copy className="w-3.5 h-3.5" /> Copiar
                 </>
               )}
             </button>
@@ -149,21 +149,21 @@ export function ComparisonView({
               onClick={() => setShowVoiceEdit(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-black rounded-lg transition-all duration-300 glass-card text-white hover:bg-white/10 hover:scale-105 active:scale-95 border border-white/20"
             >
-              <RotateCcw className="w-3.5 h-3.5 text-indigo-400" /> REFINAR
+              <RotateCcw className="w-3.5 h-3.5 text-indigo-400" /> Refinar
             </button>
 
             <button
               onClick={handleWhatsApp}
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-black rounded-lg transition-all duration-300 bg-emerald-500 text-white hover:bg-emerald-400 hover:scale-105 active:scale-95 shadow-lg shadow-emerald-500/20"
             >
-              <MessageCircle className="w-3.5 h-3.5" /> WHATSAPP
+              <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
             </button>
 
             <button
               onClick={onClose}
-              className="px-3 py-1.5 text-[10px] font-bold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-widest"
+              className="px-3 py-1.5 text-[10px] font-bold text-muted-foreground hover:text-foreground transition-colors tracking-widest"
             >
-              NOVA GRAVAÇÃO
+              Nova gravação
             </button>
           </div>
         </div>

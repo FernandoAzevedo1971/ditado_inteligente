@@ -159,7 +159,7 @@ export function RecordingInterface({
 
           {/* Instructions and Status Text */}
           <div className="max-w-xs mx-auto">
-            <p className="text-sm sm:text-base font-bold text-indigo-200/70 mb-2 uppercase tracking-[0.2em]">
+            <p className="text-sm sm:text-base font-bold text-indigo-200/70 mb-2 tracking-[0.2em]">
               {isRecording
                 ? "Gravando"
                 : audioBlob && !isRecording && !isSubmitting

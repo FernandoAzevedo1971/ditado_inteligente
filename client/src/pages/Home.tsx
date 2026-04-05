@@ -191,20 +191,20 @@ export default function Home() {
       </div>
 
       {/* Header - Glassmorphism & Minimal */}
-      <div className="flex items-center justify-between px-6 py-4 bg-transparent relative z-20">
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between px-4 py-2 sm:px-6 sm:py-3 bg-transparent relative z-20">
+        <div className="flex flex-col gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-2 sm:gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
               <AudioLines className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-2xl font-black text-foreground tracking-tighter uppercase">
-              Ditado <span className="text-indigo-500">Inteligente</span>
+            <h1 className="text-2xl font-black text-foreground tracking-tighter">
+              Ditado <span className="text-indigo-500">inteligente</span>
             </h1>
           </div>
 
           <div className="flex items-center gap-1">
             <Select value={provider} onValueChange={(v: any) => setProvider(v)}>
-              <SelectTrigger className="glass-dark border-white/5 h-8 px-3 rounded-lg transition-all hover:bg-white/10 text-[10px] font-bold uppercase tracking-widest text-indigo-200 w-auto min-w-[140px]">
+              <SelectTrigger className="glass-dark border-white/5 h-8 px-3 rounded-lg transition-all hover:bg-white/10 text-[10px] font-bold tracking-widest text-indigo-200 w-auto min-w-[140px]">
                 <SelectValue placeholder="Sintonizador" />
               </SelectTrigger>
               <SelectContent className="glass-card border-white/10">
@@ -249,11 +249,11 @@ export default function Home() {
       </div>
 
       {/* Main Content Area */}
-      <main className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-100px)]">
+      <main className={`relative z-10 flex flex-col items-center ${processingState ? 'justify-start pt-0 h-[calc(100vh-70px)]' : showHistory ? 'justify-start pt-2 h-[calc(100vh-70px)]' : 'justify-center min-h-[calc(100vh-70px)]'} w-full`}>
         {showHistory ? (
           <div className="w-full max-w-2xl mx-auto px-4 py-8 animate-in slide-in-from-bottom-4 duration-500">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-3xl font-black text-foreground tracking-tighter uppercase">
+              <h2 className="text-3xl font-black text-foreground tracking-tighter">
                 Anteriores
               </h2>
               <Button
@@ -293,7 +293,7 @@ export default function Home() {
                 </div>
 
                 <div className="text-center space-y-3">
-                  <h2 className="text-3xl font-black tracking-tighter text-glow-primary uppercase">
+                  <h2 className="text-3xl font-black tracking-tighter text-glow-primary">
                     Transcrevendo
                   </h2>
                   <p className="text-indigo-200/50 font-medium tracking-wide">
