@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { Volume2 } from "lucide-react";
 
 interface AudioWaveformProps {
   isRecording: boolean;
@@ -10,7 +9,7 @@ export function AudioWaveform({ isRecording, audioStream }: AudioWaveformProps) 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animationRef = useRef<number | null>(null);
-  const barsRef = useRef<number[]>(Array(40).fill(0));
+  const barsRef = useRef<number[]>([]);
   const scrollOffsetRef = useRef<number>(0);
 
   useEffect(() => {
@@ -22,10 +21,17 @@ export function AudioWaveform({ isRecording, audioStream }: AudioWaveformProps) 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    // Calculate how many bars fill the canvas at full width
+    const barWidth = 4;
+    const barSpacing = 3;
+    const totalBarWidth = barWidth + barSpacing;
+    const numBars = Math.ceil(canvas.width / totalBarWidth) + 2;
+    barsRef.current = Array(numBars).fill(0);
+
     // Setup Web Audio API
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
     const analyser = audioContext.createAnalyser();
-    analyser.fftSize = 256;
+    analyser.fftSize = 512;
     analyserRef.current = analyser;
 
     const source = audioContext.createMediaStreamSource(audioStream);
@@ -37,71 +43,64 @@ export function AudioWaveform({ isRecording, audioStream }: AudioWaveformProps) 
     const draw = () => {
       analyser.getByteFrequencyData(dataArray);
 
-      // Get average frequency for current frame
-      const average = dataArray.reduce((a, b) => a + b) / dataArray.length / 255;
+      // Get average of lower frequencies (voices and speech)
+      const slice = dataArray.slice(0, bufferLength / 2);
+      const average = slice.reduce((a, b) => a + b, 0) / slice.length / 255;
 
-      // Shift bars and add new value
+      // Shift left and add new bar value
       barsRef.current.shift();
       barsRef.current.push(average);
 
-      // Increment scroll offset extremamente lentamente
-      scrollOffsetRef.current += 0.02;
+      // Scroll speed: 0.01 (100% slower than original 0.02)
+      scrollOffsetRef.current += 0.01;
 
-      // Clear canvas
-      ctx.fillStyle = "white";
+      // === BLACK BACKGROUND ===
+      ctx.fillStyle = "#000000";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Draw gradient background
-      const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
-      gradient.addColorStop(0, "rgba(59, 130, 246, 0.05)");
-      gradient.addColorStop(0.5, "rgba(59, 130, 246, 0.1)");
-      gradient.addColorStop(1, "rgba(59, 130, 246, 0.05)");
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Draw vertical bars
-      const barWidth = 4; // Slimmer bars
-      const barSpacing = 3;
-      const totalBarWidth = barWidth + barSpacing;
       const centerY = canvas.height / 2;
-      const maxBarHeight = (centerY - 4) * 0.4; // Reduzindo para 40% da altura original para ser sutil
+      // High amplitude: 90% of available half-height
+      const maxBarHeight = (centerY - 4) * 0.9;
 
-      // Create glowing gradient for bars
+      // Indigo/violet gradient for the bars
       const barGradient = ctx.createLinearGradient(0, centerY - maxBarHeight, 0, centerY + maxBarHeight);
-      barGradient.addColorStop(0, "rgba(99, 102, 241, 0.2)");
-      barGradient.addColorStop(0.5, "rgba(99, 102, 241, 1)");
-      barGradient.addColorStop(1, "rgba(99, 102, 241, 0.2)");
+      barGradient.addColorStop(0, "rgba(129, 140, 248, 0.3)");
+      barGradient.addColorStop(0.4, "rgba(99, 102, 241, 0.9)");
+      barGradient.addColorStop(0.5, "rgba(139, 92, 246, 1)");
+      barGradient.addColorStop(0.6, "rgba(99, 102, 241, 0.9)");
+      barGradient.addColorStop(1, "rgba(129, 140, 248, 0.3)");
 
       ctx.fillStyle = barGradient;
 
       barsRef.current.forEach((value, i) => {
-        const x = (i * totalBarWidth) - (scrollOffsetRef.current % (totalBarWidth * barsRef.current.length));
+        // Bars scan across full canvas width
+        const x = (i * totalBarWidth) - (scrollOffsetRef.current % totalBarWidth);
 
         if (x + barWidth > 0 && x < canvas.width) {
-          const barHeight = Math.max(2, value * maxBarHeight); // Garantindo altura mínima sutil
+          const barHeight = Math.max(3, value * maxBarHeight);
 
-          // Draw top bar
+          // Top bar (upward from center)
           ctx.beginPath();
           ctx.roundRect(x, centerY - barHeight, barWidth, barHeight, 2);
           ctx.fill();
 
-          // Draw bottom bar (mirror)
+          // Bottom bar (mirror downward)
           ctx.beginPath();
           ctx.roundRect(x, centerY, barWidth, barHeight, 2);
           ctx.fill();
         }
       });
 
-      // Draw subtle glow line
-      ctx.strokeStyle = "rgba(99, 102, 241, 0.4)";
+      // Center glow line
+      ctx.strokeStyle = "rgba(139, 92, 246, 0.5)";
       ctx.lineWidth = 1;
-      ctx.shadowBlur = 10;
-      ctx.shadowColor = "rgba(99, 102, 241, 0.5)";
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = "rgba(139, 92, 246, 0.6)";
       ctx.beginPath();
       ctx.moveTo(0, centerY);
       ctx.lineTo(canvas.width, centerY);
       ctx.stroke();
-      ctx.shadowBlur = 0; // Reset shadow
+      ctx.shadowBlur = 0;
 
       animationRef.current = requestAnimationFrame(draw);
     };
@@ -119,12 +118,14 @@ export function AudioWaveform({ isRecording, audioStream }: AudioWaveformProps) 
   }, [isRecording, audioStream]);
 
   return (
-    <div className="flex items-center justify-center gap-3 py-6 w-full animate-in fade-in duration-700">
-      <div className="flex-1 max-w-md h-20 glass-card overflow-hidden relative group">
-        <div className="absolute inset-0 premium-gradient opacity-50 transition-opacity group-hover:opacity-70" />
+    <div className="flex items-center justify-center py-2 w-full animate-in fade-in duration-700">
+      <div
+        className="flex-1 h-20 overflow-hidden relative rounded-xl border border-indigo-500/20"
+        style={{ background: "#000000" }}
+      >
         <canvas
           ref={canvasRef}
-          width={400}
+          width={600}
           height={80}
           className="w-full h-full relative z-10"
           style={{ display: "block" }}
