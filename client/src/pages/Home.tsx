@@ -148,7 +148,7 @@ export default function Home() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-background">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2 text-foreground">
+          <h1 className="text-[43px] font-bold mb-2 text-foreground">
             Ditado Inteligente
           </h1>
           <p className="text-muted-foreground">
@@ -197,7 +197,7 @@ export default function Home() {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
               <AudioLines className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-2xl font-black text-foreground tracking-tighter">
+            <h1 className="text-[29px] font-black text-foreground tracking-tighter">
               Ditado <span className="text-indigo-500">inteligente</span>
             </h1>
           </div>
@@ -249,11 +249,13 @@ export default function Home() {
       </div>
 
       {/* Main Content Area */}
-      <main className={`relative z-10 flex flex-col items-center ${processingState ? 'justify-start pt-0 h-[calc(100vh-70px)]' : showHistory ? 'justify-start pt-2 h-[calc(100vh-70px)]' : 'justify-center min-h-[calc(100vh-70px)]'} w-full`}>
+      <main
+        className={`relative z-10 flex flex-col items-center ${processingState ? "justify-start pt-0 h-[calc(100vh-70px)]" : showHistory ? "justify-start pt-2 h-[calc(100vh-70px)]" : "justify-center min-h-[calc(100vh-70px)]"} w-full`}
+      >
         {showHistory ? (
           <div className="w-full max-w-2xl mx-auto px-4 py-8 animate-in slide-in-from-bottom-4 duration-500">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-3xl font-black text-foreground tracking-tighter">
+              <h2 className="text-4xl font-black text-foreground tracking-tighter">
                 Anteriores
               </h2>
               <Button
@@ -293,10 +295,10 @@ export default function Home() {
                 </div>
 
                 <div className="text-center space-y-3">
-                  <h2 className="text-3xl font-black tracking-tighter text-glow-primary">
+                  <h2 className="text-2xl font-black tracking-tighter text-glow-primary">
                     Transcrevendo
                   </h2>
-                  <p className="text-indigo-200/50 font-medium tracking-wide">
+                  <p className="text-sm text-indigo-200/50 font-medium tracking-wide">
                     acrescentando pontuação, parágrafos e corrigindo contexto
                   </p>
                 </div>

@@ -90,14 +90,14 @@ export function RecordingInterface({
         <div className="flex flex-col items-center relative z-10 text-center">
           {/* Recording Status */}
           <div className="mb-6">
-            <h1 className="text-xl sm:text-2xl font-black mb-2 text-foreground tracking-tighter text-glow-primary">
+            <h1 className="text-2xl sm:text-3xl font-black mb-2 text-foreground tracking-tighter text-glow-primary">
               {isRecording
                 ? "Transcrevendo..."
                 : audioBlob
                   ? "Sintonizando..."
                   : "Ditado Inteligente"}
             </h1>
-            <p className="text-sm sm:text-base text-indigo-200/50 font-medium tracking-wide">
+            <p className="text-[15px] sm:text-lg text-indigo-200/50 font-medium tracking-wide">
               {isRecording
                 ? "Capturando sua voz..."
                 : isProcessing
