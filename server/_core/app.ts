@@ -28,7 +28,10 @@ app.post("/api/audio/transcribe", upload.single("file"), async (req: express.Req
       return res.status(400).json({ error: "Nenhum arquivo de áudio enviado." });
     }
 
-    const filePath = multerReq.file.path;
+    const originalFilePath = multerReq.file.path;
+    const filePath = originalFilePath + ".webm";
+    fs.renameSync(originalFilePath, filePath);
+
     const provider = req.body.provider || "groq"; // groq | mistral
     const language = req.body.language || "pt";
 
