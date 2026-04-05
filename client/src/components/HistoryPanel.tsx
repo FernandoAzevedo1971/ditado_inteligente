@@ -57,7 +57,7 @@ export function HistoryPanel() {
             size="sm"
             className="text-red-500 border-red-200 hover:bg-red-500/10 dark:border-red-900 text-xs sm:text-sm h-8 sm:h-9"
           >
-            Limpar Tudo
+            Limpar tudo
           </Button>
         )}
       </div>
@@ -89,14 +89,14 @@ export function HistoryPanel() {
           {expandedId === record.id && (
             <div className="mt-4 pt-4 border-t border-border space-y-3">
               <div>
-                <h4 className="text-xs font-semibold text-muted-foreground mb-2">Texto Original:</h4>
+                <h4 className="text-xs font-semibold text-muted-foreground mb-2">Texto original:</h4>
                 <p className="text-sm text-foreground bg-muted p-3 rounded max-h-24 overflow-y-auto">
                   {record.originalText}
                 </p>
               </div>
 
               <div>
-                <h4 className="text-xs font-semibold text-muted-foreground mb-2">Texto Corrigido:</h4>
+                <h4 className="text-xs font-semibold text-muted-foreground mb-2">Texto corrigido:</h4>
                 <p className="text-sm text-foreground bg-green-500/10 p-3 rounded max-h-24 overflow-y-auto">
                   {record.correctedText}
                 </p>
