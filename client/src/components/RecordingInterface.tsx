@@ -166,7 +166,7 @@ export function RecordingInterface({
                   ? "✓ Pronto"
                   : isSubmitting
                     ? "⏳ Transcrevendo"
-                    : "Pressione para Ditar"}
+                    : "Pressione para ditar"}
             </p>
             {!isRecording && !audioBlob && (
               <p className="text-xs text-muted-foreground leading-relaxed italic">
