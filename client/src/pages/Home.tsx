@@ -30,7 +30,8 @@ export default function Home() {
   const { user, loading, isAuthenticated, logout } = useAuth();
   const { addRecord } = useTranscriptionHistory();
   // Remover tema escuro - manter apenas fundo claro
-  const [processingState, setProcessingState] = useState<ProcessingState | null>(null);
+  const [processingState, setProcessingState] =
+    useState<ProcessingState | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingStep, setProcessingStep] = useState<ProcessingStep>("idle");
   const [showHistory, setShowHistory] = useState(false);
@@ -85,7 +86,7 @@ export default function Home() {
       }
 
       const originalText = responseData.text;
-      
+
       // Move to correction step
       setProcessingStep("correcting");
 
@@ -104,7 +105,7 @@ export default function Home() {
         transcription: originalText,
         corrected: correctedText,
       });
-      
+
       setProcessingStep("idle");
       setIsProcessing(false);
       toast.success("Transcrição e correção concluídas!");
@@ -112,11 +113,16 @@ export default function Home() {
       setProcessingStep("idle");
       setIsProcessing(false);
       console.error("Error processing audio:", error);
-      
+
       const errorMsg = error.message || "Erro desconhecido";
       if (errorMsg.includes("413") || errorMsg.includes("large")) {
-        toast.error("Áudio muito grande para o servidor. Tente gravar menos de 3 minutos.");
-      } else if (errorMsg.includes("timeout") || errorMsg.includes("deadline")) {
+        toast.error(
+          "Áudio muito grande para o servidor. Tente gravar menos de 3 minutos."
+        );
+      } else if (
+        errorMsg.includes("timeout") ||
+        errorMsg.includes("deadline")
+      ) {
         toast.error("Tempo limite excedido. Tente uma frase mais curta.");
       } else {
         toast.error(`Erro: ${errorMsg}`);
@@ -140,9 +146,11 @@ export default function Home() {
 
   if (!isAuthenticated) {
     return (
-       <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-background">
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-background">
         <div className="text-center mb-8">
-           <h1 className="text-4xl font-bold mb-2 text-foreground">Ditado Inteligente</h1>
+          <h1 className="text-4xl font-bold mb-2 text-foreground">
+            Ditado Inteligente
+          </h1>
           <p className="text-muted-foreground">
             Transcreva e corrija seus textos com IA
           </p>
@@ -150,7 +158,9 @@ export default function Home() {
         <Button
           onClick={async () => {
             if (!auth) {
-              toast.error("Firebase não configurado. Verifique as variáveis de ambiente.");
+              toast.error(
+                "Firebase não configurado. Verifique as variáveis de ambiente."
+              );
               return;
             }
             try {
@@ -174,11 +184,14 @@ export default function Home() {
       {/* Ambient Background Elements */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }} />
+        <div
+          className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px] animate-pulse"
+          style={{ animationDelay: "2s" }}
+        />
       </div>
 
       {/* Header - Glassmorphism & Minimal */}
-      <div className="flex items-center justify-between px-6 py-8 bg-transparent relative z-20">
+      <div className="flex items-center justify-between px-6 py-4 bg-transparent relative z-20">
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
@@ -195,10 +208,16 @@ export default function Home() {
                 <SelectValue placeholder="Sintonizador" />
               </SelectTrigger>
               <SelectContent className="glass-card border-white/10">
-                <SelectItem value="groq" className="flex items-center gap-2 focus:bg-indigo-500/20">
+                <SelectItem
+                  value="groq"
+                  className="flex items-center gap-2 focus:bg-indigo-500/20"
+                >
                   <span className="text-[10px] font-bold">Groq Ultra-Fast</span>
                 </SelectItem>
-                <SelectItem value="mistral" className="flex items-center gap-2 focus:bg-indigo-500/20">
+                <SelectItem
+                  value="mistral"
+                  className="flex items-center gap-2 focus:bg-indigo-500/20"
+                >
                   <span className="text-[10px] font-bold">Mistral Pro</span>
                 </SelectItem>
               </SelectContent>
@@ -210,8 +229,8 @@ export default function Home() {
           <button
             onClick={() => setShowHistory(!showHistory)}
             className={`p-3 rounded-xl transition-all border border-white/5 ${
-              showHistory 
-                ? "bg-indigo-500/20 text-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.2)]" 
+              showHistory
+                ? "bg-indigo-500/20 text-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.2)]"
                 : "glass-dark hover:bg-white/10 text-muted-foreground hover:text-indigo-400"
             }`}
             title="Histórico"
@@ -230,13 +249,15 @@ export default function Home() {
       </div>
 
       {/* Main Content Area */}
-      <main className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-140px)]">
+      <main className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-100px)]">
         {showHistory ? (
           <div className="w-full max-w-2xl mx-auto px-4 py-8 animate-in slide-in-from-bottom-4 duration-500">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-3xl font-black text-foreground tracking-tighter uppercase">Anteriores</h2>
-              <Button 
-                variant="ghost" 
+              <h2 className="text-3xl font-black text-foreground tracking-tighter uppercase">
+                Anteriores
+              </h2>
+              <Button
+                variant="ghost"
                 onClick={() => setShowHistory(false)}
                 className="text-muted-foreground hover:text-foreground"
               >
@@ -264,13 +285,13 @@ export default function Home() {
         {/* Processing Overlay - Premium Blur */}
         {isProcessing && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 animate-in fade-in duration-500">
-             <div className="glass-card p-12 max-w-md w-full mx-4 border-white/10 shadow-[0_0_100px_rgba(99,102,241,0.2)]">
+            <div className="glass-card p-12 max-w-md w-full mx-4 border-white/10 shadow-[0_0_100px_rgba(99,102,241,0.2)]">
               <div className="flex flex-col items-center gap-8">
                 <div className="relative">
                   <Loader2 className="w-16 h-16 animate-spin text-indigo-500" />
                   <div className="absolute inset-0 blur-xl bg-indigo-500/20 animate-pulse" />
                 </div>
-                
+
                 <div className="text-center space-y-3">
                   <h2 className="text-3xl font-black tracking-tighter text-glow-primary uppercase">
                     Transcrevendo

@@ -15,8 +15,17 @@ export function RecordingInterface({
   onTranscriptionStart,
   isProcessing = false,
 }: RecordingInterfaceProps) {
-  const { isRecording, audioBlob, startRecording, stopRecording, resetRecording, recordingTime, amplitude, error, mediaStream } =
-    useAudioRecorder();
+  const {
+    isRecording,
+    audioBlob,
+    startRecording,
+    stopRecording,
+    resetRecording,
+    recordingTime,
+    amplitude,
+    error,
+    mediaStream,
+  } = useAudioRecorder();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Auto-submit when audio blob is ready
@@ -63,8 +72,8 @@ export function RecordingInterface({
   };
 
   return (
-    <div className="w-full flex flex-col items-center justify-center px-4 py-8 animate-in fade-in zoom-in duration-1000">
-      <div className="w-full max-w-lg glass-card p-8 sm:p-12 relative overflow-hidden">
+    <div className="w-full flex flex-col items-center justify-center px-4 py-2 animate-in fade-in zoom-in duration-1000">
+      <div className="w-full max-w-lg glass-card p-4 sm:p-6 relative overflow-hidden">
         {/* Background Decorative Glows */}
         <div className="absolute -top-24 -left-24 w-48 h-48 bg-indigo-600/10 rounded-full blur-3xl" />
         <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-blue-600/10 rounded-full blur-3xl" />
@@ -80,59 +89,70 @@ export function RecordingInterface({
         {/* Main Interface Content */}
         <div className="flex flex-col items-center relative z-10 text-center">
           {/* Recording Status */}
-          <div className="mb-10">
-            <h1 className="text-3xl sm:text-5xl font-black mb-3 text-foreground tracking-tighter text-glow-primary">
-              {isRecording ? "Transcrevendo..." : audioBlob ? "Sintonizando..." : "Ditado Inteligente"}
+          <div className="mb-6">
+            <h1 className="text-xl sm:text-2xl font-black mb-2 text-foreground tracking-tighter text-glow-primary">
+              {isRecording
+                ? "Transcrevendo..."
+                : audioBlob
+                  ? "Sintonizando..."
+                  : "Ditado Inteligente"}
             </h1>
-            <p className="text-base sm:text-xl text-indigo-200/50 font-medium tracking-wide">
-              {isRecording ? "Capturando sua voz..." : isProcessing ? "Refinando texto..." : "Toque para iniciar a magia"}
+            <p className="text-sm sm:text-base text-indigo-200/50 font-medium tracking-wide">
+              {isRecording
+                ? "Capturando sua voz..."
+                : isProcessing
+                  ? "Refinando texto..."
+                  : "Toque para iniciar a magia"}
             </p>
           </div>
 
           {/* Audio Waveform Visualization - Full height background style */}
           {isRecording && mediaStream && (
-            <div className="w-full mb-10 h-24 flex items-center justify-center">
-              <AudioWaveform isRecording={isRecording} audioStream={mediaStream} />
+            <div className="w-full mb-6 h-16 flex items-center justify-center">
+              <AudioWaveform
+                isRecording={isRecording}
+                audioStream={mediaStream}
+              />
             </div>
           )}
 
           {/* Recording Time */}
           {isRecording && (
-            <div className="mb-10">
-              <div className="text-6xl sm:text-7xl font-mono font-black text-indigo-400/80 tracking-tighter transition-all">
+            <div className="mb-6">
+              <div className="text-3xl sm:text-4xl font-mono font-black text-indigo-400/80 tracking-tighter transition-all">
                 {formatTime(recordingTime)}
               </div>
             </div>
           )}
 
           {/* Main Recording Button */}
-          <div className="flex justify-center mb-12 relative items-center">
+          <div className="flex justify-center mb-4 relative items-center">
             {!isRecording && !audioBlob ? (
               <button
                 onClick={startRecording}
-                className="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-gradient-to-br from-indigo-500 to-blue-700 text-white shadow-2xl shadow-indigo-500/40 hover:scale-105 active:scale-95 transition-all flex items-center justify-center relative group overflow-hidden"
+                className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-indigo-500 to-blue-700 text-white shadow-2xl shadow-indigo-500/40 hover:scale-105 active:scale-95 transition-all flex items-center justify-center relative group overflow-hidden"
               >
                 <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <Mic className="w-16 h-16 sm:w-24 sm:h-24" />
+                <Mic className="w-10 h-10 sm:w-14 sm:h-14" />
                 <div className="absolute inset-0 rounded-full border-4 border-white/10 animate-pulse" />
               </button>
             ) : isRecording ? (
               <button
                 onClick={stopRecording}
-                className="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-gradient-to-br from-red-500/80 to-rose-700/80 text-white animate-pulse-glow flex items-center justify-center relative z-10 active:scale-95 border-4 border-white/20"
+                className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-red-500/80 to-rose-700/80 text-white animate-pulse-glow flex items-center justify-center relative z-10 active:scale-95 border-4 border-white/20"
               >
-                <Square className="w-14 h-14 sm:w-20 sm:h-20 fill-current" />
+                <Square className="w-8 h-8 sm:w-10 sm:h-10 fill-current" />
               </button>
             ) : isSubmitting || isProcessing ? (
-              <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full glass-dark flex items-center justify-center border-2 border-indigo-500/30">
-                <Loader2 className="w-16 h-16 sm:w-24 sm:h-24 text-indigo-400 animate-spin" />
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full glass-dark flex items-center justify-center border-2 border-indigo-500/30">
+                <Loader2 className="w-8 h-8 sm:w-12 sm:h-12 text-indigo-400 animate-spin" />
               </div>
             ) : (
               <button
                 onClick={handleManualSubmit}
-                className="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-2xl shadow-emerald-500/40 hover:scale-105 active:scale-95 transition-all flex items-center justify-center"
+                className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-2xl shadow-emerald-500/40 hover:scale-105 active:scale-95 transition-all flex items-center justify-center"
               >
-                <Mic className="w-16 h-16 sm:w-24 sm:h-24" />
+                <Mic className="w-10 h-10 sm:w-14 sm:h-14" />
               </button>
             )}
           </div>
