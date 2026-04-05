@@ -43,74 +43,74 @@
 }
 
 :root {
-  --primary: #3B82F6;
-  --primary-foreground: #F0F9FF;
-  --sidebar-primary: #2563EB;
-  --sidebar-primary-foreground: #F0F9FF;
+  --primary: #3b82f6;
+  --primary-foreground: #f0f9ff;
+  --sidebar-primary: #2563eb;
+  --sidebar-primary-foreground: #f0f9ff;
   --background: #09090b;
-  --foreground: #F1F5F9;
+  --foreground: #f1f5f9;
   --card: #18181b;
-  --card-foreground: #F1F5F9;
+  --card-foreground: #f1f5f9;
   --popover: #18181b;
-  --popover-foreground: #F1F5F9;
-  --secondary: #A78BFA;
-  --secondary-foreground: #0F172A;
+  --popover-foreground: #f1f5f9;
+  --secondary: #a78bfa;
+  --secondary-foreground: #0f172a;
   --muted: #27272a;
-  --muted-foreground: #94A3B8;
-  --accent: #10B981;
-  --accent-foreground: #0F172A;
-  --destructive: #F87171;
-  --destructive-foreground: #0F172A;
+  --muted-foreground: #94a3b8;
+  --accent: #10b981;
+  --accent-foreground: #0f172a;
+  --destructive: #f87171;
+  --destructive-foreground: #0f172a;
   --border: #27272a;
   --input: #18181b;
-  --ring: #3B82F6;
-  --chart-1: #60A5FA;
-  --chart-2: #3B82F6;
-  --chart-3: #2563EB;
-  --chart-4: #1E40AF;
-  --chart-5: #1E3A8A;
+  --ring: #3b82f6;
+  --chart-1: #60a5fa;
+  --chart-2: #3b82f6;
+  --chart-3: #2563eb;
+  --chart-4: #1e40af;
+  --chart-5: #1e3a8a;
   --sidebar: #18181b;
-  --sidebar-foreground: #F1F5F9;
-  --sidebar-accent: #1E40AF;
-  --sidebar-accent-foreground: #E0E7FF;
+  --sidebar-foreground: #f1f5f9;
+  --sidebar-accent: #1e40af;
+  --sidebar-accent-foreground: #e0e7ff;
   --sidebar-border: #27272a;
-  --sidebar-ring: #3B82F6;
+  --sidebar-ring: #3b82f6;
   --radius: 0.75rem;
 }
 
 .light {
-  --primary: #2563EB;
-  --primary-foreground: #F0F9FF;
-  --sidebar-primary: #1E40AF;
-  --sidebar-primary-foreground: #F0F9FF;
-  --chart-1: #3B82F6;
-  --chart-2: #2563EB;
-  --chart-3: #1E40AF;
-  --chart-4: #1E3A8A;
+  --primary: #2563eb;
+  --primary-foreground: #f0f9ff;
+  --sidebar-primary: #1e40af;
+  --sidebar-primary-foreground: #f0f9ff;
+  --chart-1: #3b82f6;
+  --chart-2: #2563eb;
+  --chart-3: #1e40af;
+  --chart-4: #1e3a8a;
   --chart-5: #172554;
-  --background: #FFFFFF;
-  --foreground: #0F172A;
-  --card: #F8FAFC;
-  --card-foreground: #0F172A;
-  --popover: #FFFFFF;
-  --popover-foreground: #0F172A;
-  --secondary: #7C3AED;
-  --secondary-foreground: #FFFFFF;
-  --muted: #E2E8F0;
-  --muted-foreground: #64748B;
-  --accent: #10B981;
-  --accent-foreground: #FFFFFF;
-  --destructive: #EF4444;
-  --destructive-foreground: #FFFFFF;
-  --border: #E2E8F0;
-  --input: #F1F5F9;
-  --ring: #3B82F6;
-  --sidebar: #FFFFFF;
-  --sidebar-foreground: #0F172A;
-  --sidebar-accent: #E0E7FF;
-  --sidebar-accent-foreground: #1E40AF;
-  --sidebar-border: #E2E8F0;
-  --sidebar-ring: #3B82F6;
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --card: #f8fafc;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --secondary: #7c3aed;
+  --secondary-foreground: #ffffff;
+  --muted: #e2e8f0;
+  --muted-foreground: #64748b;
+  --accent: #10b981;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e2e8f0;
+  --input: #f1f5f9;
+  --ring: #3b82f6;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0f172a;
+  --sidebar-accent: #e0e7ff;
+  --sidebar-accent-foreground: #1e40af;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #3b82f6;
 }
 
 @layer base {
@@ -119,6 +119,19 @@
   }
   body {
     @apply bg-background text-foreground min-h-screen;
+  }
+
+  /* Increase all font sizes by 15% on mobile while preventing overflow */
+  @media (max-width: 639px) {
+    html {
+      font-size: 115%;
+    }
+
+    /* Prevent scrolling by constraining main content area */
+    body {
+      overflow: hidden;
+      height: 100dvh;
+    }
   }
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
@@ -188,7 +201,8 @@
 
 /* Refined Animations */
 @keyframes pulse-glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
     transform: scale(1);
   }
@@ -199,8 +213,13 @@
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .animate-pulse-glow {
@@ -213,7 +232,11 @@
 
 /* Custom sound bar adjustment */
 .waveform-container {
-  mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 15%,
+    black 85%,
+    transparent
+  );
 }
-
-
