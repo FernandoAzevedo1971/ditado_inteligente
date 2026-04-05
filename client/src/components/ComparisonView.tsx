@@ -75,7 +75,7 @@ export function ComparisonView({
 
   return (
     <>
-      <div className="w-full h-full max-w-4xl mx-auto px-2 py-0 sm:p-2 animate-in fade-in slide-in-from-bottom-8 duration-1000 flex flex-col">
+      <div className="w-full h-full max-w-4xl mx-auto px-2 pt-4 sm:pt-2 animate-in fade-in slide-in-from-bottom-8 duration-1000 flex flex-col">
         <div className="space-y-1.5 flex flex-col flex-1 overflow-hidden">
           <div className="flex items-center justify-between pb-0 shrink-0">
             <h2 className="text-base sm:text-lg font-black text-foreground tracking-tighter text-glow-primary">

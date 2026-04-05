@@ -252,7 +252,7 @@ export default function Home() {
       <main
         className={`relative z-10 flex-1 flex flex-col items-center ${
           processingState 
-            ? "justify-start pt-0" 
+            ? "justify-start pt-24 sm:pt-32" 
             : showHistory 
               ? "justify-start pt-2" 
               : "justify-center"
