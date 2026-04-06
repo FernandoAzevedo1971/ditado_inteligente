@@ -6,19 +6,21 @@ export type SupportedLanguage = "pt" | "en" | "es";
 
 const CORRECTION_PROMPTS: Record<SupportedLanguage, { system: string; user: string }> = {
   pt: {
-    system: `VOCÊ É UM CORRETOR GRAMATICAL ESTRITO.
-SUA ÚNICA TAREFA É CORRIGIR ORTOGRAFIA, PONTUAÇÃO, GRAMÁTICA E ESTRUTURA DO TEXTO EM PORTUGUÊS.
+    system: `VOCÊ É UM CORRETOR GRAMATICAL ESTRITO ESPECIALIZADO EM CONTEXTOS CLÍNICOS E PROFISSIONAIS.
+SUA TAREFA É TRANSFORMAR A TRANSCRIÇÃO DE VOZ EM UM TEXTO ESTRUTURADO E PROFISSIONAL.
 
-REGRAS ABSOLUTAS:
+REGRAS CRÍTICAS DE ESTRUTURAÇÃO:
+1. PARAGRAFAÇÃO POR CONTEXTO: Insira quebras de parágrafo (\n\n) sempre que houver uma transição de tópico. Em contextos médicos, identifique mudanças como: Anamnese -> Exame Físico -> Hipótese Diagnóstica -> Conduta.
+2. CONCLUSÃO DE RACIOCÍNIO: Identifique pontos onde um pensamento parece ser concluído e inicie um novo parágrafo.
+3. FLUXO CLÍNICO: O texto deve fluir como um relatório médico ou nota de evolução.
+
+REGRAS ABSOLUTAS DE SAÍDA:
 - RETORNE APENAS O TEXTO CORRIGIDO EM PORTUGUÊS.
-- NUNCA TRADUZA PARA O INGLÊS OU QUALQUER OUTRA LÍNGUA.
-- NUNCA DÊ SUGESTÕES DE TRADUÇÃO.
-- IDENTIFIQUE MUDANÇAS DE CONTEXTO, TÓPICO OU PAUSAS E ADICIONE QUEBRAS DE PARÁGRAFO (\n\n) QUANDO NECESSÁRIO PARA MELHORAR A LEITURA.
-- NUNCA ADICIONE COMENTÁRIOS, INTRODUÇÕES OU CONCLUSÕES.
-- NÃO USE FRASES COMO "AQUI ESTÁ O TEXTO", "TEXTO CORRIGIDO:" OU QUALQUER EXPLICAÇÃO.
-- MANTENHA A ESSÊNCIA E AS PALAVRAS DO ORIGINAL, MAS AJUSTE A ESTRUTURA SE NECESSÁRIO PARA CLAREZA.
-- SE O TEXTO JÁ ESTIVER CORRETO, RETORNE O MESMO TEXTO SEM ALTERAR NADA.`,
-    user: `Corrija a pontuação, ortografia, gramática e separe em parágrafos por contexto o texto abaixo. Mantenha o texto estritamente em português:\n\n`,
+- NUNCA TRADUZA PARA OUTRA LÍNGUA NEM DÊ SUGESTÕES.
+- NUNCA ADICIONE COMENTÁRIOS, INTRODUÇÕES ("Aqui está o texto...") OU CONCLUSÕES.
+- MANTENHA A ESSÊNCIA DAS PALAVRAS ORIGINAIS, MAS AJUSTE A PONTUAÇÃO E GRAMÁTICA PARA MÁXIMA CLAREZA.
+- SE O TEXTO JÁ ESTIVER PERFEITO, RETORNE-O IDENTICAMENTE.`,
+    user: `Corrija e estruture o texto abaixo em parágrafos profissionais baseados em transições de contexto clínico. Mantenha estritamente em português:\n\n`,
   },
   en: {
     system: `YOU ARE A STRICT GRAMMAR CORRECTOR.

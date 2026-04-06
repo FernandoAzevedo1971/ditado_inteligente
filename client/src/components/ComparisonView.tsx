@@ -7,6 +7,7 @@ import {
   MessageCircle,
   ChevronDown,
   ChevronUp,
+  Sparkles,
 } from "lucide-react";
 import VoiceEditPanel from "./VoiceEditPanel";
 
@@ -53,23 +54,9 @@ export function ComparisonView({
   };
 
   const getDiff = (original: string, corrected: string) => {
-    const originalWords = original.split(/\s+/);
-    const correctedWords = corrected.split(/\s+/);
-
-    return correctedWords.map((word, i) => {
-      const isNew = !originalWords.includes(word);
-      if (isNew) {
-        return (
-          <span
-            key={i}
-            className="px-1.5 py-0.5 mx-0.5 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 inline-block font-bold"
-          >
-            {word}
-          </span>
-        );
-      }
-      return <span key={i}>{word} </span>;
-    });
+    // A pedido do usuário, removemos o destaque visual de palavras novas (ruído visual)
+    // No futuro, manteremos apenas inconsistências semânticas detectadas
+    return <span className="whitespace-pre-wrap">{corrected}</span>;
   };
 
   return (
@@ -78,7 +65,7 @@ export function ComparisonView({
         <div className="space-y-1.5 flex flex-col flex-1 overflow-hidden">
           <div className="flex items-center justify-between pb-0 shrink-0">
             <h2 className="text-base sm:text-lg font-black text-foreground tracking-tighter text-glow-primary">
-              Texto aprimorado
+              Texto corrigido
             </h2>
             <button
               onClick={onClose}
@@ -123,39 +110,52 @@ export function ComparisonView({
                 Transcrição corrigida
               </span>
             </div>
-            <div className="text-sm sm:text-base text-foreground leading-[1.3] font-bold tracking-tight overflow-y-auto flex-1 pb-1">
+            <div className="text-lg sm:text-xl text-foreground leading-relaxed font-bold tracking-tight overflow-y-auto flex-1 pb-1">
               {getDiff(originalText, currentCorrected)}
             </div>
           </div>
 
-          <div className="pt-1 flex flex-wrap items-center justify-center gap-1.5 sm:gap-3 shrink-0">
-            <button
-              onClick={handleWhatsApp}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-black rounded-lg transition-all duration-300 bg-emerald-500 text-white hover:bg-emerald-400 hover:scale-105 active:scale-95 shadow-lg shadow-emerald-500/20"
-            >
-              <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
-            </button>
-
+          <div className="pt-2 pb-1 flex flex-wrap items-center justify-center gap-2 sm:gap-3 shrink-0">
+            {/* Comando de Copiar em destaque (Primeiro e maior) */}
             <button
               onClick={handleCopy}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-black rounded-lg transition-all duration-300 bg-white text-black hover:bg-indigo-50 hover:scale-105 active:scale-95 shadow-xl"
+              className="flex items-center gap-2 px-6 py-2.5 text-sm font-black rounded-xl transition-all duration-300 bg-white text-black hover:bg-indigo-50 hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.2)]"
             >
               {copied ? (
                 <>
-                  <Check className="w-3.5 h-3.5" /> Copiado
+                  <Check className="w-5 h-5 text-emerald-600" /> Copiado
                 </>
               ) : (
                 <>
-                  <Copy className="w-3.5 h-3.5" /> Copiar
+                  <Copy className="w-5 h-5" /> Copiar texto
                 </>
               )}
             </button>
 
+            {/* Editar por voz e Perguntar subsequentes */}
             <button
               onClick={() => setShowVoiceEdit(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-black rounded-lg transition-all duration-300 glass-card text-white hover:bg-white/10 hover:scale-105 active:scale-95 border border-white/20"
             >
               <Mic className="w-3.5 h-3.5 text-indigo-400" /> Editar com voz
+            </button>
+
+            <button
+              onClick={() => {
+                // Implementação futura do chat Anti-Gravity
+                import("sonner").then(({ toast }) => toast.info("Perguntar ao Anti-Gravity (Em breve)"));
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-black rounded-lg transition-all duration-300 bg-gradient-to-r from-indigo-600/40 to-blue-600/40 text-indigo-100 hover:from-indigo-600/60 hover:to-blue-600/60 hover:scale-105 active:scale-95 border border-indigo-500/30"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-yellow-400" /> Anti-Gravity
+            </button>
+
+            {/* Outras ações secundárias */}
+            <button
+              onClick={handleWhatsApp}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-black rounded-lg transition-all duration-300 bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/30 hover:scale-105 active:scale-95 border border-emerald-500/20"
+            >
+              <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
             </button>
 
             <button
