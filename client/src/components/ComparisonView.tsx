@@ -7,6 +7,7 @@ import {
   MessageCircle,
   ChevronDown,
   ChevronUp,
+  Square,
 } from "lucide-react";
 import VoiceEditPanel from "./VoiceEditPanel";
 
@@ -99,9 +100,6 @@ export function ComparisonView({
           </div>
 
           <div className="glass-card justify-start p-2 sm:p-3 rounded-lg border-l-4 border-indigo-500 relative shadow-[0_0_50px_rgba(79,70,229,0.1)] flex flex-col flex-1 overflow-hidden min-h-0">
-            <div className="absolute top-0 right-0 p-2 opacity-10 shrink-0">
-              <Check className="w-8 h-8 text-indigo-400" />
-            </div>
             <div className="flex items-center gap-2 mb-1.5 shrink-0">
               <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[9px] font-black tracking-[0.2em] border border-indigo-500/30">
                 Transcrição corrigida
@@ -112,41 +110,48 @@ export function ComparisonView({
             </div>
           </div>
 
-          <div className="pt-2 pb-1 grid grid-cols-2 gap-2 sm:gap-3 shrink-0">
+          <div className="pt-2 pb-1 flex flex-col gap-2.5 shrink-0">
+            {/* Primary Action - WhatsApp */}
             <button
               onClick={handleWhatsApp}
-              className="col-span-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-black rounded-xl transition-all duration-300 bg-emerald-500 text-white hover:bg-emerald-400 hover:scale-[1.02] active:scale-95 shadow-[0_0_30px_rgba(16,185,129,0.35)] border border-emerald-300/30"
+              className="w-full flex items-center justify-center gap-3 px-6 py-4 text-base font-black rounded-2xl transition-all duration-300 bg-emerald-500 text-white hover:bg-emerald-400 hover:scale-[1.02] active:scale-95 shadow-[0_10px_30px_rgba(16,185,129,0.3)] border border-white/20"
             >
-              <MessageCircle className="w-5 h-5" /> WhatsApp
+              <MessageCircle className="w-6 h-6 fill-white/20" /> 
+              <span>Enviar para WhatsApp</span>
             </button>
 
-            <button
-              onClick={handleCopy}
-              className="col-span-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-black rounded-xl transition-all duration-300 bg-white text-black hover:bg-indigo-50 hover:scale-[1.02] active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.2)]"
-            >
-              {copied ? (
-                <>
-                  <Check className="w-5 h-5 text-emerald-600" /> Copiado
-                </>
-              ) : (
-                <>
-                  <Copy className="w-5 h-5" /> Copiar Texto
-                </>
-              )}
-            </button>
+            {/* Secondary Actions - Grid */}
+            <div className="grid grid-cols-2 gap-2.5">
+              <button
+                onClick={handleCopy}
+                className="flex items-center justify-center gap-2 px-4 py-3.5 text-sm font-black rounded-xl transition-all duration-300 bg-white text-black hover:bg-slate-100 hover:scale-[1.02] active:scale-95 shadow-lg"
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-5 h-5 text-emerald-600" /> Copiado
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-5 h-5" /> Copiar Texto
+                  </>
+                )}
+              </button>
 
-            <button
-              onClick={() => setShowVoiceEdit(true)}
-              className="col-span-1 flex items-center justify-center gap-1.5 px-3 py-3 text-xs sm:text-sm font-black rounded-xl transition-all duration-300 glass-card text-white hover:bg-white/10 hover:scale-[1.02] active:scale-95 border border-white/20"
-            >
-              <Mic className="w-3.5 h-3.5 text-indigo-400" /> Editar com Voz
-            </button>
+              <button
+                onClick={() => setShowVoiceEdit(true)}
+                className="flex items-center justify-center gap-2 px-4 py-3.5 text-sm font-black rounded-xl transition-all duration-300 glass-card text-white hover:bg-white/10 hover:scale-[1.02] active:scale-95 border border-white/10"
+              >
+                <Mic className="w-4 h-4 text-indigo-400" /> Editar com Voz
+              </button>
+            </div>
 
+            {/* Tertiary Action - New Recording */}
             <button
               onClick={onClose}
-              className="col-span-1 flex items-center justify-center gap-1.5 px-3 py-3 text-xs sm:text-sm font-black rounded-xl transition-all duration-300 glass-dark text-muted-foreground hover:text-foreground hover:bg-white/10 hover:scale-[1.02] active:scale-95 border border-white/10"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 text-xs font-bold rounded-xl transition-all duration-300 glass-dark text-muted-foreground hover:text-foreground hover:bg-white/5 active:scale-98 border border-white/5"
             >
-              Nova Gravação
+              <Square className="w-3.5 h-3.5 text-indigo-400/50" /> 
+              <span>Nova Gravação</span>
             </button>
           </div>
         </div>
