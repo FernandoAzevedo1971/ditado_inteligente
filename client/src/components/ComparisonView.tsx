@@ -7,7 +7,6 @@ import {
   MessageCircle,
   ChevronDown,
   ChevronUp,
-  Sparkles,
 } from "lucide-react";
 import VoiceEditPanel from "./VoiceEditPanel";
 
@@ -43,20 +42,18 @@ export function ComparisonView({
     try {
       await navigator.clipboard.writeText(currentCorrected);
       const encoded = encodeURIComponent(currentCorrected);
-      // Abre o WhatsApp com o texto pré-preenchido
       window.open(`https://wa.me/?text=${encoded}`, "_blank");
     } catch (err) {
       console.error("Failed to share via WhatsApp", err);
     }
   };
+
   const handleVoiceTextUpdated = (finalText: string) => {
     setCurrentCorrected(finalText);
   };
 
   const getDiff = (original: string, corrected: string) => {
-    // A pedido do usuário, removemos o destaque visual de palavras novas (ruído visual)
-    // No futuro, manteremos apenas inconsistências semânticas detectadas
-    return <span className="whitespace-pre-wrap">{corrected}</span>;
+    return <span className="whitespace-pre-wrap font-normal">{corrected}</span>;
   };
 
   return (
@@ -110,16 +107,22 @@ export function ComparisonView({
                 Transcrição corrigida
               </span>
             </div>
-            <div className="text-lg sm:text-xl text-foreground leading-relaxed font-bold tracking-tight overflow-y-auto flex-1 pb-1">
+            <div className="text-lg sm:text-xl text-foreground leading-relaxed font-normal tracking-tight overflow-y-auto flex-1 pb-1">
               {getDiff(originalText, currentCorrected)}
             </div>
           </div>
 
-          <div className="pt-2 pb-1 flex flex-wrap items-center justify-center gap-2 sm:gap-3 shrink-0">
-            {/* Comando de Copiar em destaque (Primeiro e maior) */}
+          <div className="pt-2 pb-1 grid grid-cols-2 gap-2 sm:gap-3 shrink-0">
+            <button
+              onClick={handleWhatsApp}
+              className="col-span-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-black rounded-xl transition-all duration-300 bg-emerald-500 text-white hover:bg-emerald-400 hover:scale-[1.02] active:scale-95 shadow-[0_0_30px_rgba(16,185,129,0.35)] border border-emerald-300/30"
+            >
+              <MessageCircle className="w-5 h-5" /> WhatsApp
+            </button>
+
             <button
               onClick={handleCopy}
-              className="flex items-center gap-2 px-6 py-2.5 text-sm font-black rounded-xl transition-all duration-300 bg-white text-black hover:bg-indigo-50 hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.2)]"
+              className="col-span-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-black rounded-xl transition-all duration-300 bg-white text-black hover:bg-indigo-50 hover:scale-[1.02] active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.2)]"
             >
               {copied ? (
                 <>
@@ -127,42 +130,23 @@ export function ComparisonView({
                 </>
               ) : (
                 <>
-                  <Copy className="w-5 h-5" /> Copiar texto
+                  <Copy className="w-5 h-5" /> Copiar Texto
                 </>
               )}
             </button>
 
-            {/* Editar por voz e Perguntar subsequentes */}
             <button
               onClick={() => setShowVoiceEdit(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-black rounded-lg transition-all duration-300 glass-card text-white hover:bg-white/10 hover:scale-105 active:scale-95 border border-white/20"
+              className="col-span-1 flex items-center justify-center gap-1.5 px-3 py-3 text-xs sm:text-sm font-black rounded-xl transition-all duration-300 glass-card text-white hover:bg-white/10 hover:scale-[1.02] active:scale-95 border border-white/20"
             >
-              <Mic className="w-3.5 h-3.5 text-indigo-400" /> Editar com voz
-            </button>
-
-            <button
-              onClick={() => {
-                // Implementação futura do chat Anti-Gravity
-                import("sonner").then(({ toast }) => toast.info("Perguntar ao Anti-Gravity (Em breve)"));
-              }}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-black rounded-lg transition-all duration-300 bg-gradient-to-r from-indigo-600/40 to-blue-600/40 text-indigo-100 hover:from-indigo-600/60 hover:to-blue-600/60 hover:scale-105 active:scale-95 border border-indigo-500/30"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-yellow-400" /> Anti-Gravity
-            </button>
-
-            {/* Outras ações secundárias */}
-            <button
-              onClick={handleWhatsApp}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-black rounded-lg transition-all duration-300 bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/30 hover:scale-105 active:scale-95 border border-emerald-500/20"
-            >
-              <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
+              <Mic className="w-3.5 h-3.5 text-indigo-400" /> Editar com Voz
             </button>
 
             <button
               onClick={onClose}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-black rounded-lg transition-all duration-300 glass-dark text-muted-foreground hover:text-foreground hover:bg-white/10 hover:scale-105 active:scale-95 border border-white/10"
+              className="col-span-1 flex items-center justify-center gap-1.5 px-3 py-3 text-xs sm:text-sm font-black rounded-xl transition-all duration-300 glass-dark text-muted-foreground hover:text-foreground hover:bg-white/10 hover:scale-[1.02] active:scale-95 border border-white/10"
             >
-              Nova gravação
+              Nova Gravação
             </button>
           </div>
         </div>

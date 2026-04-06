@@ -1,8 +1,5 @@
 import { useState, useEffect } from "react";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { useSystemTheme } from "@/hooks/useSystemTheme";
 import { AudioWaveform } from "@/components/AudioWaveform";
 import { Loader2, Mic, Square, AlertCircle } from "lucide-react";
 
@@ -102,7 +99,7 @@ export function RecordingInterface({
                 ? "Capturando sua voz..."
                 : isProcessing
                   ? "Refinando texto..."
-                  : "Toque para iniciar a magia"}
+                  : "Sua voz será convertida em texto após o término da gravação."}
             </p>
           </div>
 
@@ -139,7 +136,7 @@ export function RecordingInterface({
             ) : isRecording ? (
               <button
                 onClick={stopRecording}
-                className="w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-gradient-to-br from-red-500/80 to-rose-700/80 text-white animate-pulse-glow flex items-center justify-center relative z-10 active:scale-95 border-4 border-white/20"
+                className="w-[90px] h-[90px] sm:w-[115px] sm:h-[115px] rounded-full bg-gradient-to-br from-red-500/80 to-rose-700/80 text-white animate-pulse-glow flex items-center justify-center relative z-10 active:scale-95 border-4 border-white/20"
               >
                 <Square className="w-16 h-16 sm:w-20 sm:h-20 fill-current" />
               </button>
@@ -168,11 +165,6 @@ export function RecordingInterface({
                     ? "⏳ Transcrevendo"
                     : "Pressione para ditar"}
             </p>
-            {!isRecording && !audioBlob && (
-              <p className="text-xs text-muted-foreground leading-relaxed italic">
-                Sua voz será convertida em texto profissional instantaneamente.
-              </p>
-            )}
           </div>
         </div>
       </div>
