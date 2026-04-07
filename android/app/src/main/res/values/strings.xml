@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">Ditado Inteligente</string>
-    <string name="title_activity_main">Ditado Inteligente</string>
-    <string name="package_name">com.ditadointeligente.app</string>
-    <string name="custom_url_scheme">com.ditadointeligente.app</string>
-</resources>
