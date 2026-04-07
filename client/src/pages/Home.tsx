@@ -10,7 +10,7 @@ import { useTranscriptionHistory } from "@/hooks/useTranscriptionHistory";
 import { History, LogOut, Loader2 } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { AudioLines, Sparkles } from "lucide-react";
+import { AudioLines } from "lucide-react";
 
 interface ProcessingState {
   transcription: string;

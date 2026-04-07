@@ -1,5 +1,5 @@
 import { useTranscriptionHistory } from "@/hooks/useTranscriptionHistory";
-import { Button } from "@/components/ui/button";
+
 import { Trash2, ChevronDown, ChevronUp, Copy, Check, Calendar, Type } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";

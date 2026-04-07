@@ -7,7 +7,7 @@ import {
   MessageCircle,
   ChevronDown,
   ChevronUp,
-  Square,
+  RotateCcw,
 } from "lucide-react";
 import VoiceEditPanel from "./VoiceEditPanel";
 
@@ -53,7 +53,7 @@ export function ComparisonView({
     setCurrentCorrected(finalText);
   };
 
-  const getDiff = (original: string, corrected: string) => {
+  const getDiff = (corrected: string) => {
     return <span className="whitespace-pre-wrap font-normal">{corrected}</span>;
   };
 
@@ -106,7 +106,7 @@ export function ComparisonView({
               </span>
             </div>
             <div className="text-lg sm:text-xl text-foreground leading-relaxed font-normal tracking-tight overflow-y-auto flex-1 pb-1">
-              {getDiff(originalText, currentCorrected)}
+              {getDiff(currentCorrected)}
             </div>
           </div>
 
@@ -150,7 +150,7 @@ export function ComparisonView({
               onClick={onClose}
               className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-[10px] font-bold rounded-xl transition-all duration-300 glass-dark text-muted-foreground hover:text-foreground hover:bg-white/5 active:scale-98 border border-white/5"
             >
-              <Square className="w-3 h-3 text-indigo-400/50" /> 
+              <RotateCcw className="w-3 h-3 text-indigo-400/50" /> 
               <span>Nova Gravação</span>
             </button>
           </div>
@@ -158,16 +158,12 @@ export function ComparisonView({
       </div>
 
       {showVoiceEdit && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="w-full max-w-2xl animate-in zoom-in-95 duration-300">
-            <VoiceEditPanel
-              correctedText={currentCorrected}
-              language={language}
-              onTextUpdated={handleVoiceTextUpdated}
-              onClose={() => setShowVoiceEdit(false)}
-            />
-          </div>
-        </div>
+        <VoiceEditPanel
+          correctedText={currentCorrected}
+          language={language}
+          onTextUpdated={handleVoiceTextUpdated}
+          onClose={() => setShowVoiceEdit(false)}
+        />
       )}
     </>
   );
