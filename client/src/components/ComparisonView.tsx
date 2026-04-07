@@ -114,43 +114,43 @@ export function ComparisonView({
             {/* Primary Action - WhatsApp */}
             <button
               onClick={handleWhatsApp}
-              className="w-full flex items-center justify-center gap-3 px-6 py-4 text-base font-black rounded-2xl transition-all duration-300 bg-emerald-500 text-white hover:bg-emerald-400 hover:scale-[1.02] active:scale-95 shadow-[0_10px_30px_rgba(16,185,129,0.3)] border border-white/20"
+              className="w-full flex items-center justify-center gap-2.5 px-6 py-3 text-sm font-black rounded-2xl transition-all duration-300 bg-emerald-500 text-white hover:bg-emerald-400 hover:scale-[1.02] active:scale-95 shadow-[0_10px_30px_rgba(16,185,129,0.3)] border border-white/20"
             >
-              <MessageCircle className="w-6 h-6 fill-white/20" /> 
-              <span>Enviar para WhatsApp</span>
+              <MessageCircle className="w-5 h-5 fill-white/20" /> 
+              <span>WhatsApp</span>
             </button>
 
             {/* Secondary Actions - Grid */}
             <div className="grid grid-cols-2 gap-2.5">
               <button
                 onClick={handleCopy}
-                className="flex items-center justify-center gap-2 px-4 py-3.5 text-sm font-black rounded-xl transition-all duration-300 bg-white text-black hover:bg-slate-100 hover:scale-[1.02] active:scale-95 shadow-lg"
+                className="flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-black rounded-xl transition-all duration-300 bg-white text-black hover:bg-slate-100 hover:scale-[1.02] active:scale-95 shadow-lg"
               >
                 {copied ? (
                   <>
-                    <Check className="w-5 h-5 text-emerald-600" /> Copiado
+                    <Check className="w-4 h-4 text-emerald-600" /> Copiado
                   </>
                 ) : (
                   <>
-                    <Copy className="w-5 h-5" /> Copiar Texto
+                    <Copy className="w-4 h-4" /> Copiar
                   </>
                 )}
               </button>
 
               <button
                 onClick={() => setShowVoiceEdit(true)}
-                className="flex items-center justify-center gap-2 px-4 py-3.5 text-sm font-black rounded-xl transition-all duration-300 glass-card text-white hover:bg-white/10 hover:scale-[1.02] active:scale-95 border border-white/10"
+                className="flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-black rounded-xl transition-all duration-300 glass-card text-white hover:bg-white/10 hover:scale-[1.02] active:scale-95 border border-white/10"
               >
-                <Mic className="w-4 h-4 text-indigo-400" /> Editar com Voz
+                <Mic className="w-4 h-4 text-indigo-400" /> Editar voz
               </button>
             </div>
 
             {/* Tertiary Action - New Recording */}
             <button
               onClick={onClose}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 text-xs font-bold rounded-xl transition-all duration-300 glass-dark text-muted-foreground hover:text-foreground hover:bg-white/5 active:scale-98 border border-white/5"
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-[10px] font-bold rounded-xl transition-all duration-300 glass-dark text-muted-foreground hover:text-foreground hover:bg-white/5 active:scale-98 border border-white/5"
             >
-              <Square className="w-3.5 h-3.5 text-indigo-400/50" /> 
+              <Square className="w-3 h-3 text-indigo-400/50" /> 
               <span>Nova Gravação</span>
             </button>
           </div>
