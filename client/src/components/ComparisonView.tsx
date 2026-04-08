@@ -62,7 +62,7 @@ export function ComparisonView({
       <div className="w-full h-full max-w-4xl mx-auto px-2 pt-4 sm:pt-2 animate-in fade-in slide-in-from-bottom-8 duration-1000 flex flex-col">
         <div className="space-y-1.5 flex flex-col flex-1 overflow-hidden">
           <div className="flex items-center justify-between pb-0 shrink-0">
-            <h2 className="text-base sm:text-lg font-black text-foreground tracking-tighter text-glow-primary">
+            <h2 className="text-base sm:text-lg font-semibold text-foreground tracking-tighter text-glow-primary">
               Texto corrigido
             </h2>
             <button
@@ -80,7 +80,7 @@ export function ComparisonView({
             >
               <div className="flex items-center gap-2">
                 <Mic className="w-3.5 h-3.5 text-slate-400" />
-                <span className="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 text-[9px] font-black tracking-[0.2em] border border-white/5">
+                <span className="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 text-[9px] font-semibold tracking-[0.2em] border border-white/5">
                   Texto original
                 </span>
               </div>
@@ -99,58 +99,57 @@ export function ComparisonView({
             )}
           </div>
 
-          <div className="glass-card justify-start p-2 sm:p-3 rounded-lg border-l-4 border-indigo-500 relative shadow-[0_0_50px_rgba(79,70,229,0.1)] flex flex-col flex-1 overflow-hidden min-h-0">
-            <div className="flex items-center gap-2 mb-1.5 shrink-0">
-              <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[9px] font-black tracking-[0.2em] border border-indigo-500/30">
+          <div className="glass-card flex-1 p-6 sm:p-8 relative shadow-[0_0_50px_rgba(99,102,241,0.05)] flex flex-col overflow-hidden min-h-0">
+            <div className="flex items-center gap-2 mb-4 shrink-0">
+              <span className="px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-300 text-[10px] font-medium tracking-[0.2em] uppercase border border-indigo-500/20">
                 Transcrição corrigida
               </span>
             </div>
-            <div className="text-lg sm:text-xl text-foreground leading-relaxed font-normal tracking-tight overflow-y-auto flex-1 pb-1">
+            <div className="text-xl sm:text-2xl text-foreground leading-relaxed font-medium tracking-tight overflow-y-auto flex-1 pb-2">
               {getDiff(currentCorrected)}
             </div>
           </div>
 
-          <div className="pt-2 pb-1 flex flex-col gap-2.5 shrink-0">
-            {/* Primary Action - WhatsApp */}
+          <div className="pt-4 pb-1 grid grid-cols-2 gap-3 shrink-0">
+            {/* Row 1, Col 1: WhatsApp (Green) */}
             <button
               onClick={handleWhatsApp}
-              className="w-full flex items-center justify-center gap-2.5 px-6 py-3 text-sm font-black rounded-2xl transition-all duration-300 bg-emerald-500 text-white hover:bg-emerald-400 hover:scale-[1.02] active:scale-95 shadow-[0_10px_30px_rgba(16,185,129,0.3)] border border-white/20"
+              className="flex items-center justify-center gap-2 px-4 py-3 text-[11px] font-medium rounded-xl transition-all duration-300 bg-emerald-500 text-white hover:bg-emerald-400 active:scale-95 shadow-lg shadow-emerald-500/20"
             >
-              <MessageCircle className="w-5 h-5 fill-white/20" /> 
+              <MessageCircle className="w-4 h-4" /> 
               <span>WhatsApp</span>
             </button>
 
-            {/* Secondary Actions - Grid */}
-            <div className="grid grid-cols-2 gap-2.5">
-              <button
-                onClick={handleCopy}
-                className="flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-black rounded-xl transition-all duration-300 bg-white text-black hover:bg-slate-100 hover:scale-[1.02] active:scale-95 shadow-lg"
-              >
-                {copied ? (
-                  <>
-                    <Check className="w-4 h-4 text-emerald-600" /> Copiado
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4" /> Copiar
-                  </>
-                )}
-              </button>
+            {/* Row 1, Col 2: Copiar (Light Blue) */}
+            <button
+              onClick={handleCopy}
+              className="flex items-center justify-center gap-2 px-4 py-3 text-[11px] font-medium rounded-xl transition-all duration-300 bg-sky-600 text-white hover:bg-sky-500 active:scale-95 shadow-lg shadow-sky-600/20"
+            >
+              {copied ? (
+                <>
+                  <Check className="w-4 h-4" /> Copiado
+                </>
+              ) : (
+                <>
+                  <Copy className="w-4 h-4" /> Copiar
+                </>
+              )}
+            </button>
 
-              <button
-                onClick={() => setShowVoiceEdit(true)}
-                className="flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-black rounded-xl transition-all duration-300 glass-card text-white hover:bg-white/10 hover:scale-[1.02] active:scale-95 border border-white/10"
-              >
-                <Mic className="w-4 h-4 text-indigo-400" /> Editar voz
-              </button>
-            </div>
+            {/* Row 2, Col 1: Editar por voz (Light Purple/Lilac) */}
+            <button
+              onClick={() => setShowVoiceEdit(true)}
+              className="flex items-center justify-center gap-2 px-4 py-3 text-[11px] font-medium rounded-xl transition-all duration-300 bg-violet-400 text-violet-950 hover:bg-violet-300 active:scale-95 shadow-lg shadow-violet-400/20"
+            >
+              <Mic className="w-4 h-4" /> Editar por voz
+            </button>
 
-            {/* Tertiary Action - New Recording */}
+            {/* Row 2, Col 2: Nova gravação (White) */}
             <button
               onClick={onClose}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-[10px] font-bold rounded-xl transition-all duration-300 glass-dark text-muted-foreground hover:text-foreground hover:bg-white/5 active:scale-98 border border-white/5"
+              className="flex items-center justify-center gap-2 px-4 py-3 text-[11px] font-medium rounded-xl transition-all duration-300 bg-white text-slate-900 hover:bg-slate-50 active:scale-95 shadow-lg shadow-white/20"
             >
-              <RotateCcw className="w-3 h-3 text-indigo-400/50" /> 
+              <RotateCcw className="w-4 h-4" /> 
               <span>Nova Gravação</span>
             </button>
           </div>

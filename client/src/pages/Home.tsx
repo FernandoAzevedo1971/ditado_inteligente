@@ -138,13 +138,19 @@ export default function Home() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-background">
-        <div className="text-center mb-8">
-          <h1 className="text-[43px] font-bold mb-2 text-foreground">
-            Ditado Inteligente
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-background relative overflow-hidden">
+        {/* Ambient Background */}
+        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-indigo-500/5 rounded-full blur-[120px]" />
+        
+        <div className="text-center mb-12 relative z-10">
+          <div className="w-20 h-20 mx-auto mb-8 rounded-3xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-2xl shadow-indigo-500/20">
+            <AudioLines className="w-10 h-10 text-white" />
+          </div>
+          <h1 className="text-5xl font-semibold mb-4 text-foreground tracking-tighter font-display">
+            Ditado <span className="text-indigo-500">Inteligente</span>
           </h1>
-          <p className="text-muted-foreground">
-            Transcreva e corrija seus textos com IA
+          <p className="text-lg text-indigo-200/40 font-medium tracking-wide">
+            Converte seu ditado em texto
           </p>
         </div>
         <Button
@@ -163,7 +169,7 @@ export default function Home() {
               toast.error("Erro no login: " + err.message);
             }
           }}
-          className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-lg"
+          className="glass-button text-foreground px-10 py-6 rounded-2xl font-semibold tracking-widest uppercase hover:scale-105 transition-all shadow-xl"
         >
           Entrar com Google
         </Button>
@@ -173,25 +179,21 @@ export default function Home() {
 
   return (
     <div className="h-[100dvh] flex flex-col bg-background overflow-x-hidden relative">
-      {/* Ambient Background Elements */}
+      {/* Ambient Background Elements - Ultra Clean */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px] animate-pulse" />
-        <div
-          className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px] animate-pulse"
-          style={{ animationDelay: "2s" }}
-        />
+        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-indigo-500/5 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-blue-500/5 rounded-full blur-[120px]" />
       </div>
 
       {/* Header - Glassmorphism & Minimal */}
-      <header className="absolute top-0 left-0 right-0 z-20 px-4 pt-2 pb-1 sm:px-6 sm:pt-3 bg-transparent">
+      <header className="absolute top-0 left-0 right-0 z-20 px-6 pt-4 pb-2 bg-transparent">
         <div className="flex items-center justify-between">
-          {/* Logo + Title na mesma linha */}
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <div className="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-              <AudioLines className="w-5 h-5 text-white" />
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+              <AudioLines className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-[22px] sm:text-[26px] font-black text-foreground tracking-tighter whitespace-nowrap">
-              Ditado <span className="text-indigo-500">inteligente</span>
+            <h1 className="text-2xl font-semibold text-foreground tracking-tighter whitespace-nowrap font-display">
+              Ditado <span className="text-indigo-500">Inteligente</span>
             </h1>
           </div>
 
@@ -199,10 +201,10 @@ export default function Home() {
           <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-3">
             <button
               onClick={() => setShowHistory(!showHistory)}
-              className={`p-2.5 rounded-xl transition-all border border-white/5 ${
+              className={`p-2.5 rounded-xl transition-all border border-white/5 glass-button ${
                 showHistory
                   ? "bg-indigo-500/20 text-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.2)]"
-                  : "glass-dark hover:bg-white/10 text-muted-foreground hover:text-indigo-400"
+                  : "text-muted-foreground hover:text-indigo-400"
               }`}
               title="Histórico"
             >
@@ -221,7 +223,7 @@ export default function Home() {
 
         {/* Subtitle badge abaixo */}
         <div className="mt-0.5 ml-11 sm:ml-12">
-          <span className="text-[10px] font-bold tracking-widest text-indigo-200/40 uppercase">
+          <span className="text-[10px] font-medium tracking-widest text-indigo-200/40 italic">
             Groq Ultra-Fast Whisper
           </span>
         </div>
@@ -240,7 +242,7 @@ export default function Home() {
         {showHistory ? (
           <div className="w-full max-w-2xl mx-auto px-4 py-8 animate-in slide-in-from-bottom-4 duration-500">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-4xl font-black text-foreground tracking-tighter">
+              <h2 className="text-4xl font-semibold text-foreground tracking-tighter">
                 Anteriores
               </h2>
               <Button
@@ -280,11 +282,11 @@ export default function Home() {
                 </div>
 
                 <div className="text-center space-y-3">
-                  <h2 className="text-2xl font-black tracking-tighter text-glow-primary">
-                    Transcrevendo
+                  <h2 className="text-2xl font-semibold tracking-tighter text-glow-primary">
+                    Corrigindo com IA
                   </h2>
                   <p className="text-sm text-indigo-200/50 font-medium tracking-wide">
-                    acrescentando pontuação, parágrafos e corrigindo contexto
+                    Aplicando pontuação, gramática e parágrafos...
                   </p>
                 </div>
               </div>

@@ -54,8 +54,8 @@ export function AudioWaveform({ isRecording, audioStream }: AudioWaveformProps) 
       // Scroll speed: 0.01 (100% slower than original 0.02)
       scrollOffsetRef.current += 0.01;
 
-      // === BLACK BACKGROUND ===
-      ctx.fillStyle = "#000000";
+      // === DEEP SPACE BACKGROUND ===
+      ctx.fillStyle = "#0b1326";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       const centerY = canvas.height / 2;
@@ -120,8 +120,8 @@ export function AudioWaveform({ isRecording, audioStream }: AudioWaveformProps) 
   return (
     <div className="flex items-center justify-center py-2 w-full animate-in fade-in duration-700">
       <div
-        className="flex-1 h-20 overflow-hidden relative rounded-xl border border-indigo-500/20"
-        style={{ background: "#000000" }}
+        className="flex-1 h-20 overflow-hidden relative rounded-xl border border-indigo-500/10"
+        style={{ background: "#0b1326" }}
       >
         <canvas
           ref={canvasRef}

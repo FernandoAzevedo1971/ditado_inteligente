@@ -52,7 +52,7 @@ export function HistoryPanel() {
     <div className="space-y-4 pb-20">
       <div className="flex justify-between items-end mb-6">
         <div>
-          <h3 className="text-2xl font-black text-foreground tracking-tighter">Anteriores</h3>
+          <h3 className="text-2xl font-semibold text-foreground tracking-tighter">Anteriores</h3>
           <p className="text-[10px] font-bold tracking-[0.2em] text-indigo-400/50 uppercase mt-1">
             {history.length} {history.length === 1 ? 'REGISTRO' : 'REGISTROS'}
           </p>
@@ -61,7 +61,7 @@ export function HistoryPanel() {
           onClick={() => {
             if (confirm("Deseja limpar todo o histórico?")) clearHistory();
           }}
-          className="text-[10px] font-black tracking-widest text-red-400/60 hover:text-red-400 uppercase transition-colors flex items-center gap-1.5 px-3 py-2 glass-dark rounded-lg border border-red-500/10"
+          className="text-[10px] font-semibold tracking-widest text-red-400/60 hover:text-red-400 uppercase transition-colors flex items-center gap-1.5 px-3 py-2 glass-dark rounded-lg border border-red-500/10"
         >
           <Trash2 className="w-3 h-3" /> Limpar Histórico
         </button>
@@ -80,7 +80,7 @@ export function HistoryPanel() {
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 mb-2.5">
-                  <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[8px] font-black tracking-[0.2em] border border-indigo-500/30 uppercase">
+                  <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[8px] font-semibold tracking-[0.2em] border border-indigo-500/30 uppercase">
                     {getLanguageName(record.language)}
                   </span>
                   <span className="text-[10px] font-bold text-slate-500 tracking-wider">
@@ -108,7 +108,7 @@ export function HistoryPanel() {
                   <div>
                     <div className="flex items-center gap-2 mb-2">
                        <Type className="w-3 h-3 text-slate-500" />
-                       <h4 className="text-[9px] font-black tracking-[0.2em] text-slate-500 uppercase">Original</h4>
+                       <h4 className="text-[9px] font-semibold tracking-[0.2em] text-slate-500 uppercase">Original</h4>
                     </div>
                     <div className="bg-black/20 rounded-xl p-3 sm:p-4 border border-white/5">
                       <p className="text-xs sm:text-sm text-slate-400 leading-relaxed italic">
@@ -120,7 +120,7 @@ export function HistoryPanel() {
                   <div>
                     <div className="flex items-center gap-2 mb-2">
                        <Check className="w-3 h-3 text-indigo-400" />
-                       <h4 className="text-[9px] font-black tracking-[0.2em] text-indigo-400 uppercase">Aprimorado</h4>
+                       <h4 className="text-[9px] font-semibold tracking-[0.2em] text-indigo-400 uppercase">Aprimorado</h4>
                     </div>
                     <div className="glass-dark rounded-xl p-3 sm:p-4 border border-white/10">
                       <p className="text-sm sm:text-base text-white leading-relaxed font-medium">
@@ -132,7 +132,7 @@ export function HistoryPanel() {
                   <div className="flex gap-2 pt-2">
                     <button
                       onClick={() => copyToClipboard(record.correctedText, record.id)}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 text-[10px] sm:text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300 bg-white text-black hover:bg-slate-100 active:scale-[0.98] shadow-lg"
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 text-[10px] sm:text-xs font-semibold uppercase tracking-widest rounded-xl transition-all duration-300 bg-white text-black hover:bg-slate-100 active:scale-[0.98] shadow-lg"
                     >
                       {copiedId === record.id ? (
                         <>

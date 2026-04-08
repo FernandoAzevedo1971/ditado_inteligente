@@ -70,10 +70,9 @@ export function RecordingInterface({
 
   return (
     <div className="w-full flex flex-col items-center justify-center px-4 py-2 animate-in fade-in zoom-in duration-1000">
-      <div className="w-full max-w-lg glass-card p-4 sm:p-6 relative overflow-hidden">
-        {/* Background Decorative Glows */}
-        <div className="absolute -top-24 -left-24 w-48 h-48 bg-indigo-600/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-blue-600/10 rounded-full blur-3xl" />
+      <div className="w-full max-w-lg glass-card p-8 sm:p-12 relative overflow-hidden text-center">
+        {/* Subtle Ambient Light */}
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent" />
 
         {/* Error Message */}
         {error && (
@@ -86,20 +85,20 @@ export function RecordingInterface({
         {/* Main Interface Content */}
         <div className="flex flex-col items-center relative z-10 text-center">
           {/* Recording Status */}
-          <div className="mb-6">
-            <h1 className="text-2xl sm:text-3xl font-black mb-2 text-foreground tracking-tighter text-glow-primary">
+          <div className="mb-10 sm:mb-14">
+            <h1 className="text-2xl sm:text-3xl font-semibold mb-1 text-foreground tracking-tighter text-glow-primary font-display">
               {isRecording
-                ? "Transcrevendo..."
+                ? "Ditando..."
                 : audioBlob
                   ? "Sintonizando..."
                   : "Ditado Inteligente"}
             </h1>
-            <p className="text-[15px] sm:text-lg text-indigo-200/50 font-medium tracking-wide">
+            <p className="text-[14px] text-indigo-200/40 font-medium tracking-wide">
               {isRecording
-                ? "Capturando sua voz..."
+                ? "Convertendo audio em texto..."
                 : isProcessing
                   ? "Refinando texto..."
-                  : "Sua voz será convertida em texto após o término da gravação."}
+                  : "Converte seu ditado em texto"}
             </p>
           </div>
 
@@ -116,7 +115,7 @@ export function RecordingInterface({
           {/* Recording Time */}
           {isRecording && (
             <div className="mb-6">
-              <div className="text-3xl sm:text-4xl font-mono font-black text-indigo-400/80 tracking-tighter transition-all">
+              <div className="text-3xl sm:text-4xl font-mono font-medium text-indigo-400/80 tracking-tighter transition-all">
                 {formatTime(recordingTime)}
               </div>
             </div>
@@ -138,7 +137,7 @@ export function RecordingInterface({
                 onClick={stopRecording}
                 className="w-[90px] h-[90px] sm:w-[115px] sm:h-[115px] rounded-full bg-gradient-to-br from-red-500/80 to-rose-700/80 text-white animate-pulse-glow flex items-center justify-center relative z-10 active:scale-95 border-4 border-white/20"
               >
-                <Square className="w-16 h-16 sm:w-20 sm:h-20 fill-current" />
+                <Square className="w-6 h-6 sm:w-7 sm:h-7 fill-current" />
               </button>
             ) : isSubmitting || isProcessing ? (
               <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full glass-dark flex items-center justify-center border-2 border-indigo-500/30">
@@ -156,14 +155,14 @@ export function RecordingInterface({
 
           {/* Instructions and Status Text */}
           <div className="max-w-xs mx-auto">
-            <p className="text-sm sm:text-base font-bold text-indigo-200/70 mb-2 tracking-[0.2em]">
+            <p className="text-sm font-medium text-indigo-200/30 tracking-[0.3em] uppercase">
               {isRecording
                 ? "Gravando"
                 : audioBlob && !isRecording && !isSubmitting
                   ? "✓ Pronto"
                   : isSubmitting
                     ? "⏳ Transcrevendo"
-                    : "Pressione para ditar"}
+                    : "Pressione para iniciar"}
             </p>
           </div>
         </div>
