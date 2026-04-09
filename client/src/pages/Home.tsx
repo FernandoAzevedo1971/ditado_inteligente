@@ -187,7 +187,7 @@ export default function Home() {
 
       {/* Header - Glassmorphism & Minimal */}
       <header className="absolute top-0 left-0 right-0 z-20 px-6 pt-4 pb-2 bg-transparent">
-        <div className="flex items-center justify-between">
+        <div className="flex items-start justify-between">
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
               <AudioLines className="w-6 h-6 text-white" />
@@ -197,8 +197,16 @@ export default function Home() {
             </h1>
           </div>
 
-          {/* Ícones alinhados à direita */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-3">
+          {/* Ícones empilhados na vertical à direita */}
+          <div className="flex flex-col items-end gap-2 shrink-0 ml-3">
+            <button
+              onClick={logout}
+              className="p-2.5 rounded-xl transition-all glass-dark hover:bg-red-500/10 text-muted-foreground hover:text-red-400 border border-white/5"
+              title="Sair"
+            >
+              <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
+
             <button
               onClick={() => setShowHistory(!showHistory)}
               className={`p-2.5 rounded-xl transition-all border border-white/5 glass-button ${
@@ -209,14 +217,6 @@ export default function Home() {
               title="Histórico"
             >
               <History className="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>
-
-            <button
-              onClick={logout}
-              className="p-2.5 rounded-xl transition-all glass-dark hover:bg-red-500/10 text-muted-foreground hover:text-red-400 border border-white/5"
-              title="Sair"
-            >
-              <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           </div>
         </div>
