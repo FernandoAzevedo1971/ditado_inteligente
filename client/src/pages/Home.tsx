@@ -221,19 +221,13 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Subtitle badge abaixo */}
-        <div className="mt-0.5 ml-11 sm:ml-12">
-          <span className="text-[10px] font-medium tracking-widest text-indigo-200/40 italic">
-            Groq Ultra-Fast Whisper
-          </span>
-        </div>
       </header>
 
       {/* Main Content Area */}
       <main
-        className={`relative z-10 flex-1 flex flex-col items-center ${
+        className={`relative z-10 flex-1 flex flex-col items-center min-h-0 ${
           processingState 
-            ? "justify-start pt-24 sm:pt-32" 
+            ? "justify-start pt-24 sm:pt-32 pb-4 px-2 overflow-hidden" 
             : showHistory 
               ? "justify-start pt-2" 
               : "justify-center"
