@@ -44,12 +44,12 @@ export default function Home() {
     try {
       // 1. Verificação de tamanho (Vercel Payload Limit: 4.5MB)
       // Como usamos FormData agora, o limite é o binário puro.
-      // 6MB é seguro para 3-5 minutos de áudio.
-      const MAX_BLOB_SIZE = 6 * 1024 * 1024; // 6MB
+      // O áudio agora é gravado com bitrate 32kbps (~720KB para 3 min)
+      const MAX_BLOB_SIZE = 4.5 * 1024 * 1024; // 4.5MB
       if (audioBlob.size > MAX_BLOB_SIZE) {
         setIsProcessing(false);
         setProcessingStep("idle");
-        toast.error("Áudio muito longo (> 6MB). Grave arquivos mais curtos.");
+        toast.error("Áudio muito longo (> 4.5MB). Vercel não suporta esse tamanho. Tente gravar menos tempo.");
         return;
       }
 

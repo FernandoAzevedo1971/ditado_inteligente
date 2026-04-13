@@ -33,17 +33,47 @@ export async function transcribeAudioFile(filePath: string, language: SupportedL
 
     // 3. Envia o arquivo de áudio real para o Whisper v3 no Groq Cloud
     console.log(`[Transcription] Enviando para Groq Whisper (modelo: whisper-large-v3, arquivo: ${filePath})...`);
+    
+    // Type checking para a resposta verbose_json
+    type WhisperVerboseJSONResponse = {
+      text: string;
+      segments?: Array<{ start: number; end: number; text: string }>;
+    };
+
     const result = await groq.audio.transcriptions.create({
       file: fs.createReadStream(filePath),
       model: "whisper-large-v3",
       prompt: LANGUAGE_PROMPTS[language],
-      response_format: "json",
+      response_format: "verbose_json",
+      timestamp_granularities: ["segment"],
       language: language === "pt" ? "pt" : language === "es" ? "es" : "en",
-    });
+    }) as WhisperVerboseJSONResponse;
 
-    console.log(`[Transcription] Sucesso! Texto transcrito: "${result.text.substring(0, 50)}..."`);
+    let finalTranscription = result.text;
 
-    return result.text;
+    // Processar segmentos para paragrafação baseada em pausas
+    if (result.segments && result.segments.length > 0) {
+      const PAUSE_THRESHOLD = 1.5; // Limite de 1.5 segundos definido
+      let paragraphedText = "";
+
+      for (let i = 0; i < result.segments.length; i++) {
+        // Usa trim para evitar acúmulo indesejado de espaços soltos e unifica com um espaço regular ou formatação desejada. 
+        // O Whisper já traz os espaços necessários, mas as pausas substituem isso.
+        paragraphedText += result.segments[i].text;
+        
+        if (i < result.segments.length - 1) {
+          const gap = result.segments[i + 1].start - result.segments[i].end;
+          if (gap >= PAUSE_THRESHOLD) {
+            paragraphedText += "\n\n";
+          }
+        }
+      }
+      finalTranscription = paragraphedText;
+    }
+
+    console.log(`[Transcription] Sucesso! Texto transcrito: "${finalTranscription.substring(0, 50).trim()}..."`);
+
+    return finalTranscription.trim();
   } catch (error: any) {
     console.error("[Transcription] ERRO CRÍTICO transcrevendo áudio com Groq Whisper:");
     console.error(`- Mensagem: ${error.message}`);

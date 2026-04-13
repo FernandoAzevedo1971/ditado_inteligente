@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+export const MAX_RECORDING_SECONDS = 180;
+
 interface UseAudioRecorderReturn {
   isRecording: boolean;
   audioBlob: Blob | null;
@@ -66,6 +68,7 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
 
       const mediaRecorder = new MediaRecorder(stream, {
         mimeType: mimeType || undefined,
+        audioBitsPerSecond: 32000,
       });
       mediaRecorderRef.current = mediaRecorder;
 
@@ -76,8 +79,8 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
       };
 
       mediaRecorder.onstop = () => {
-        const mimeType = mediaRecorder.mimeType || "audio/webm";
-        const blob = new Blob(chunksRef.current, { type: mimeType });
+        const actualMimeType = mediaRecorder.mimeType || "audio/webm";
+        const blob = new Blob(chunksRef.current, { type: actualMimeType });
         setAudioBlob(blob);
         chunksRef.current = [];
 
@@ -86,7 +89,7 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
       };
 
       mediaRecorder.onerror = (event) => {
-        const errorMsg = `Erro ao gravar: ${event.error}`;
+        const errorMsg = `Erro ao gravar: ${(event as any).error || "Desconhecido"}`;
         setError(errorMsg);
         toast.error(errorMsg);
         setIsRecording(false);
@@ -131,9 +134,19 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
         console.warn("Audio context not available for visualization:", audioError);
       }
 
-      // Start recording timer
+      // Start recording timer with auto-stop
       timerRef.current = setInterval(() => {
-        setRecordingTime((prev) => prev + 1);
+        setRecordingTime((prev) => {
+          const nextTime = prev + 1;
+          if (nextTime >= MAX_RECORDING_SECONDS) {
+            // Must use ref instead of state action since state may be stale inside the interval without proper deps
+            if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+              mediaRecorderRef.current.stop();
+              toast.info("Limite de 3 minutos atingido. Gravação finalizada automaticamente.");
+            }
+          }
+          return nextTime;
+        });
       }, 1000);
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Erro ao acessar o microfone";

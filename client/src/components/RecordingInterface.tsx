@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useAudioRecorder } from "@/hooks/useAudioRecorder";
+import { useAudioRecorder, MAX_RECORDING_SECONDS } from "@/hooks/useAudioRecorder";
 import { AudioWaveform } from "@/components/AudioWaveform";
 import { Loader2, Mic, Square, AlertCircle } from "lucide-react";
 
@@ -114,9 +114,29 @@ export function RecordingInterface({
 
           {/* Recording Time */}
           {isRecording && (
-            <div className="mb-6">
-              <div className="text-3xl sm:text-4xl font-mono font-medium text-indigo-400/80 tracking-tighter transition-all">
+            <div className="mb-6 flex flex-col items-center gap-2 animate-in slide-in-from-bottom-2">
+              <div className={`text-3xl sm:text-4xl font-mono font-medium tracking-tighter transition-colors duration-500 ${
+                recordingTime >= MAX_RECORDING_SECONDS - 10 
+                  ? "text-red-500 animate-pulse" 
+                  : recordingTime >= MAX_RECORDING_SECONDS - 30 
+                    ? "text-amber-400" 
+                    : "text-indigo-400/80"
+              }`}>
                 {formatTime(recordingTime)}
+              </div>
+              
+              {/* Progress Bar (Visual indicator of remaining time) */}
+              <div className="w-full max-w-[200px] h-1.5 bg-white/5 rounded-full overflow-hidden">
+                <div 
+                  className={`h-full transition-all duration-1000 ease-linear ${
+                    recordingTime >= MAX_RECORDING_SECONDS - 10 
+                      ? "bg-red-500" 
+                      : recordingTime >= MAX_RECORDING_SECONDS - 30 
+                        ? "bg-amber-400" 
+                        : "bg-indigo-500"
+                  }`}
+                  style={{ width: `${Math.min(100, (recordingTime / MAX_RECORDING_SECONDS) * 100)}%` }}
+                />
               </div>
             </div>
           )}
@@ -154,15 +174,17 @@ export function RecordingInterface({
           </div>
 
           {/* Instructions and Status Text */}
-          <div className="max-w-xs mx-auto">
-            <p className="text-sm font-medium text-indigo-200/30 tracking-[0.3em] uppercase">
+          <div className="max-w-xs mx-auto mt-4">
+            <p className="text-sm font-medium text-indigo-200/50 tracking-[0.2em] uppercase">
               {isRecording
-                ? "Gravando"
+                ? recordingTime >= MAX_RECORDING_SECONDS - 30 
+                    ? "Limite próximo..." 
+                    : "Gravando"
                 : audioBlob && !isRecording && !isSubmitting
                   ? "✓ Pronto"
                   : isSubmitting
                     ? "⏳ Transcrevendo"
-                    : "Pressione para iniciar"}
+                    : "Até 3 min por gravação"}
             </p>
           </div>
         </div>

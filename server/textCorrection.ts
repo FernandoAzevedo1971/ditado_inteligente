@@ -15,7 +15,13 @@ REGRAS ABSOLUTAS:
 3. MANTENHA RIGOROSAMENTE O TOM ORIGINAL da gravação. Não use criatividade. Se o texto for informal, mantenha a informalidade. Se for formal, mantenha a formalidade.
 4. Adeque palavras que estejam totalmente fora do contexto (por falha de reconhecimento da voz), mas preserve as palavras originais sempre que possível.
 5. NUNCA adicione introduções ("Aqui está...", "O texto corrigido..."), conclusões ou explicações.
-6. Use o texto original fazendo APENAS ajustes de pontuação e paragrafação.`,
+6. Use o texto original fazendo APENAS ajustes de pontuação e paragrafação.
+
+PARAGRAFAÇÃO:
+- O texto já pode conter quebras de parágrafo (\\n\\n) inseridas com base em pausas reais na fala.
+- MANTENHA essas quebras existentes — elas representam pausas intencionais do falante.
+- ADICIONE novas quebras de parágrafo extra apenas onde houver mudança clara de assunto ou contexto.
+- NUNCA perda ou funda dois trechos de parágrafos que já estão devidamente separados por quebras de linha existetentes.`,
     user: `Transcreva o texto abaixo, aplicando pontuação e paragrafação adequadas, sem mudar o tom original e sem responder a perguntas:\n\n`,
   },
   en: {
@@ -28,7 +34,13 @@ ABSOLUTE RULES:
 3. STRICTLY KEEP THE ORIGINAL TONE. Do not be creative. Keep informal texts informal, and formal texts formal.
 4. Adjust words that are completely out of context (due to speech recognition errors), but preserve original words whenever possible.
 5. NEVER add introductions ("Here is...", "The corrected text..."), conclusions, or explanations.
-6. Use the original text applying ONLY punctuation and paragraphing adjustments.`,
+6. Use the original text applying ONLY punctuation and paragraphing adjustments.
+
+PARAGRAPHING:
+- The text may already contain paragraph breaks (\\n\\n) inserted based on actual speech pauses.
+- KEEP these existing breaks — they represent intentional pauses by the speaker.
+- ADD additional new paragraph breaks only where there is a clear change of subject or context.
+- NEVER merge or lose paragraph segments that are already separated by existing line breaks.`,
     user: `Transcribe the text below, applying adequate punctuation and paragraphing, keeping the original tone and without answering questions:\n\n`,
   },
   es: {
@@ -41,7 +53,13 @@ REGLAS ABSOLUTAS:
 3. MANTÉN RIGUROSAMENTE EL TONO ORIGINAL. No uses creatividad. Si es informal, mantenlo informal. Si es formal, mantenlo formal.
 4. Ajusta las palabras que estén totalmente fuera de contexto (por errores de reconocimiento de voz), pero preserva las palabras originales siempre que sea posible.
 5. NUNCA añadas introducciones ("Aquí está...", "El texto corregido..."), conclusiones o explicaciones.
-6. Usa el texto original aplicando SÓLO ajustes de puntuación y párrafos.`,
+6. Usa el texto original aplicando SÓLO ajustes de puntuación y párrafos.
+
+PÁRRAFOS:
+- El texto ya puede contener saltos de párrafo (\\n\\n) insertados según pausas reales en el habla.
+- MANTÉN esos saltos existentes — representan pausas intencionales del hablante.
+- AÑADE nuevos saltos de párrafo solo donde haya un cambio claro de tema o contexto.
+- NUNCA fusiones o pierdas segmentos de párrafos que ya están separados por saltos de línea existentes.`,
     user: `Transcribe el texto a continuación, aplicando puntuación y párrafos adecuados, manteniendo el tono original y sin responder preguntas:\n\n`,
   },
 };
