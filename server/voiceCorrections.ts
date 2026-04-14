@@ -25,7 +25,7 @@ export async function applyVoiceCorrections(
 Sua tarefa é:
 1. Aplicar as correções específicas que o usuário solicitou por voz.
 2. Garantir que o texto esteja ESTRITAMENTE em Português.
-3. ESTRUTURAÇÃO OBRIGATÓRIA: Reorganize TODO o texto em parágrafos profissionais (\n\n) baseados na transição de tópicos e contextos.
+3. ESTRUTURAÇÃO PROFISSIONAL: Reorganize o texto em parágrafos (\n\n) sempre que houver mudança de tópico ou contexto. Use parágrafo único apenas se o texto for curto ou tiver contexto indivisível.
 4. Identifique pontos de conclusão de raciocínio para iniciar novos parágrafos.
 5. Ajuste a pontuação de todo o texto para garantir fluidez e clareza profissional.
 6. NÃO adicionar nenhum comentário, saudação ou explicação.
@@ -34,7 +34,7 @@ Sua tarefa é:
 Regras:
 - Se o usuário diz "mudar X por Y", substitua X por Y.
 - Se o usuário diz "remover X", remova X.
-- SEMPRE aplique quebras de parágrafo (\n\n) para separar assuntos ou seções diferentes.
+- Aplique quebras de parágrafo (\n\n) para separar assuntos ou seções diferentes sempre que apropriado.
 - O texto final deve ser limpo, profissional e bem formatado, mesmo que a correção solicitada seja pequena.`
       : language === "en"
         ? `You are a strict assistant for applying voice-dictated text corrections.
