@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Square, Loader2, AlertCircle, Check } from "lucide-react";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 import { AudioWaveform } from "@/components/AudioWaveform";
@@ -24,37 +24,16 @@ export default function VoiceEditPanel({
   const [wasRecording, setWasRecording] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
 
-  const transcribeMutation = trpc.audio.transcribe.useMutation();
   const applyCorrectionsM = trpc.text.applyVoiceCorrections.useMutation();
 
-  // Iniciar gravação automaticamente quando o painel abre
-  useEffect(() => {
-    if (!hasStarted) {
-      startRecording();
-      setHasStarted(true);
-      setWasRecording(true);
-    }
-  }, [hasStarted, startRecording]);
-
-  // Monitorar quando a gravação para e o audioBlob está disponível
-  useEffect(() => {
-    if (!isRecording && wasRecording && audioBlob) {
-      // Gravação parou e temos um audioBlob
-      handleTranscribeAndApply(audioBlob);
-      setWasRecording(false);
-    }
-  }, [isRecording, audioBlob, wasRecording]);
-
-  const handleStopRecording = async () => {
-    stopRecording();
-  };
-
-  const handleTranscribeAndApply = async (audio: Blob) => {
+  // useCallback garante que o effect sempre use a versão mais recente de correctedText
+  // (evita stale closure ao capturar correctedText dentro do useEffect)
+  const handleTranscribeAndApply = useCallback(async (audio: Blob) => {
     if (!audio) return;
 
     setIsProcessing(true);
     try {
-      // Usando o endpoint REST com FormData em vez do TRPC para evitar limite de payload de JSON (Base64) e melhorar o tratamento de erro
+      // Usando o endpoint REST com FormData em vez do TRPC para evitar limite de payload
       const formData = new FormData();
       formData.append("file", audio, "audio.webm");
       formData.append("provider", "groq");
@@ -80,28 +59,50 @@ export default function VoiceEditPanel({
 
       const voiceCorrections = responseData.text;
 
-        if (!voiceCorrections.trim()) {
-          toast.error("Nenhuma correção foi detectada. Tente novamente.");
-          setIsProcessing(false);
-          return;
-        }
-
-        // Aplicar as correções ao texto corrigido
-        const result = await applyCorrectionsM.mutateAsync({
-          correctedText,
-          voiceCorrections,
-          language: (language as "pt" | "en" | "es") || "pt",
-        });
-
-        onTextUpdated(result.finalText);
-        toast.success("Correções aplicadas com sucesso!");
+      if (!voiceCorrections.trim()) {
+        toast.error("Nenhuma correção foi detectada. Tente novamente.");
         setIsProcessing(false);
-        onClose();
+        return;
+      }
+
+      // Aplicar as correções ao texto corrigido
+      const result = await applyCorrectionsM.mutateAsync({
+        correctedText,
+        voiceCorrections,
+        language: (language as "pt" | "en" | "es") || "pt",
+      });
+
+      onTextUpdated(result.finalText);
+      toast.success("Correções aplicadas com sucesso!");
+      setIsProcessing(false);
+      onClose();
     } catch (err: any) {
       console.error("Erro ao processar correções:", err);
       toast.error(err?.message || "Erro ao aplicar correções. Tente novamente.");
       setIsProcessing(false);
     }
+  }, [correctedText, language, applyCorrectionsM, onTextUpdated, onClose]);
+
+  // Iniciar gravação automaticamente quando o painel abre
+  useEffect(() => {
+    if (!hasStarted) {
+      startRecording();
+      setHasStarted(true);
+      setWasRecording(true);
+    }
+  }, [hasStarted, startRecording]);
+
+  // Monitorar quando a gravação para e o audioBlob está disponível
+  useEffect(() => {
+    if (!isRecording && wasRecording && audioBlob) {
+      // Gravação parou e temos um audioBlob — marca como não-gravando antes de processar
+      setWasRecording(false);
+      handleTranscribeAndApply(audioBlob);
+    }
+  }, [isRecording, audioBlob, wasRecording, handleTranscribeAndApply]);
+
+  const handleStopRecording = async () => {
+    stopRecording();
   };
 
   return (

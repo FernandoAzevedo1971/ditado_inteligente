@@ -57,8 +57,8 @@ export const appRouter = router({
         language: LANGUAGE_ENUM.default("auto"),
       }))
       .mutation(async ({ input }) => {
-        // Se language é "auto", deixa undefined para detecção automática
-        const lang = input.language === "auto" ? undefined : (input.language as CorrectionLanguage);
+        // Se language é "auto", usa "pt" como padrão para voiceCorrections
+        const lang: CorrectionLanguage = (input.language === "auto" ? "pt" : input.language) as CorrectionLanguage;
         const finalText = await applyVoiceCorrections(
           input.correctedText,
           input.voiceCorrections,

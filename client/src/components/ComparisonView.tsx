@@ -94,7 +94,7 @@ export function ComparisonView({
             </div>
             {showOriginalText && (
               <p className="text-slate-400 text-xs sm:text-sm leading-relaxed font-medium italic select-none mt-2 max-h-20 overflow-y-auto">
-                "{originalText}"
+                {originalText}
               </p>
             )}
           </div>
