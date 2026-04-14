@@ -173,6 +173,10 @@ export default function Home() {
         >
           Entrar com Google
         </Button>
+        
+        <footer className="absolute bottom-8 text-[10px] text-indigo-400/20 font-semibold tracking-[0.3em] uppercase pointer-events-none">
+          BY FERNANDO AZEVEDO
+        </footer>
       </div>
     );
   }
@@ -288,6 +292,10 @@ export default function Home() {
           </div>
         )}
       </main>
+
+      <footer className="absolute bottom-4 left-0 right-0 flex justify-center text-[9px] text-muted-foreground/20 font-semibold tracking-[0.4em] uppercase pointer-events-none">
+        BY FERNANDO AZEVEDO
+      </footer>
     </div>
   );
 }
