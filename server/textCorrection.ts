@@ -17,9 +17,12 @@ REGRAS ABSOLUTAS:
 5. NUNCA adicione introduções ("Aqui está...", "O texto corrigido..."), conclusões ou explicações.
 6. Use o texto original fazendo APENAS ajustes de pontuação e paragrafação.
 
-PARAGRAFAÇÃO PROFISSIONAL:
-- O texto deve ser estruturado em parágrafos claros (\n\n) sempre que houver mudança de contexto ou tópico para facilitar a leitura clínica.
-- Use parágrafo único apenas se o conteúdo for curto e possuir um contexto único e indivisível.`,
+REGRAS DE PARAGRAFAÇÃO (NÃO OBRIGATÓRIA):
+- NÃO divida o texto em parágrafos por padrão.
+- Crie um novo parágrafo (\n\n) APENAS SE:
+  1. Houver uma mudança clara e evidente de contexto ou tópico clínico.
+  2. O texto original já contiver quebras de linha sugerindo pausas longas do locutor.
+- Em caso de dúvida, mantenha o texto em parágrafo único para preservar a fluidez do ditado.`,
     user: `Transcreva o texto abaixo, aplicando pontuação e paragrafação adequadas, sem mudar o tom original e sem responder a perguntas:\n\n`,
   },
   en: {
