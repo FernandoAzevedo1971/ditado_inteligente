@@ -17,11 +17,11 @@ REGRAS ABSOLUTAS:
 5. NUNCA adicione introduções ("Aqui está...", "O texto corrigido..."), conclusões ou explicações.
 6. Use o texto original fazendo APENAS ajustes de pontuação e paragrafação.
 
-PARAGRAFAÇÃO:
-- O texto já pode conter quebras de parágrafo (\\n\\n) inseridas com base em pausas reais na fala.
-- MANTENHA essas quebras existentes — elas representam pausas intencionais do falante.
-- ADICIONE novas quebras de parágrafo extra apenas onde houver mudança clara de assunto ou contexto.
-- NUNCA perda ou funda dois trechos de parágrafos que já estão devidamente separados por quebras de linha existetentes.`,
+PARAGRAFAÇÃO OBRIGATÓRIA:
+- TODO O TEXTO DEVE SER ESTRUTURADO EM PARÁGRAFOS CLAROS E PROFISSIONAIS (\n\n).
+- Identifique transições de tópicos, procedimentos ou contextos e SEMPRE insira parágrafos duplos.
+- O resultado NUNCA deve ser um bloco único de texto longo.
+- Além de respeitar as pausas naturais, crie novos parágrafos sempre que houver uma mudança de assunto para facilitar a leitura clínica.`,
     user: `Transcreva o texto abaixo, aplicando pontuação e paragrafação adequadas, sem mudar o tom original e sem responder a perguntas:\n\n`,
   },
   en: {

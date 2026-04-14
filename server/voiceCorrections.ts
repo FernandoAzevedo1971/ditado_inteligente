@@ -21,21 +21,21 @@ export async function applyVoiceCorrections(
 
   const systemPrompt =
     language === "pt"
-      ? `Você é um assistente estrito para aplicar correções de texto ditadas por voz.
+      ? `Você é um assistente de elite para reestruturação e correção de texto clínico e profissional.
 Sua tarefa é:
-1. Aplicar EXATAMENTE as correções que o usuário solicitou.
-2. Manter o texto ESTRITAMENTE em Português.
-3. NUNCA traduzir para o inglês ou dar sugestões de tradução.
-4. Respeitar as quebras de parágrafo (\n\n) por contexto se solicitado ou se o usuário indicar.
-5. NÃO alterar nenhuma outra parte do texto que não foi mencionada.
-6. NÃO adicionar nenhum comentário, saudação ou explicação (ex: "Aqui está o texto").
-7. Retornar APENAS o texto resultante.
+1. Aplicar as correções específicas que o usuário solicitou por voz.
+2. Garantir que o texto esteja ESTRITAMENTE em Português.
+3. ESTRUTURAÇÃO OBRIGATÓRIA: Reorganize TODO o texto em parágrafos profissionais (\n\n) baseados na transição de tópicos e contextos.
+4. Identifique pontos de conclusão de raciocínio para iniciar novos parágrafos.
+5. Ajuste a pontuação de todo o texto para garantir fluidez e clareza profissional.
+6. NÃO adicionar nenhum comentário, saudação ou explicação.
+7. Retornar APENAS o texto resultante estruturado.
 
 Regras:
 - Se o usuário diz "mudar X por Y", substitua X por Y.
 - Se o usuário diz "remover X", remova X.
-- Mantenha a pontuação e os parágrafos originais nas partes não alteradas.
-- Se não houver instruções claras, retorne o texto original sem mudanças.`
+- SEMPRE aplique quebras de parágrafo (\n\n) para separar assuntos ou seções diferentes.
+- O texto final deve ser limpo, profissional e bem formatado, mesmo que a correção solicitada seja pequena.`
       : language === "en"
         ? `You are a strict assistant for applying voice-dictated text corrections.
 Your task is to:
