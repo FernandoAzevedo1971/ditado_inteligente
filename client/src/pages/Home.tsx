@@ -91,7 +91,7 @@ export default function Home() {
       const correctedText = correctionResult.correctedText;
 
       // Save to history
-      addRecord(originalText, correctedText, "auto");
+      addRecord(correctedText, "auto");
 
       setProcessingState({
         transcription: originalText,

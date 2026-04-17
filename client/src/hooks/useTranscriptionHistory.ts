@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 
 export interface TranscriptionRecord {
   id: string;
-  originalText: string;
   correctedText: string;
   language: string;
   timestamp: number;
@@ -40,10 +39,9 @@ export function useTranscriptionHistory() {
     }
   }, [history, isLoaded]);
 
-  const addRecord = (originalText: string, correctedText: string, language: string) => {
+  const addRecord = (correctedText: string, language: string) => {
     const newRecord: TranscriptionRecord = {
       id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      originalText,
       correctedText,
       language,
       timestamp: Date.now(),

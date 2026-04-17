@@ -106,22 +106,6 @@ export function HistoryPanel() {
                 
                 <div className="space-y-5">
                   <div>
-                    <div className="flex items-center gap-2 mb-2">
-                       <Type className="w-3 h-3 text-slate-500" />
-                       <h4 className="text-[9px] font-semibold tracking-[0.2em] text-slate-500 uppercase">Original</h4>
-                    </div>
-                    <div className="bg-black/20 rounded-xl p-3 sm:p-4 border border-white/5">
-                      <p className="text-xs sm:text-sm text-slate-400 leading-relaxed italic">
-                        "{record.originalText}"
-                      </p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                       <Check className="w-3 h-3 text-indigo-400" />
-                       <h4 className="text-[9px] font-semibold tracking-[0.2em] text-indigo-400 uppercase">Aprimorado</h4>
-                    </div>
                     <div className="glass-dark rounded-xl p-3 sm:p-4 border border-white/10">
                       <p className="text-sm sm:text-base text-white leading-relaxed font-medium">
                         {record.correctedText}

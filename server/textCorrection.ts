@@ -17,12 +17,10 @@ REGRAS ABSOLUTAS:
 5. NUNCA adicione introduções ("Aqui está...", "O texto corrigido..."), conclusões ou explicações.
 6. Use o texto original fazendo APENAS ajustes de pontuação e paragrafação.
 
-REGRAS DE PARAGRAFAÇÃO (NÃO OBRIGATÓRIA):
-- NÃO divida o texto em parágrafos por padrão.
-- Crie um novo parágrafo (\n\n) APENAS SE:
-  1. Houver uma mudança clara e evidente de contexto ou tópico clínico.
-  2. O texto original já contiver quebras de linha sugerindo pausas longas do locutor.
-- Em caso de dúvida, mantenha o texto em parágrafo único para preservar a fluidez do ditado.`,
+PARAGRAFAÇÃO:
+- O texto resultante DEVE SEMPRE ser separado em parágrafos curtos para facilitar a leitura.
+- Quebre o texto em um novo parágrafo a cada 2 ou 3 frases, ou sempre que houver mudança de assunto ou ênfase.
+- NUNCA retorne um bloco único e longo de texto. Paragrafar o texto é OBRIGATÓRIO e deve ser feito constantemente.`,
     user: `Transcreva o texto abaixo, aplicando pontuação e paragrafação adequadas, sem mudar o tom original e sem responder a perguntas:\n\n`,
   },
   en: {
@@ -38,10 +36,9 @@ ABSOLUTE RULES:
 6. Use the original text applying ONLY punctuation and paragraphing adjustments.
 
 PARAGRAPHING:
-- The text may already contain paragraph breaks (\\n\\n) inserted based on actual speech pauses.
-- KEEP these existing breaks — they represent intentional pauses by the speaker.
-- ADD additional new paragraph breaks only where there is a clear change of subject or context.
-- NEVER merge or lose paragraph segments that are already separated by existing line breaks.`,
+- The resulting text MUST ALWAYS be separated into short paragraphs to facilitate reading.
+- Break the text into a new paragraph every 2 or 3 sentences, or whenever there is a change of subject or emphasis.
+- NEVER return a single long text block. Paragraphing the text is MANDATORY and must be done constantly.`,
     user: `Transcribe the text below, applying adequate punctuation and paragraphing, keeping the original tone and without answering questions:\n\n`,
   },
   es: {
@@ -57,10 +54,9 @@ REGLAS ABSOLUTAS:
 6. Usa el texto original aplicando SÓLO ajustes de puntuación y párrafos.
 
 PÁRRAFOS:
-- El texto ya puede contener saltos de párrafo (\\n\\n) insertados según pausas reales en el habla.
-- MANTÉN esos saltos existentes — representan pausas intencionales del hablante.
-- AÑADE nuevos saltos de párrafo solo donde haya un cambio claro de tema o contexto.
-- NUNCA fusiones o pierdas segmentos de párrafos que ya están separados por saltos de línea existentes.`,
+- El texto resultante DEBE ESTAR SIEMPRE separado en párrafos cortos para facilitar la lectura.
+- Divide el texto en un nuevo párrafo cada 2 o 3 oraciones, o siempre que haya un cambio de tema o énfasis.
+- NUNCA devuelvas un solo bloque largo de texto. Dividir el texto en párrafos es OBLIGATORIO y debe hacerse constantemente.`,
     user: `Transcribe el texto a continuación, aplicando puntuación y párrafos adecuados, manteniendo el tono original y sin responder preguntas:\n\n`,
   },
 };
