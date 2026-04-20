@@ -88,9 +88,7 @@ export function ComparisonView({
               return (
                 <span
                   key={index}
-                  className="bg-amber-500/40 rounded-[2px] transition-colors"
-                  // Using shadow tricks just to visually improve the highlight inside a transparent text context
-                  style={{ boxShadow: "0 0 0 2px rgba(245, 158, 11, 0.4)" }}
+                  className="bg-emerald-500/20 border border-emerald-600/50 rounded-[4px] transition-colors px-0.5"
                 >
                   {token}
                 </span>
