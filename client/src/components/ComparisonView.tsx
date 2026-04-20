@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import {
   Check,
   Copy,
@@ -14,6 +14,7 @@ import VoiceEditPanel from "./VoiceEditPanel";
 interface ComparisonViewProps {
   originalText: string;
   correctedText: string;
+  outOfContextWords?: string[];
   language?: string;
   onClose: () => void;
 }
@@ -21,6 +22,7 @@ interface ComparisonViewProps {
 export function ComparisonView({
   originalText,
   correctedText,
+  outOfContextWords = [],
   language = "auto",
   onClose,
 }: ComparisonViewProps) {
@@ -53,8 +55,62 @@ export function ComparisonView({
     setCurrentCorrected(finalText);
   };
 
-  const getDiff = (corrected: string) => {
-    return <span className="whitespace-pre-wrap font-normal">{corrected}</span>;
+  const tokens = useMemo(() => {
+    // Regex divides by anything that is punctuation or space, keeping the matched split token.
+    return currentCorrected.split(/([\s.,:;!?\n]+)/);
+  }, [currentCorrected]);
+
+  const isOutOfContext = (word: string) => {
+    if (!outOfContextWords || outOfContextWords.length === 0) return false;
+    return outOfContextWords.some((w) => w.toLowerCase() === word.toLowerCase());
+  };
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + "px";
+    }
+  }, [currentCorrected]);
+
+  const getDiff = () => {
+    return (
+      <div className="relative w-full min-h-full cursor-text">
+        {/* Underlay */}
+        <div 
+          className="absolute top-0 left-0 w-full h-full pointer-events-none whitespace-pre-wrap break-words text-transparent z-0 m-0 p-0"
+        >
+          {tokens.map((token, index) => {
+            const isWord = !/^[\s.,:;!?\n]+$/.test(token) && token.length > 0;
+            const isHighlighted = isWord && isOutOfContext(token);
+            if (isHighlighted) {
+              return (
+                <span
+                  key={index}
+                  className="bg-amber-500/40 rounded-[2px] transition-colors"
+                  // Using shadow tricks just to visually improve the highlight inside a transparent text context
+                  style={{ boxShadow: "0 0 0 2px rgba(245, 158, 11, 0.4)" }}
+                >
+                  {token}
+                </span>
+              );
+            }
+            return <span key={index}>{token}</span>;
+          })}
+        </div>
+        
+        {/* Editable textarea on top */}
+        <textarea
+          ref={textareaRef}
+          className="relative block w-full bg-transparent text-foreground outline-none resize-none z-10 whitespace-pre-wrap break-words overflow-hidden m-0 p-0 font-inherit"
+          value={currentCorrected}
+          onChange={(e) => setCurrentCorrected(e.target.value)}
+          spellCheck={false}
+          placeholder="Digite ou edite o texto aqui..."
+        />
+      </div>
+    );
   };
 
   return (
@@ -106,7 +162,7 @@ export function ComparisonView({
               </span>
             </div>
             <div className="text-xl sm:text-2xl text-foreground leading-relaxed font-medium tracking-tight overflow-y-auto flex-1 pb-2">
-              {getDiff(currentCorrected)}
+              {getDiff()}
             </div>
           </div>
 

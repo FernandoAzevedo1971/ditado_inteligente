@@ -47,8 +47,11 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         // Se language é "auto", deixa undefined para detecção automática
         const lang = input.language === "auto" ? undefined : (input.language as CorrectionLanguage);
-        const correctedText = await correctTextWithAI(input.text, lang);
-        return { correctedText };
+        const result = await correctTextWithAI(input.text, lang);
+        return { 
+          correctedText: result.correctedText, 
+          outOfContextWords: result.outOfContextWords 
+        };
       }),
     applyVoiceCorrections: publicProcedure
       .input(z.object({

@@ -12,16 +12,17 @@ SUA ÚNICA TAREFA É ORGANIZAR A PONTUAÇÃO E A PARAGRAFAÇÃO DO TEXTO DITADO.
 REGRAS ABSOLUTAS:
 1. TRANSCREVA APENAS O QUE FOI DITADO. Não crie comentários, descrições ou contextos.
 2. Não responda a perguntas contidas no texto, limite-se a transcrever.
-3. MANTENHA RIGOROSAMENTE O TOM ORIGINAL da gravação. Não use criatividade. Se o texto for informal, mantenha a informalidade. Se for formal, mantenha a formalidade.
-4. Adeque palavras que estejam totalmente fora do contexto (por falha de reconhecimento da voz), mas preserve as palavras originais sempre que possível.
+3. MANTENHA RIGOROSAMENTE O TOM ORIGINAL da gravação. Não use criatividade. Se o texto for informal, mantenha a informalidade.
+4. Identifique palavras que pareçam "fora de contexto" (possíveis erros de transcrição de voz). Retorne uma lista com essas palavras exatas, da forma como estão no texto.
 5. NUNCA adicione introduções ("Aqui está...", "O texto corrigido..."), conclusões ou explicações.
 6. Use o texto original fazendo APENAS ajustes de pontuação e paragrafação.
-
-PARAGRAFAÇÃO:
-- O texto resultante DEVE SEMPRE ser separado em parágrafos curtos para facilitar a leitura.
-- Quebre o texto em um novo parágrafo a cada 2 ou 3 frases, ou sempre que houver mudança de assunto ou ênfase.
-- NUNCA retorne um bloco único e longo de texto. Paragrafar o texto é OBRIGATÓRIO e deve ser feito constantemente.`,
-    user: `Transcreva o texto abaixo, aplicando pontuação e paragrafação adequadas, sem mudar o tom original e sem responder a perguntas:\n\n`,
+7. O TEXTO DEVE ESTAR EM PARÁGRAFOS CURTOS.
+8. VOCÊ DEVE RESPONDER EXCLUSIVAMENTE NESTE FORMATO JSON, E NADA MAIS:
+{
+  "correctedText": "o texto completo corrigido e em parágrafos aqui...",
+  "outOfContextWords": ["palavra1", "palavra2"]
+}`,
+    user: `Transcreva o texto abaixo, aplicando pontuação e paragrafação adequadas, mantendo o tom original e identificando as palavras fora de contexto. Responda APENAS com o JSON esperado:\n\n`,
   },
   en: {
     system: `YOU ARE A TRANSCRIPTION ASSISTANT.
@@ -30,16 +31,17 @@ YOUR ONLY TASK IS TO ORGANIZE PUNCTUATION AND PARAGRAPHING OF THE DICTATED TEXT.
 ABSOLUTE RULES:
 1. TRANSCRIBE ONLY WHAT WAS DICTATED. Do not create comments, descriptions, or contexts.
 2. Do not answer questions contained in the text, just transcribe.
-3. STRICTLY KEEP THE ORIGINAL TONE. Do not be creative. Keep informal texts informal, and formal texts formal.
-4. Adjust words that are completely out of context (due to speech recognition errors), but preserve original words whenever possible.
+3. STRICTLY KEEP THE ORIGINAL TONE. Do not be creative.
+4. Identify words that seem "out of context" (possible speech transcription errors). Return a list with these exact words as they appear in the text.
 5. NEVER add introductions ("Here is...", "The corrected text..."), conclusions, or explanations.
 6. Use the original text applying ONLY punctuation and paragraphing adjustments.
-
-PARAGRAPHING:
-- The resulting text MUST ALWAYS be separated into short paragraphs to facilitate reading.
-- Break the text into a new paragraph every 2 or 3 sentences, or whenever there is a change of subject or emphasis.
-- NEVER return a single long text block. Paragraphing the text is MANDATORY and must be done constantly.`,
-    user: `Transcribe the text below, applying adequate punctuation and paragraphing, keeping the original tone and without answering questions:\n\n`,
+7. TEXT MUST BE IN SHORT PARAGRAPHS.
+8. YOU MUST REPLY EXCLUSIVELY IN THIS JSON FORMAT, AND NOTHING ELSE:
+{
+  "correctedText": "the full corrected text with paragraphs here...",
+  "outOfContextWords": ["word1", "word2"]
+}`,
+    user: `Transcribe the text below, applying adequate punctuation and paragraphing, keeping original tone and identifying out of context words. Reply ONLY with the expected JSON:\n\n`,
   },
   es: {
     system: `ERES UN ASISTENTE DE TRANSCRIPCIÓN.
@@ -48,24 +50,28 @@ TU ÚNICA TAREA ES ORGANIZAR LA PUNTUACIÓN Y LOS PÁRRAFOS DEL TEXTO DICTADO.
 REGLAS ABSOLUTAS:
 1. TRANSCRIBE ÚNICAMENTE LO QUE FUE DICTADO. No crees comentarios, descripciones o contextos.
 2. No respondas a las preguntas contenidas en el texto, limítate a transcribir.
-3. MANTÉN RIGUROSAMENTE EL TONO ORIGINAL. No uses creatividad. Si es informal, mantenlo informal. Si es formal, mantenlo formal.
-4. Ajusta las palabras que estén totalmente fuera de contexto (por errores de reconocimiento de voz), pero preserva las palabras originales siempre que sea posible.
-5. NUNCA añadas introducciones ("Aquí está...", "El texto corregido..."), conclusiones o explicaciones.
+3. MANTÉN RIGUROSAMENTE EL TONO ORIGINAL. No uses creatividad.
+4. Identifica palabras que parezcan "fuera de contexto" (posibles errores de transcripción de voz). Devuelve una lista con estas palabras exactas, tal como están en el texto.
+5. NUNCA añadas introducciones ("Aquí está..."), conclusiones o explicaciones.
 6. Usa el texto original aplicando SÓLO ajustes de puntuación y párrafos.
-
-PÁRRAFOS:
-- El texto resultante DEBE ESTAR SIEMPRE separado en párrafos cortos para facilitar la lectura.
-- Divide el texto en un nuevo párrafo cada 2 o 3 oraciones, o siempre que haya un cambio de tema o énfasis.
-- NUNCA devuelvas un solo bloque largo de texto. Dividir el texto en párrafos es OBLIGATORIO y debe hacerse constantemente.`,
-    user: `Transcribe el texto a continuación, aplicando puntuación y párrafos adecuados, manteniendo el tono original y sin responder preguntas:\n\n`,
+7. EL TEXTO DEBE ESTAR EN PÁRRAFOS CORTOS.
+8. DEBES RESPONDER EXCLUSIVAMENTE EN ESTE FORMATO JSON, Y NADA MÁS:
+{
+  "correctedText": "el texto completo corregido con párrafos aquí...",
+  "outOfContextWords": ["palabra1", "palabra2"]
+}`,
+    user: `Transcribe el texto a continuación, aplicando puntuación y párrafos adecuados, manteniendo el tono original e identificando palabras fuera de contexto. Responde SÓLO con el JSON esperado:\n\n`,
   },
 };
 
-export async function correctTextWithAI(originalText: string, language: SupportedLanguage = "pt"): Promise<string> {
+export async function correctTextWithAI(originalText: string, language: SupportedLanguage = "pt"): Promise<{ correctedText: string; outOfContextWords: string[] }> {
   // --- MOCK TEMPORÁRIO PARA TESTE SEM CHAVE ---
   if (!process.env.GROQ_API_KEY) {
     return new Promise(resolve => {
-      setTimeout(() => resolve(originalText), 1500);
+      setTimeout(() => resolve({
+        correctedText: originalText,
+        outOfContextWords: []
+      }), 1500);
     });
   }
 
@@ -79,7 +85,8 @@ export async function correctTextWithAI(originalText: string, language: Supporte
         { role: "user", content: `${prompts.user}${originalText}` }
       ],
       model: "llama-3.3-70b-versatile",
-      temperature: 0.1, // Temperatura baixa para garantir que siga regras de não adicionar enrolação ao final
+      temperature: 0.1, // Temperatura baixa para garantir estabilidade do JSON
+      response_format: { type: "json_object" }
     });
 
     const content = chatCompletion.choices[0]?.message?.content;
@@ -87,8 +94,16 @@ export async function correctTextWithAI(originalText: string, language: Supporte
       throw new Error("Llama 3 devolveu uma resposta vazia.");
     }
 
-    // Passo 2: Retornamos o texto corrigido diretamente para evitar interpretações de contexto indesejadas
-    return content;
+    try {
+      const parsed = JSON.parse(content);
+      return {
+        correctedText: parsed.correctedText || originalText,
+        outOfContextWords: Array.isArray(parsed.outOfContextWords) ? parsed.outOfContextWords : []
+      };
+    } catch (parseError) {
+      console.error("Failed to parse JSON form Groq:", content);
+      return { correctedText: content, outOfContextWords: [] };
+    }
   } catch (error) {
     console.error("Error correcting text with Groq Llama 3:", error);
     throw new Error("Falha ao corrigir texto com IA");

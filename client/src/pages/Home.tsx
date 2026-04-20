@@ -15,6 +15,7 @@ import { AudioLines } from "lucide-react";
 interface ProcessingState {
   transcription: string;
   corrected: string;
+  outOfContextWords: string[];
 }
 
 type ProcessingStep = "idle" | "transcribing" | "correcting";
@@ -89,6 +90,7 @@ export default function Home() {
       });
 
       const correctedText = correctionResult.correctedText;
+      const outOfContextWords = correctionResult.outOfContextWords || [];
 
       // Save to history
       addRecord(correctedText, "auto");
@@ -96,6 +98,7 @@ export default function Home() {
       setProcessingState({
         transcription: originalText,
         corrected: correctedText,
+        outOfContextWords,
       });
 
       setProcessingStep("idle");
@@ -257,6 +260,7 @@ export default function Home() {
           <ComparisonView
             originalText={processingState.transcription}
             correctedText={processingState.corrected}
+            outOfContextWords={processingState.outOfContextWords}
             language="auto"
             onClose={handleReset}
           />
