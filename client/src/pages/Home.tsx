@@ -1,10 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { RecordingInterface } from "@/components/RecordingInterface";
 import { ComparisonView } from "@/components/ComparisonView";
 import { HistoryPanel } from "@/components/HistoryPanel";
-import { PaywallModal } from "@/components/PaywallModal";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { useTranscriptionHistory } from "@/hooks/useTranscriptionHistory";
@@ -22,9 +21,6 @@ interface ProcessingState {
 
 type ProcessingStep = "idle" | "transcribing" | "correcting";
 
-const FREE_LIMIT = 30;
-const WARNING_AT = 20;
-
 export default function Home() {
   const { user, loading, isAuthenticated, logout } = useAuth();
   const { addRecord } = useTranscriptionHistory();
@@ -32,58 +28,12 @@ export default function Home() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingStep, setProcessingStep] = useState<ProcessingStep>("idle");
   const [showHistory, setShowHistory] = useState(false);
-  const [usageCount, setUsageCount] = useState(0);
-  const [isPremium, setIsPremium] = useState(false);
-  const [showPaywall, setShowPaywall] = useState(false);
-  const warningShownRef = useRef(false);
 
   const correctMutation = trpc.text.correct.useMutation();
-  const usageQuery = trpc.user.getUsage.useQuery(
-    { openId: user?.uid ?? "" },
-    { enabled: !!user?.uid, refetchOnWindowFocus: true }
-  );
-
-  // Sincronizar estado de uso com o servidor
-  useEffect(() => {
-    if (!usageQuery.data) return;
-    const { usageCount: count, isPremium: premium } = usageQuery.data;
-    setUsageCount(count);
-    setIsPremium(premium);
-    if (!premium && count >= FREE_LIMIT) setShowPaywall(true);
-  }, [usageQuery.data]);
-
-  // Mostrar toast de aviso ao atingir 20 usos
-  useEffect(() => {
-    if (!warningShownRef.current && usageCount >= WARNING_AT && usageCount < FREE_LIMIT && !isPremium) {
-      warningShownRef.current = true;
-      toast.warning("Você tem mais 10 usos gratuitos do aplicativo", {
-        duration: 6000,
-        description: "Após 30 usos, é necessário assinar o plano Pro por US$ 1,99/mês.",
-      });
-    }
-  }, [usageCount, isPremium]);
-
-  // Detectar retorno do Stripe (payment=success)
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("payment") === "success") {
-      window.history.replaceState({}, "", window.location.pathname);
-      toast.success("🎉 Assinatura ativada! Obrigado pelo suporte.");
-      usageQuery.refetch();
-    } else if (params.get("payment") === "canceled") {
-      window.history.replaceState({}, "", window.location.pathname);
-      toast.info("Pagamento cancelado.");
-    }
-  }, []);
 
   const handleTranscriptionStart = async (audioBlob: Blob) => {
     if (!user) {
       toast.error("Você precisa estar autenticado");
-      return;
-    }
-
-    if (!isPremium && usageCount >= FREE_LIMIT) {
-      setShowPaywall(true);
       return;
     }
 
@@ -95,7 +45,7 @@ export default function Home() {
       if (audioBlob.size > MAX_BLOB_SIZE) {
         setIsProcessing(false);
         setProcessingStep("idle");
-        toast.error("Áudio muito longo (> 4.5MB). Tente gravar menos tempo.");
+        toast.error("Áudio muito longo (> 4.5MB). Vercel não suporta esse tamanho. Tente gravar menos tempo.");
         return;
       }
 
@@ -126,13 +76,7 @@ export default function Home() {
       const correctionResult = await correctMutation.mutateAsync({
         text: originalText,
         language: "auto",
-        openId: user.uid,
       });
-
-      const newCount = correctionResult.usageCount ?? usageCount + 1;
-      setUsageCount(newCount);
-
-      if (!isPremium && newCount >= FREE_LIMIT) setShowPaywall(true);
 
       addRecord(correctionResult.correctedText, "auto");
 
@@ -153,14 +97,9 @@ export default function Home() {
     } catch (error: any) {
       setProcessingStep("idle");
       setIsProcessing(false);
-
       const errorMsg = error.message || "Erro desconhecido";
-      if (errorMsg === "USAGE_LIMIT_REACHED") {
-        setShowPaywall(true);
-        return;
-      }
       if (errorMsg.includes("413") || errorMsg.includes("large")) {
-        toast.error("Áudio muito grande. Tente gravar menos de 3 minutos.");
+        toast.error("Áudio muito grande para o servidor. Tente gravar menos de 3 minutos.");
       } else if (errorMsg.includes("timeout") || errorMsg.includes("deadline")) {
         toast.error("Tempo limite excedido. Tente uma frase mais curta.");
       } else {
@@ -326,8 +265,6 @@ export default function Home() {
       <footer className="absolute bottom-4 left-0 right-0 flex justify-center text-[9px] text-muted-foreground/20 font-semibold tracking-[0.4em] uppercase pointer-events-none">
         BY FERNANDO AZEVEDO
       </footer>
-
-      {showPaywall && user && <PaywallModal openId={user.uid} />}
     </div>
   );
 }

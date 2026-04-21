@@ -1,4 +1,4 @@
-import { boolean, int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 
 export const users = mysqlTable("users", {
   id: int("id").autoincrement().primaryKey(),
@@ -10,11 +10,6 @@ export const users = mysqlTable("users", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
-  usageCount: int("usageCount").default(0).notNull(),
-  isPremium: boolean("isPremium").default(false).notNull(),
-  stripeCustomerId: varchar("stripeCustomerId", { length: 128 }),
-  stripeSubscriptionId: varchar("stripeSubscriptionId", { length: 128 }),
-  subscriptionStatus: mysqlEnum("subscriptionStatus", ["active", "canceled", "past_due"]),
 });
 
 export type User = typeof users.$inferSelect;

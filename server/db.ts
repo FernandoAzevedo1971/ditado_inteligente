@@ -1,4 +1,4 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users, transcriptions, InsertTranscription } from "../drizzle/schema.js";
 import type { User } from "../drizzle/schema.js";
@@ -73,7 +73,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
   }
 }
 
-export async function getUserByOpenId(openId: string): Promise<User | undefined> {
+export async function getUserByOpenId(openId: string) {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot get user: database not available");
@@ -81,51 +81,6 @@ export async function getUserByOpenId(openId: string): Promise<User | undefined>
   }
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
   return result.length > 0 ? result[0] : undefined;
-}
-
-export async function incrementUsageCount(openId: string): Promise<number> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-
-  await db
-    .update(users)
-    .set({ usageCount: sql`${users.usageCount} + 1` })
-    .where(eq(users.openId, openId));
-
-  const updated = await getUserByOpenId(openId);
-  return updated?.usageCount ?? 0;
-}
-
-export async function setUserPremium(
-  openId: string,
-  stripeCustomerId: string,
-  stripeSubscriptionId: string
-): Promise<void> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-
-  await db
-    .update(users)
-    .set({
-      isPremium: true,
-      stripeCustomerId,
-      stripeSubscriptionId,
-      subscriptionStatus: "active",
-    })
-    .where(eq(users.openId, openId));
-}
-
-export async function setUserByStripeCustomerId(
-  stripeCustomerId: string,
-  updates: { isPremium?: boolean; subscriptionStatus?: "active" | "canceled" | "past_due" }
-): Promise<void> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-
-  await db
-    .update(users)
-    .set(updates)
-    .where(eq(users.stripeCustomerId, stripeCustomerId));
 }
 
 export async function createTranscription(transcription: InsertTranscription) {
