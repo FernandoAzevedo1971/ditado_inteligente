@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { RecordingInterface } from "@/components/RecordingInterface";
 import { ComparisonView } from "@/components/ComparisonView";
 import { HistoryPanel } from "@/components/HistoryPanel";
+import { PaywallModal } from "@/components/PaywallModal";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { useTranscriptionHistory } from "@/hooks/useTranscriptionHistory";
@@ -21,20 +22,68 @@ interface ProcessingState {
 
 type ProcessingStep = "idle" | "transcribing" | "correcting";
 
+const FREE_LIMIT = 30;
+const WARNING_AT = 20;
+
 export default function Home() {
   const { user, loading, isAuthenticated, logout } = useAuth();
   const { addRecord } = useTranscriptionHistory();
-  const [processingState, setProcessingState] =
-    useState<ProcessingState | null>(null);
+  const [processingState, setProcessingState] = useState<ProcessingState | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingStep, setProcessingStep] = useState<ProcessingStep>("idle");
   const [showHistory, setShowHistory] = useState(false);
+  const [usageCount, setUsageCount] = useState(0);
+  const [isPremium, setIsPremium] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
+  const warningShownRef = useRef(false);
 
   const correctMutation = trpc.text.correct.useMutation();
+  const usageQuery = trpc.user.getUsage.useQuery(
+    { openId: user?.uid ?? "" },
+    { enabled: !!user?.uid, refetchOnWindowFocus: true }
+  );
+
+  // Sincronizar estado de uso com o servidor
+  useEffect(() => {
+    if (!usageQuery.data) return;
+    const { usageCount: count, isPremium: premium } = usageQuery.data;
+    setUsageCount(count);
+    setIsPremium(premium);
+    if (!premium && count >= FREE_LIMIT) setShowPaywall(true);
+  }, [usageQuery.data]);
+
+  // Mostrar toast de aviso ao atingir 20 usos
+  useEffect(() => {
+    if (!warningShownRef.current && usageCount >= WARNING_AT && usageCount < FREE_LIMIT && !isPremium) {
+      warningShownRef.current = true;
+      toast.warning("Você tem mais 10 usos gratuitos do aplicativo", {
+        duration: 6000,
+        description: "Após 30 usos, é necessário assinar o plano Pro por US$ 1,99/mês.",
+      });
+    }
+  }, [usageCount, isPremium]);
+
+  // Detectar retorno do Stripe (payment=success)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("payment") === "success") {
+      window.history.replaceState({}, "", window.location.pathname);
+      toast.success("🎉 Assinatura ativada! Obrigado pelo suporte.");
+      usageQuery.refetch();
+    } else if (params.get("payment") === "canceled") {
+      window.history.replaceState({}, "", window.location.pathname);
+      toast.info("Pagamento cancelado.");
+    }
+  }, []);
 
   const handleTranscriptionStart = async (audioBlob: Blob) => {
     if (!user) {
       toast.error("Você precisa estar autenticado");
+      return;
+    }
+
+    if (!isPremium && usageCount >= FREE_LIMIT) {
+      setShowPaywall(true);
       return;
     }
 
@@ -46,7 +95,7 @@ export default function Home() {
       if (audioBlob.size > MAX_BLOB_SIZE) {
         setIsProcessing(false);
         setProcessingStep("idle");
-        toast.error("Áudio muito longo (> 4.5MB). Vercel não suporta esse tamanho. Tente gravar menos tempo.");
+        toast.error("Áudio muito longo (> 4.5MB). Tente gravar menos tempo.");
         return;
       }
 
@@ -69,53 +118,50 @@ export default function Home() {
         throw new Error(`Erro no servidor: ${errorText.substring(0, 100)}`);
       }
 
-      if (!response.ok) {
-        throw new Error(responseData?.error || "Falha na transcrição");
-      }
+      if (!response.ok) throw new Error(responseData?.error || "Falha na transcrição");
 
       const originalText = responseData.text;
-
       setProcessingStep("correcting");
 
       const correctionResult = await correctMutation.mutateAsync({
         text: originalText,
         language: "auto",
+        openId: user.uid,
       });
 
-      const correctedText = correctionResult.correctedText;
-      const outOfContextWords = correctionResult.outOfContextWords || [];
-      const translatedTo = correctionResult.translatedTo ?? undefined;
+      const newCount = correctionResult.usageCount ?? usageCount + 1;
+      setUsageCount(newCount);
 
-      addRecord(correctedText, "auto");
+      if (!isPremium && newCount >= FREE_LIMIT) setShowPaywall(true);
+
+      addRecord(correctionResult.correctedText, "auto");
 
       setProcessingState({
         transcription: originalText,
-        corrected: correctedText,
-        outOfContextWords,
-        translatedTo,
+        corrected: correctionResult.correctedText,
+        outOfContextWords: correctionResult.outOfContextWords || [],
+        translatedTo: correctionResult.translatedTo ?? undefined,
       });
 
       setProcessingStep("idle");
       setIsProcessing(false);
       toast.success(
-        translatedTo
-          ? `Tradução para ${translatedTo} concluída!`
+        correctionResult.translatedTo
+          ? `Tradução para ${correctionResult.translatedTo} concluída!`
           : "Transcrição e correção concluídas!"
       );
     } catch (error: any) {
       setProcessingStep("idle");
       setIsProcessing(false);
-      console.error("Error processing audio:", error);
 
       const errorMsg = error.message || "Erro desconhecido";
+      if (errorMsg === "USAGE_LIMIT_REACHED") {
+        setShowPaywall(true);
+        return;
+      }
       if (errorMsg.includes("413") || errorMsg.includes("large")) {
-        toast.error(
-          "Áudio muito grande para o servidor. Tente gravar menos de 3 minutos."
-        );
-      } else if (
-        errorMsg.includes("timeout") ||
-        errorMsg.includes("deadline")
-      ) {
+        toast.error("Áudio muito grande. Tente gravar menos de 3 minutos.");
+      } else if (errorMsg.includes("timeout") || errorMsg.includes("deadline")) {
         toast.error("Tempo limite excedido. Tente uma frase mais curta.");
       } else {
         toast.error(`Erro: ${errorMsg}`);
@@ -141,7 +187,6 @@ export default function Home() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-background relative overflow-hidden">
         <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-indigo-500/5 rounded-full blur-[120px]" />
-        
         <div className="text-center mb-12 relative z-10">
           <div className="w-20 h-20 mx-auto mb-8 rounded-3xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-2xl shadow-indigo-500/20">
             <AudioLines className="w-10 h-10 text-white" />
@@ -156,9 +201,7 @@ export default function Home() {
         <Button
           onClick={async () => {
             if (!auth) {
-              toast.error(
-                "Firebase não configurado. Verifique as variáveis de ambiente."
-              );
+              toast.error("Firebase não configurado. Verifique as variáveis de ambiente.");
               return;
             }
             try {
@@ -173,7 +216,6 @@ export default function Home() {
         >
           Entrar com Google
         </Button>
-        
         <footer className="absolute bottom-8 text-[10px] text-indigo-400/20 font-semibold tracking-[0.3em] uppercase pointer-events-none">
           BY FERNANDO AZEVEDO
         </footer>
@@ -198,7 +240,6 @@ export default function Home() {
               Ditado <span className="text-indigo-500">Inteligente</span>
             </h1>
           </div>
-
           <div className="flex flex-col items-end gap-2 shrink-0 ml-3">
             <button
               onClick={logout}
@@ -207,7 +248,6 @@ export default function Home() {
             >
               <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
-
             <button
               onClick={() => setShowHistory(!showHistory)}
               className={`p-2.5 rounded-xl transition-all border border-white/5 glass-button ${
@@ -225,21 +265,17 @@ export default function Home() {
 
       <main
         className={`relative z-10 flex-1 flex flex-col items-center min-h-0 ${
-          processingState 
-            ? "justify-start pt-24 sm:pt-32 pb-4 px-2 overflow-hidden" 
-            : showHistory 
-              ? "justify-start pt-2" 
+          processingState
+            ? "justify-start pt-24 sm:pt-32 pb-4 px-2 overflow-hidden"
+            : showHistory
+              ? "justify-start pt-2"
               : "justify-center"
         } w-full`}
       >
         {showHistory ? (
           <div className="w-full max-w-2xl mx-auto px-4 py-8 animate-in slide-in-from-bottom-4 duration-500">
             <div className="flex items-center justify-end mb-8">
-              <Button
-                variant="ghost"
-                onClick={() => setShowHistory(false)}
-                className="text-muted-foreground hover:text-foreground"
-              >
+              <Button variant="ghost" onClick={() => setShowHistory(false)} className="text-muted-foreground hover:text-foreground">
                 Voltar ao Gravador
               </Button>
             </div>
@@ -271,7 +307,6 @@ export default function Home() {
                   <Loader2 className="w-16 h-16 animate-spin text-indigo-500" />
                   <div className="absolute inset-0 blur-xl bg-indigo-500/20 animate-pulse" />
                 </div>
-
                 <div className="text-center space-y-3">
                   <h2 className="text-2xl font-semibold tracking-tighter text-glow-primary">
                     {processingStep === "transcribing" ? "Transcrevendo..." : "Corrigindo com IA"}
@@ -291,6 +326,8 @@ export default function Home() {
       <footer className="absolute bottom-4 left-0 right-0 flex justify-center text-[9px] text-muted-foreground/20 font-semibold tracking-[0.4em] uppercase pointer-events-none">
         BY FERNANDO AZEVEDO
       </footer>
+
+      {showPaywall && user && <PaywallModal openId={user.uid} />}
     </div>
   );
 }
