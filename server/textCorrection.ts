@@ -16,13 +16,13 @@ REGRAS ABSOLUTAS:
 4. Identifique palavras que pareçam "fora de contexto" (possíveis erros de transcrição de voz). Retorne uma lista com essas palavras exatas, da forma como estão no texto.
 5. NUNCA adicione introduções ("Aqui está...", "O texto corrigido..."), conclusões ou explicações.
 6. Use o texto original fazendo APENAS ajustes de pontuação e paragrafação.
-7. O TEXTO DEVE ESTAR EM PARÁGRAFOS CURTOS.
+7. PARAGRAFAÇÃO POR CONTEXTO: separe obrigatoriamente em parágrafos distintos sempre que houver mudança de assunto, contexto ou ideia. Cada parágrafo deve tratar de um único tema. Se o texto inteiro tratar do mesmo assunto, pode ser um único parágrafo.
 8. VOCÊ DEVE RESPONDER EXCLUSIVAMENTE NESTE FORMATO JSON, E NADA MAIS:
 {
   "correctedText": "o texto completo corrigido e em parágrafos aqui...",
   "outOfContextWords": ["palavra1", "palavra2"]
 }`,
-    user: `Transcreva o texto abaixo, aplicando pontuação e paragrafação adequadas, mantendo o tom original e identificando as palavras fora de contexto. Responda APENAS com o JSON esperado:\n\n`,
+    user: `Transcreva o texto abaixo, aplicando pontuação e paragrafação adequadas (separando em parágrafos sempre que o contexto ou assunto mudar), mantendo o tom original e identificando as palavras fora de contexto. Responda APENAS com o JSON esperado:\n\n`,
   },
   en: {
     system: `YOU ARE A TRANSCRIPTION ASSISTANT.
@@ -35,13 +35,13 @@ ABSOLUTE RULES:
 4. Identify words that seem "out of context" (possible speech transcription errors). Return a list with these exact words as they appear in the text.
 5. NEVER add introductions ("Here is...", "The corrected text..."), conclusions, or explanations.
 6. Use the original text applying ONLY punctuation and paragraphing adjustments.
-7. TEXT MUST BE IN SHORT PARAGRAPHS.
+7. CONTEXT-BASED PARAGRAPHS: always start a new paragraph whenever the subject, context, or idea changes. Each paragraph must cover a single topic. If the entire text is about the same subject, it may be a single paragraph.
 8. YOU MUST REPLY EXCLUSIVELY IN THIS JSON FORMAT, AND NOTHING ELSE:
 {
   "correctedText": "the full corrected text with paragraphs here...",
   "outOfContextWords": ["word1", "word2"]
 }`,
-    user: `Transcribe the text below, applying adequate punctuation and paragraphing, keeping original tone and identifying out of context words. Reply ONLY with the expected JSON:\n\n`,
+    user: `Transcribe the text below, applying adequate punctuation and paragraphing (starting a new paragraph whenever the context or subject changes), keeping original tone and identifying out of context words. Reply ONLY with the expected JSON:\n\n`,
   },
   es: {
     system: `ERES UN ASISTENTE DE TRANSCRIPCIÓN.
@@ -54,13 +54,13 @@ REGLAS ABSOLUTAS:
 4. Identifica palabras que parezcan "fuera de contexto" (posibles errores de transcripción de voz). Devuelve una lista con estas palabras exactas, tal como están en el texto.
 5. NUNCA añadas introducciones ("Aquí está..."), conclusiones o explicaciones.
 6. Usa el texto original aplicando SÓLO ajustes de puntuación y párrafos.
-7. EL TEXTO DEBE ESTAR EN PÁRRAFOS CORTOS.
+7. PÁRRAFOS POR CONTEXTO: inicia siempre un nuevo párrafo cuando haya un cambio de tema, contexto o idea. Cada párrafo debe tratar un único tema. Si todo el texto trata el mismo asunto, puede ser un único párrafo.
 8. DEBES RESPONDER EXCLUSIVAMENTE EN ESTE FORMATO JSON, Y NADA MÁS:
 {
   "correctedText": "el texto completo corregido con párrafos aquí...",
   "outOfContextWords": ["palabra1", "palabra2"]
 }`,
-    user: `Transcribe el texto a continuación, aplicando puntuación y párrafos adecuados, manteniendo el tono original e identificando palabras fuera de contexto. Responde SÓLO con el JSON esperado:\n\n`,
+    user: `Transcribe el texto a continuación, aplicando puntuación y párrafos adecuados (iniciando un nuevo párrafo siempre que el contexto o el tema cambie), manteniendo el tono original e identificando palabras fuera de contexto. Responde SÓLO con el JSON esperado:\n\n`,
   },
 };
 
