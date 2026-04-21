@@ -242,10 +242,7 @@ export default function Home() {
       >
         {showHistory ? (
           <div className="w-full max-w-2xl mx-auto px-4 py-8 animate-in slide-in-from-bottom-4 duration-500">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-4xl font-semibold text-foreground tracking-tighter">
-                Anteriores
-              </h2>
+            <div className="flex items-center justify-end mb-8">
               <Button
                 variant="ghost"
                 onClick={() => setShowHistory(false)}

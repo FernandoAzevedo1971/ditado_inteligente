@@ -52,7 +52,7 @@ export function HistoryPanel() {
     <div className="space-y-4 pb-20">
       <div className="flex justify-between items-end mb-6">
         <div>
-          <h3 className="text-2xl font-semibold text-foreground tracking-tighter">Anteriores</h3>
+          <h3 className="text-2xl font-semibold text-foreground tracking-tighter">Ditados anteriores</h3>
           <p className="text-[10px] font-bold tracking-[0.2em] text-indigo-400/50 uppercase mt-1">
             {history.length} {history.length === 1 ? 'REGISTRO' : 'REGISTROS'}
           </p>
