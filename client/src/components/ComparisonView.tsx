@@ -8,6 +8,7 @@ import {
   ChevronDown,
   ChevronUp,
   RotateCcw,
+  Languages,
 } from "lucide-react";
 import VoiceEditPanel from "./VoiceEditPanel";
 
@@ -16,6 +17,7 @@ interface ComparisonViewProps {
   correctedText: string;
   outOfContextWords?: string[];
   language?: string;
+  translatedTo?: string;
   onClose: () => void;
 }
 
@@ -24,6 +26,7 @@ export function ComparisonView({
   correctedText,
   outOfContextWords = [],
   language = "auto",
+  translatedTo,
   onClose,
 }: ComparisonViewProps) {
   const [copied, setCopied] = useState(false);
@@ -56,7 +59,6 @@ export function ComparisonView({
   };
 
   const tokens = useMemo(() => {
-    // Regex divides by anything that is punctuation or space, keeping the matched split token.
     return currentCorrected.split(/([\s.,:;!?\n]+)/);
   }, [currentCorrected]);
 
@@ -77,7 +79,6 @@ export function ComparisonView({
   const getDiff = () => {
     return (
       <div className="relative w-full min-h-full cursor-text">
-        {/* Underlay */}
         <div 
           className="absolute top-0 left-0 w-full h-full pointer-events-none whitespace-pre-wrap break-words text-transparent z-0 m-0 p-0"
         >
@@ -98,7 +99,6 @@ export function ComparisonView({
           })}
         </div>
         
-        {/* Editable textarea on top */}
         <textarea
           ref={textareaRef}
           className="relative block w-full bg-transparent text-foreground outline-none resize-none z-10 whitespace-pre-wrap break-words overflow-hidden m-0 p-0 font-inherit"
@@ -117,7 +117,7 @@ export function ComparisonView({
         <div className="space-y-1.5 flex flex-col flex-1 overflow-hidden">
           <div className="flex items-center justify-between pb-0 shrink-0">
             <h2 className="text-base sm:text-lg font-semibold text-foreground tracking-tighter text-glow-primary">
-              Texto corrigido
+              {translatedTo ? `Texto traduzido` : "Texto corrigido"}
             </h2>
             <button
               onClick={onClose}
@@ -155,9 +155,16 @@ export function ComparisonView({
 
           <div className="glass-card flex-1 p-6 sm:p-8 relative shadow-[0_0_50px_rgba(99,102,241,0.05)] flex flex-col overflow-hidden min-h-0">
             <div className="flex items-center gap-2 mb-4 shrink-0">
-              <span className="px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-300 text-[10px] font-medium tracking-[0.2em] uppercase border border-indigo-500/20">
-                Transcrição corrigida
-              </span>
+              {translatedTo ? (
+                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-300 text-[10px] font-medium tracking-[0.2em] uppercase border border-emerald-500/20">
+                  <Languages className="w-3 h-3" />
+                  Traduzido para: {translatedTo}
+                </span>
+              ) : (
+                <span className="px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-300 text-[10px] font-medium tracking-[0.2em] uppercase border border-indigo-500/20">
+                  Transcrição corrigida
+                </span>
+              )}
             </div>
             <div className="text-xl sm:text-2xl text-foreground leading-relaxed font-medium tracking-tight overflow-y-auto flex-1 pb-2">
               {getDiff()}
@@ -165,7 +172,6 @@ export function ComparisonView({
           </div>
 
           <div className="pt-4 pb-1 grid grid-cols-2 gap-3 shrink-0">
-            {/* Row 1, Col 1: WhatsApp (Green) */}
             <button
               onClick={handleWhatsApp}
               className="flex items-center justify-center gap-2 px-4 py-3 text-[11px] font-medium rounded-xl transition-all duration-300 bg-emerald-500 text-white hover:bg-emerald-400 active:scale-95 shadow-lg shadow-emerald-500/20"
@@ -174,23 +180,17 @@ export function ComparisonView({
               <span>WhatsApp</span>
             </button>
 
-            {/* Row 1, Col 2: Copiar (Light Blue) */}
             <button
               onClick={handleCopy}
               className="flex items-center justify-center gap-2 px-4 py-3 text-[11px] font-medium rounded-xl transition-all duration-300 bg-sky-600 text-white hover:bg-sky-500 active:scale-95 shadow-lg shadow-sky-600/20"
             >
               {copied ? (
-                <>
-                  <Check className="w-4 h-4" /> Copiado
-                </>
+                <><Check className="w-4 h-4" /> Copiado</>
               ) : (
-                <>
-                  <Copy className="w-4 h-4" /> Copiar
-                </>
+                <><Copy className="w-4 h-4" /> Copiar</>
               )}
             </button>
 
-            {/* Row 2, Col 1: Editar por voz (Light Purple/Lilac) */}
             <button
               onClick={() => setShowVoiceEdit(true)}
               className="flex items-center justify-center gap-2 px-4 py-3 text-[11px] font-medium rounded-xl transition-all duration-300 bg-violet-400 text-violet-950 hover:bg-violet-300 active:scale-95 shadow-lg shadow-violet-400/20"
@@ -198,7 +198,6 @@ export function ComparisonView({
               <Mic className="w-4 h-4" /> Editar por voz
             </button>
 
-            {/* Row 2, Col 2: Nova gravação (White) */}
             <button
               onClick={onClose}
               className="flex items-center justify-center gap-2 px-4 py-3 text-[11px] font-medium rounded-xl transition-all duration-300 bg-white text-slate-900 hover:bg-slate-50 active:scale-95 shadow-lg shadow-white/20"
