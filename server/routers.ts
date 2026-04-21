@@ -20,7 +20,6 @@ export const appRouter = router({
         language: LANGUAGE_ENUM.default("auto"),
       }))
       .mutation(async ({ input }) => {
-        // Remove o prefixo "data:audio/webm;base64," se existir
         const base64Data = input.audioData.includes(",") 
           ? input.audioData.split(",")[1] 
           : input.audioData;
@@ -29,7 +28,6 @@ export const appRouter = router({
         const tempFilePath = path.join(os.tmpdir(), `audio-trpc-${Date.now()}.webm`);
         fs.writeFileSync(tempFilePath, buffer);
 
-        // Se language é "auto", deixa undefined para detecção automática
         const lang = input.language === "auto" ? undefined : (input.language as SupportedLanguage);
         const transcribedText = await transcribeAudioFile(tempFilePath, lang);
         
@@ -45,12 +43,12 @@ export const appRouter = router({
         language: LANGUAGE_ENUM.default("auto"),
       }))
       .mutation(async ({ input }) => {
-        // Se language é "auto", deixa undefined para detecção automática
         const lang = input.language === "auto" ? undefined : (input.language as CorrectionLanguage);
         const result = await correctTextWithAI(input.text, lang);
         return { 
           correctedText: result.correctedText, 
-          outOfContextWords: result.outOfContextWords 
+          outOfContextWords: result.outOfContextWords,
+          translatedTo: result.translatedTo,
         };
       }),
     applyVoiceCorrections: publicProcedure
@@ -60,7 +58,6 @@ export const appRouter = router({
         language: LANGUAGE_ENUM.default("auto"),
       }))
       .mutation(async ({ input }) => {
-        // Se language é "auto", usa "pt" como padrão para voiceCorrections
         const lang: CorrectionLanguage = (input.language === "auto" ? "pt" : input.language) as CorrectionLanguage;
         const finalText = await applyVoiceCorrections(
           input.correctedText,
