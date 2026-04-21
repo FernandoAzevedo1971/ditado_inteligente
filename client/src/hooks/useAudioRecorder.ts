@@ -29,6 +29,38 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const animationRef = useRef<number | null>(null);
+  const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+
+  const acquireWakeLock = async () => {
+    if (!("wakeLock" in navigator)) return;
+    try {
+      wakeLockRef.current = await navigator.wakeLock.request("screen");
+    } catch (e) {
+      console.warn("Wake lock não disponível:", e);
+    }
+  };
+
+  const releaseWakeLock = async () => {
+    if (wakeLockRef.current) {
+      try {
+        await wakeLockRef.current.release();
+      } catch (e) {
+        console.warn("Erro ao liberar wake lock:", e);
+      }
+      wakeLockRef.current = null;
+    }
+  };
+
+  // Re-adquire o wake lock ao retornar para a página (o browser libera automaticamente ao esconder)
+  useEffect(() => {
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState === "visible" && isRecording) {
+        await acquireWakeLock();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [isRecording]);
 
   const startRecording = async () => {
     try {
@@ -41,6 +73,9 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
         toast.error(errorMsg);
         return;
       }
+
+      // Impede a tela de apagar enquanto o ditado estiver ativo
+      await acquireWakeLock();
 
       // Request microphone access
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -93,6 +128,7 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
         setError(errorMsg);
         toast.error(errorMsg);
         setIsRecording(false);
+        releaseWakeLock();
       };
 
       mediaRecorder.start();
@@ -150,7 +186,7 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
       }, 1000);
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Erro ao acessar o microfone";
-      
+
       if (errorMsg.includes("NotAllowedError") || errorMsg.includes("Permission denied")) {
         setError("Permissão de microfone negada. Por favor, permita o acesso ao microfone nas configurações do navegador.");
         toast.error("Permissão de microfone negada");
@@ -164,6 +200,7 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
 
       console.error("Error accessing microphone:", err);
       setIsRecording(false);
+      releaseWakeLock();
     }
   };
 
@@ -191,6 +228,9 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
         audioContextRef.current = null;
       }
     }
+
+    // Libera o wake lock ao parar o ditado
+    releaseWakeLock();
   };
 
   const resetRecording = () => {
@@ -214,6 +254,7 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
           console.warn("Error closing audio context on cleanup:", e);
         }
       }
+      releaseWakeLock();
     };
   }, []);
 
