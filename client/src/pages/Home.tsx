@@ -16,6 +16,7 @@ interface ProcessingState {
   transcription: string;
   corrected: string;
   outOfContextWords: string[];
+  translatedTo?: string;
 }
 
 type ProcessingStep = "idle" | "transcribing" | "correcting";
@@ -23,14 +24,12 @@ type ProcessingStep = "idle" | "transcribing" | "correcting";
 export default function Home() {
   const { user, loading, isAuthenticated, logout } = useAuth();
   const { addRecord } = useTranscriptionHistory();
-  // Remover tema escuro - manter apenas fundo claro
   const [processingState, setProcessingState] =
     useState<ProcessingState | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingStep, setProcessingStep] = useState<ProcessingStep>("idle");
   const [showHistory, setShowHistory] = useState(false);
 
-  // Mutations
   const correctMutation = trpc.text.correct.useMutation();
 
   const handleTranscriptionStart = async (audioBlob: Blob) => {
@@ -43,10 +42,7 @@ export default function Home() {
     setProcessingStep("transcribing");
 
     try {
-      // 1. Verificação de tamanho (Vercel Payload Limit: 4.5MB)
-      // Como usamos FormData agora, o limite é o binário puro.
-      // O áudio agora é gravado com bitrate 32kbps (~720KB para 3 min)
-      const MAX_BLOB_SIZE = 4.5 * 1024 * 1024; // 4.5MB
+      const MAX_BLOB_SIZE = 4.5 * 1024 * 1024;
       if (audioBlob.size > MAX_BLOB_SIZE) {
         setIsProcessing(false);
         setProcessingStep("idle");
@@ -54,7 +50,6 @@ export default function Home() {
         return;
       }
 
-      // 2. Envio via FormData para evitar overhead de Base64
       const formData = new FormData();
       formData.append("file", audioBlob, "audio.webm");
       formData.append("provider", "groq");
@@ -80,10 +75,8 @@ export default function Home() {
 
       const originalText = responseData.text;
 
-      // Move to correction step
       setProcessingStep("correcting");
 
-      // Correct text with AI
       const correctionResult = await correctMutation.mutateAsync({
         text: originalText,
         language: "auto",
@@ -91,19 +84,24 @@ export default function Home() {
 
       const correctedText = correctionResult.correctedText;
       const outOfContextWords = correctionResult.outOfContextWords || [];
+      const translatedTo = correctionResult.translatedTo ?? undefined;
 
-      // Save to history
       addRecord(correctedText, "auto");
 
       setProcessingState({
         transcription: originalText,
         corrected: correctedText,
         outOfContextWords,
+        translatedTo,
       });
 
       setProcessingStep("idle");
       setIsProcessing(false);
-      toast.success("Transcrição e correção concluídas!");
+      toast.success(
+        translatedTo
+          ? `Tradução para ${translatedTo} concluída!`
+          : "Transcrição e correção concluídas!"
+      );
     } catch (error: any) {
       setProcessingStep("idle");
       setIsProcessing(false);
@@ -142,7 +140,6 @@ export default function Home() {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-background relative overflow-hidden">
-        {/* Ambient Background */}
         <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-indigo-500/5 rounded-full blur-[120px]" />
         
         <div className="text-center mb-12 relative z-10">
@@ -186,13 +183,11 @@ export default function Home() {
 
   return (
     <div className="h-[100dvh] flex flex-col bg-background overflow-x-hidden relative">
-      {/* Ambient Background Elements - Ultra Clean */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-indigo-500/5 rounded-full blur-[120px]" />
         <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-blue-500/5 rounded-full blur-[120px]" />
       </div>
 
-      {/* Header - Glassmorphism & Minimal */}
       <header className="absolute top-0 left-0 right-0 z-20 px-6 pt-4 pb-2 bg-transparent">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3 min-w-0">
@@ -204,7 +199,6 @@ export default function Home() {
             </h1>
           </div>
 
-          {/* Ícones empilhados na vertical à direita */}
           <div className="flex flex-col items-end gap-2 shrink-0 ml-3">
             <button
               onClick={logout}
@@ -227,10 +221,8 @@ export default function Home() {
             </button>
           </div>
         </div>
-
       </header>
 
-      {/* Main Content Area */}
       <main
         className={`relative z-10 flex-1 flex flex-col items-center min-h-0 ${
           processingState 
@@ -258,6 +250,7 @@ export default function Home() {
             originalText={processingState.transcription}
             correctedText={processingState.corrected}
             outOfContextWords={processingState.outOfContextWords}
+            translatedTo={processingState.translatedTo}
             language="auto"
             onClose={handleReset}
           />
@@ -270,7 +263,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* Processing Overlay - Premium Blur */}
         {isProcessing && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 animate-in fade-in duration-500">
             <div className="glass-card p-12 max-w-md w-full mx-4 border-white/10 shadow-[0_0_100px_rgba(99,102,241,0.2)]">
@@ -282,10 +274,12 @@ export default function Home() {
 
                 <div className="text-center space-y-3">
                   <h2 className="text-2xl font-semibold tracking-tighter text-glow-primary">
-                    Corrigindo com IA
+                    {processingStep === "transcribing" ? "Transcrevendo..." : "Corrigindo com IA"}
                   </h2>
                   <p className="text-sm text-indigo-200/50 font-medium tracking-wide">
-                    Aplicando pontuação, gramática e parágrafos...
+                    {processingStep === "transcribing"
+                      ? "Convertendo áudio em texto..."
+                      : "Aplicando pontuação, gramática e parágrafos..."}
                   </p>
                 </div>
               </div>
