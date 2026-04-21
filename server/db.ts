@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users, transcriptions, InsertTranscription } from "../drizzle/schema.js";
 import type { User } from "../drizzle/schema.js";
@@ -6,7 +6,6 @@ import { ENV } from "./_core/env.js";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
-// Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
@@ -31,9 +30,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
   }
 
   try {
-    const values: InsertUser = {
-      openId: user.openId,
-    };
+    const values: InsertUser = { openId: user.openId };
     const updateSet: Record<string, unknown> = {};
 
     const textFields = ["name", "email", "loginMethod"] as const;
@@ -57,8 +54,8 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       values.role = user.role;
       updateSet.role = user.role;
     } else if (user.openId === ENV.ownerOpenId) {
-      values.role = 'admin';
-      updateSet.role = 'admin';
+      values.role = "admin";
+      updateSet.role = "admin";
     }
 
     if (!values.lastSignedIn) {
@@ -69,67 +66,89 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       updateSet.lastSignedIn = new Date();
     }
 
-    await db.insert(users).values(values).onDuplicateKeyUpdate({
-      set: updateSet,
-    });
+    await db.insert(users).values(values).onDuplicateKeyUpdate({ set: updateSet });
   } catch (error) {
     console.error("[Database] Failed to upsert user:", error);
     throw error;
   }
 }
 
-export async function getUserByOpenId(openId: string) {
+export async function getUserByOpenId(openId: string): Promise<User | undefined> {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot get user: database not available");
     return undefined;
   }
-
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
-
   return result.length > 0 ? result[0] : undefined;
+}
+
+export async function incrementUsageCount(openId: string): Promise<number> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(users)
+    .set({ usageCount: sql`${users.usageCount} + 1` })
+    .where(eq(users.openId, openId));
+
+  const updated = await getUserByOpenId(openId);
+  return updated?.usageCount ?? 0;
+}
+
+export async function setUserPremium(
+  openId: string,
+  stripeCustomerId: string,
+  stripeSubscriptionId: string
+): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(users)
+    .set({
+      isPremium: true,
+      stripeCustomerId,
+      stripeSubscriptionId,
+      subscriptionStatus: "active",
+    })
+    .where(eq(users.openId, openId));
+}
+
+export async function setUserByStripeCustomerId(
+  stripeCustomerId: string,
+  updates: { isPremium?: boolean; subscriptionStatus?: "active" | "canceled" | "past_due" }
+): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(users)
+    .set(updates)
+    .where(eq(users.stripeCustomerId, stripeCustomerId));
 }
 
 export async function createTranscription(transcription: InsertTranscription) {
   const db = await getDb();
-  if (!db) {
-    throw new Error("Database not available");
-  }
-
-  const result = await db.insert(transcriptions).values(transcription);
-  return result;
+  if (!db) throw new Error("Database not available");
+  return db.insert(transcriptions).values(transcription);
 }
 
 export async function getUserTranscriptions(userId: number) {
   const db = await getDb();
-  if (!db) {
-    throw new Error("Database not available");
-  }
-
-  const result = await db
+  if (!db) throw new Error("Database not available");
+  return db
     .select()
     .from(transcriptions)
     .where(eq(transcriptions.userId, userId))
     .orderBy((t) => t.createdAt)
     .limit(100);
-
-  return result;
 }
 
 export async function deleteTranscription(id: number, userId: number) {
   const db = await getDb();
-  if (!db) {
-    throw new Error("Database not available");
-  }
-
-  const result = await db
+  if (!db) throw new Error("Database not available");
+  return db
     .delete(transcriptions)
-    .where(
-      and(
-        eq(transcriptions.id, id),
-        eq(transcriptions.userId, userId)
-      )
-    );
-
-  return result;
+    .where(and(eq(transcriptions.id, id), eq(transcriptions.userId, userId)));
 }
