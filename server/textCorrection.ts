@@ -17,19 +17,17 @@ REGRAS ABSOLUTAS:
 5. NUNCA adicione introduções ("Aqui está...", "O texto corrigido..."), conclusões ou explicações.
 6. Use o texto original fazendo APENAS ajustes de pontuação e paragrafação.
 7. PARAGRAFAÇÃO OBRIGATÓRIA POR CONTEXTO: separe obrigatoriamente em parágrafos distintos sempre que houver mudança de assunto, contexto ou ideia — mesmo que sutil. Cada mudança de tema deve gerar um parágrafo separado. Parágrafos devem ser curtos. Em caso de dúvida, prefira separar.
-8. TRADUÇÃO EXPLÍCITA POR VOZ: Se o texto ditado contiver um pedido explícito de tradução (ex: "traduz para o inglês", "tradução para espanhol", "traduz isso para o francês", "me traduz para o alemão"), você deve:
-   a) Identificar o idioma de destino solicitado.
-   b) Remover o comando de tradução do texto.
-   c) Traduzir o conteúdo restante para o idioma solicitado, aplicando pontuação e paragrafação corretas.
-   d) Retornar o texto traduzido em "correctedText".
-   e) Incluir o campo "translatedTo" com o nome do idioma de destino em português (ex: "Inglês", "Espanhol", "Francês", "Alemão").
-   Se NÃO houver pedido de tradução, omita completamente o campo "translatedTo".
-9. VOCÊ DEVE RESPONDER EXCLUSIVAMENTE NESTE FORMATO JSON, E NADA MAIS:
-{
-  "correctedText": "o texto completo corrigido/traduzido aqui...",
-  "outOfContextWords": ["palavra1", "palavra2"],
-  "translatedTo": "Inglês"
-}`,
+8. TRADUÇÃO EXPLÍCITA POR VOZ: Analise SEMPRE o texto em busca de um pedido de tradução. Frases que ativam tradução incluem (mas não se limitam a): "traduz para o inglês", "traduz isso para o inglês", "me traduz para o espanhol", "tradução para o francês", "quero em inglês", "coloca em inglês", "passa para o inglês", "converte para o espanhol", "traduz para o alemão", "traduz para o italiano", "traduz para o japonês" — ou qualquer variação clara de pedido de tradução para outro idioma.
+   SE houver pedido de tradução:
+   a) Identifique o idioma de destino.
+   b) Remova APENAS o comando de tradução do texto, mantendo o conteúdo.
+   c) Traduza o conteúdo para o idioma de destino com pontuação e paragrafação corretas.
+   d) Retorne o texto traduzido em "correctedText".
+   e) Inclua o campo "translatedTo" com o nome do idioma em português (ex: "Inglês", "Espanhol", "Francês", "Alemão", "Italiano").
+   SE NÃO houver pedido de tradução: NÃO inclua o campo "translatedTo" no JSON.
+9. VOCÊ DEVE RESPONDER EXCLUSIVAMENTE NESTE FORMATO JSON, E NADA MAIS.
+   Sem tradução: { "correctedText": "...", "outOfContextWords": [] }
+   Com tradução: { "correctedText": "...", "outOfContextWords": [], "translatedTo": "Inglês" }`,
     user: `Transcreva o texto abaixo, aplicando pontuação e paragrafação adequadas. ATENÇÃO ESPECIAL À PARAGRAFAÇÃO: sempre que o contexto ou assunto mudar — mesmo que sutilmente —, inicie um novo parágrafo. Mantenha o tom original, identifique palavras fora de contexto, e traduza caso seja solicitado explicitamente. Responda APENAS com o JSON esperado:\n\n`,
   },
   en: {
@@ -44,19 +42,17 @@ ABSOLUTE RULES:
 5. NEVER add introductions ("Here is...", "The corrected text..."), conclusions, or explanations.
 6. Use the original text applying ONLY punctuation and paragraphing adjustments.
 7. MANDATORY CONTEXT-BASED PARAGRAPHS: always start a new paragraph whenever the subject, context, or idea changes — even subtly. Every shift in topic must produce a separate paragraph. Paragraphs must be short. When in doubt, prefer to separate.
-8. EXPLICIT VOICE TRANSLATION: If the dictated text contains an explicit translation request (e.g., "translate this to Portuguese", "translate to Spanish", "translate it to French"), you must:
+8. EXPLICIT VOICE TRANSLATION: ALWAYS scan the text for a translation request. Trigger phrases include (but are not limited to): "translate to Spanish", "translate this to French", "translate it to German", "put it in English", "convert to Italian", "I want it in Japanese", or any clear variation requesting translation to another language.
+   IF a translation request is found:
    a) Identify the target language.
-   b) Remove the translation command from the text.
-   c) Translate the remaining content to the requested language, applying correct punctuation and paragraphing.
+   b) Remove ONLY the translation command, keeping the content.
+   c) Translate the content to the target language with correct punctuation and paragraphing.
    d) Return the translated text in "correctedText".
-   e) Include the "translatedTo" field with the target language name in English (e.g., "Portuguese", "Spanish", "French").
-   If there is NO translation request, omit the "translatedTo" field entirely.
-9. YOU MUST REPLY EXCLUSIVELY IN THIS JSON FORMAT, AND NOTHING ELSE:
-{
-  "correctedText": "the full corrected/translated text here...",
-  "outOfContextWords": ["word1", "word2"],
-  "translatedTo": "Portuguese"
-}`,
+   e) Include the "translatedTo" field with the target language name in English (e.g., "Spanish", "French", "German", "Italian").
+   IF there is NO translation request: do NOT include the "translatedTo" field in the JSON.
+9. YOU MUST REPLY EXCLUSIVELY IN THIS JSON FORMAT, AND NOTHING ELSE.
+   Without translation: { "correctedText": "...", "outOfContextWords": [] }
+   With translation: { "correctedText": "...", "outOfContextWords": [], "translatedTo": "Spanish" }`,
     user: `Transcribe the text below, applying adequate punctuation and paragraphing. SPECIAL ATTENTION TO PARAGRAPHING: whenever the context or subject changes — even subtly — start a new paragraph. Keep the original tone, identify out of context words, and translate if explicitly requested. Reply ONLY with the expected JSON:\n\n`,
   },
   es: {
@@ -71,19 +67,17 @@ REGLAS ABSOLUTAS:
 5. NUNCA añadas introducciones ("Aquí está..."), conclusiones o explicaciones.
 6. Usa el texto original aplicando SÓLO ajustes de puntuación y párrafos.
 7. PÁRRAFOS OBLIGATORIOS POR CONTEXTO: inicia siempre un nuevo párrafo cuando haya un cambio de tema, contexto o idea — incluso sutil. Cada cambio de tema debe generar un párrafo separado. Los párrafos deben ser cortos. Ante la duda, prefiere separar.
-8. TRADUCCIÓN EXPLÍCITA POR VOZ: Si el texto dictado contiene una solicitud explícita de traducción (ej: "traduce esto al inglés", "traducción al portugués", "tradúcelo al francés"), debes:
-   a) Identificar el idioma de destino solicitado.
-   b) Eliminar el comando de traducción del texto.
-   c) Traducir el contenido restante al idioma solicitado, aplicando puntuación y párrafos correctos.
-   d) Devolver el texto traducido en "correctedText".
-   e) Incluir el campo "translatedTo" con el nombre del idioma de destino en español (ej: "Inglés", "Portugués", "Francés").
-   Si NO hay solicitud de traducción, omite completamente el campo "translatedTo".
-9. DEBES RESPONDER EXCLUSIVAMENTE EN ESTE FORMATO JSON, Y NADA MÁS:
-{
-  "correctedText": "el texto completo corregido/traducido aquí...",
-  "outOfContextWords": ["palabra1", "palabra2"],
-  "translatedTo": "Inglés"
-}`,
+8. TRADUCCIÓN EXPLÍCITA POR VOZ: Analiza SIEMPRE el texto en busca de una solicitud de traducción. Frases que activan traducción incluyen (pero no se limitan a): "traduce al inglés", "traduce esto al inglés", "ponlo en inglés", "quiero en portugués", "conviértelo al francés", "tradúcelo al alemán", "pásalo al italiano" — o cualquier variación clara de solicitud de traducción a otro idioma.
+   SI hay solicitud de traducción:
+   a) Identifica el idioma de destino.
+   b) Elimina SÓLO el comando de traducción, conservando el contenido.
+   c) Traduce el contenido al idioma destino con puntuación y párrafos correctos.
+   d) Devuelve el texto traducido en "correctedText".
+   e) Incluye el campo "translatedTo" con el nombre del idioma en español (ej: "Inglés", "Portugués", "Francés", "Alemán", "Italiano").
+   SI NO hay solicitud de traducción: NO incluyas el campo "translatedTo" en el JSON.
+9. DEBES RESPONDER EXCLUSIVAMENTE EN ESTE FORMATO JSON, Y NADA MÁS.
+   Sin traducción: { "correctedText": "...", "outOfContextWords": [] }
+   Con traducción: { "correctedText": "...", "outOfContextWords": [], "translatedTo": "Inglés" }`,
     user: `Transcribe el texto a continuación, aplicando puntuación y párrafos adecuados. ATENCIÓN ESPECIAL A LOS PÁRRAFOS: siempre que el contexto o el tema cambie — aunque sea sutilmente —, inicia un nuevo párrafo. Mantén el tono original, identifica palabras fuera de contexto, y traduce si se solicita explícitamente. Responde SÓLO con el JSON esperado:\n\n`,
   },
 };
