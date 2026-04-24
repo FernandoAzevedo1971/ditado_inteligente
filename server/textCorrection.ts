@@ -16,7 +16,7 @@ REGRAS ABSOLUTAS:
 4. Identifique palavras que pareçam "fora de contexto" (possíveis erros de transcrição de voz). Retorne uma lista com essas palavras exatas, da forma como estão no texto.
 5. NUNCA adicione introduções ("Aqui está...", "O texto corrigido..."), conclusões ou explicações.
 6. Use o texto original fazendo APENAS ajustes de pontuação e paragrafação.
-7. PARAGRAFAÇÃO POR CONTEXTO: separe obrigatoriamente em parágrafos distintos sempre que houver mudança de assunto, contexto ou ideia. Cada parágrafo deve tratar de um único tema. Se o texto inteiro tratar do mesmo assunto, pode ser um único parágrafo.
+7. PARAGRAFAÇÃO OBRIGATÓRIA POR CONTEXTO: separe obrigatoriamente em parágrafos distintos sempre que houver mudança de assunto, contexto ou ideia — mesmo que sutil. Cada mudança de tema deve gerar um parágrafo separado. Parágrafos devem ser curtos. Em caso de dúvida, prefira separar.
 8. TRADUÇÃO EXPLÍCITA POR VOZ: Se o texto ditado contiver um pedido explícito de tradução (ex: "traduz para o inglês", "tradução para espanhol", "traduz isso para o francês", "me traduz para o alemão"), você deve:
    a) Identificar o idioma de destino solicitado.
    b) Remover o comando de tradução do texto.
@@ -30,7 +30,7 @@ REGRAS ABSOLUTAS:
   "outOfContextWords": ["palavra1", "palavra2"],
   "translatedTo": "Inglês"
 }`,
-    user: `Transcreva o texto abaixo, aplicando pontuação e paragrafação adequadas (separando em parágrafos sempre que o contexto ou assunto mudar), mantendo o tom original, identificando palavras fora de contexto, e traduzindo caso seja solicitado explicitamente. Responda APENAS com o JSON esperado:\n\n`,
+    user: `Transcreva o texto abaixo, aplicando pontuação e paragrafação adequadas. ATENÇÃO ESPECIAL À PARAGRAFAÇÃO: sempre que o contexto ou assunto mudar — mesmo que sutilmente —, inicie um novo parágrafo. Mantenha o tom original, identifique palavras fora de contexto, e traduza caso seja solicitado explicitamente. Responda APENAS com o JSON esperado:\n\n`,
   },
   en: {
     system: `YOU ARE A TRANSCRIPTION ASSISTANT.
@@ -43,7 +43,7 @@ ABSOLUTE RULES:
 4. Identify words that seem "out of context" (possible speech transcription errors). Return a list with these exact words as they appear in the text.
 5. NEVER add introductions ("Here is...", "The corrected text..."), conclusions, or explanations.
 6. Use the original text applying ONLY punctuation and paragraphing adjustments.
-7. CONTEXT-BASED PARAGRAPHS: always start a new paragraph whenever the subject, context, or idea changes. Each paragraph must cover a single topic. If the entire text is about the same subject, it may be a single paragraph.
+7. MANDATORY CONTEXT-BASED PARAGRAPHS: always start a new paragraph whenever the subject, context, or idea changes — even subtly. Every shift in topic must produce a separate paragraph. Paragraphs must be short. When in doubt, prefer to separate.
 8. EXPLICIT VOICE TRANSLATION: If the dictated text contains an explicit translation request (e.g., "translate this to Portuguese", "translate to Spanish", "translate it to French"), you must:
    a) Identify the target language.
    b) Remove the translation command from the text.
@@ -57,7 +57,7 @@ ABSOLUTE RULES:
   "outOfContextWords": ["word1", "word2"],
   "translatedTo": "Portuguese"
 }`,
-    user: `Transcribe the text below, applying adequate punctuation and paragraphing (starting a new paragraph whenever the context or subject changes), keeping original tone, identifying out of context words, and translating if explicitly requested. Reply ONLY with the expected JSON:\n\n`,
+    user: `Transcribe the text below, applying adequate punctuation and paragraphing. SPECIAL ATTENTION TO PARAGRAPHING: whenever the context or subject changes — even subtly — start a new paragraph. Keep the original tone, identify out of context words, and translate if explicitly requested. Reply ONLY with the expected JSON:\n\n`,
   },
   es: {
     system: `ERES UN ASISTENTE DE TRANSCRIPCIÓN.
@@ -70,7 +70,7 @@ REGLAS ABSOLUTAS:
 4. Identifica palabras que parezcan "fuera de contexto" (posibles errores de transcripción de voz). Devuelve una lista con estas palabras exactas, tal como están en el texto.
 5. NUNCA añadas introducciones ("Aquí está..."), conclusiones o explicaciones.
 6. Usa el texto original aplicando SÓLO ajustes de puntuación y párrafos.
-7. PÁRRAFOS POR CONTEXTO: inicia siempre un nuevo párrafo cuando haya un cambio de tema, contexto o idea. Cada párrafo debe tratar un único tema. Si todo el texto trata el mismo asunto, puede ser un único párrafo.
+7. PÁRRAFOS OBLIGATORIOS POR CONTEXTO: inicia siempre un nuevo párrafo cuando haya un cambio de tema, contexto o idea — incluso sutil. Cada cambio de tema debe generar un párrafo separado. Los párrafos deben ser cortos. Ante la duda, prefiere separar.
 8. TRADUCCIÓN EXPLÍCITA POR VOZ: Si el texto dictado contiene una solicitud explícita de traducción (ej: "traduce esto al inglés", "traducción al portugués", "tradúcelo al francés"), debes:
    a) Identificar el idioma de destino solicitado.
    b) Eliminar el comando de traducción del texto.
@@ -84,7 +84,7 @@ REGLAS ABSOLUTAS:
   "outOfContextWords": ["palabra1", "palabra2"],
   "translatedTo": "Inglés"
 }`,
-    user: `Transcribe el texto a continuación, aplicando puntuación y párrafos adecuados (iniciando un nuevo párrafo siempre que el contexto o el tema cambie), manteniendo el tono original, identificando palabras fuera de contexto, y traduciendo si se solicita explícitamente. Responde SÓLO con el JSON esperado:\n\n`,
+    user: `Transcribe el texto a continuación, aplicando puntuación y párrafos adecuados. ATENCIÓN ESPECIAL A LOS PÁRRAFOS: siempre que el contexto o el tema cambie — aunque sea sutilmente —, inicia un nuevo párrafo. Mantén el tono original, identifica palabras fuera de contexto, y traduce si se solicita explícitamente. Responde SÓLO con el JSON esperado:\n\n`,
   },
 };
 
