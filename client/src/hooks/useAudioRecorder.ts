@@ -51,7 +51,6 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
     }
   };
 
-  // Re-adquire o wake lock ao retornar para a página (o browser libera automaticamente ao esconder)
   useEffect(() => {
     const handleVisibilityChange = async () => {
       if (document.visibilityState === "visible" && isRecording) {
@@ -66,7 +65,6 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
     try {
       setError(null);
 
-      // Check if getUserMedia is supported
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         const errorMsg = "Seu navegador não suporta gravação de áudio";
         setError(errorMsg);
@@ -74,10 +72,8 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
         return;
       }
 
-      // Impede a tela de apagar enquanto o ditado estiver ativo
       await acquireWakeLock();
 
-      // Request microphone access
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
@@ -89,7 +85,6 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
       streamRef.current = stream;
       chunksRef.current = [];
 
-      // Check supported MIME types
       let mimeType = "audio/webm";
       if (!MediaRecorder.isTypeSupported(mimeType)) {
         mimeType = "audio/mp4";
@@ -103,7 +98,7 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
 
       const mediaRecorder = new MediaRecorder(stream, {
         mimeType: mimeType || undefined,
-        audioBitsPerSecond: 32000,
+        audioBitsPerSecond: 64000,
       });
       mediaRecorderRef.current = mediaRecorder;
 
@@ -118,7 +113,6 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
         const blob = new Blob(chunksRef.current, { type: actualMimeType });
         setAudioBlob(blob);
         chunksRef.current = [];
-
         stream.getTracks().forEach((track) => track.stop());
         streamRef.current = null;
       };
@@ -135,7 +129,6 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
       setIsRecording(true);
       setRecordingTime(0);
 
-      // Setup audio context for amplitude visualization
       try {
         const AudioContext = (window as any).AudioContext || (window as any).webkitAudioContext;
         if (AudioContext) {
@@ -148,19 +141,12 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
           source.connect(analyser);
           analyserRef.current = analyser;
 
-          // Start amplitude visualization
           const updateAmplitude = () => {
             if (!analyserRef.current) return;
-
-            const dataArray = new Uint8Array(
-              analyserRef.current.frequencyBinCount
-            );
+            const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
             analyserRef.current.getByteFrequencyData(dataArray);
-
-            const average =
-              dataArray.reduce((a, b) => a + b) / dataArray.length;
+            const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
             setAmplitude(average / 255);
-
             animationRef.current = requestAnimationFrame(updateAmplitude);
           };
 
@@ -170,12 +156,10 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
         console.warn("Audio context not available for visualization:", audioError);
       }
 
-      // Start recording timer with auto-stop
       timerRef.current = setInterval(() => {
         setRecordingTime((prev) => {
           const nextTime = prev + 1;
           if (nextTime >= MAX_RECORDING_SECONDS) {
-            // Must use ref instead of state action since state may be stale inside the interval without proper deps
             if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
               mediaRecorderRef.current.stop();
               toast.info("Limite de 3 minutos atingido. Gravação finalizada automaticamente.");
@@ -229,7 +213,6 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
       }
     }
 
-    // Libera o wake lock ao parar o ditado
     releaseWakeLock();
   };
 
