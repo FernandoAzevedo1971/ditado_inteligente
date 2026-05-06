@@ -47,11 +47,19 @@ Blocos típicos de um prontuário médico que SEMPRE devem estar em parágrafos 
   • Exames solicitados
   • Conduta / Prescrição / Orientações
 
+═══ EXEMPLO OBRIGATÓRIO — siga este padrão de paragrafação ═══
+Entrada: "paciente joão silva 45 anos masculino queixa dor no peito há 3 dias nega febre tem hipertensão arterial usa losartana há 2 anos pressão arterial 150 por 90 frequência cardíaca 88 batimentos por minuto ritmo regular ausculta pulmonar murmúrio vesicular presente sem ruídos adventícios abdome sem alterações hipótese diagnóstica angina instável conduta solicitar eletrocardiograma e troponina prescrever AAS 100 miligramas por dia orientar retorno em 24 horas"
+
+Saída correta:
+{"correctedText":"Paciente João Silva, 45 anos, masculino. Queixa de dor no peito há 3 dias. Nega febre. Tem hipertensão arterial, usa losartana há 2 anos.\n\nPressão arterial: 150/90 mmHg. Frequência cardíaca: 88 bpm, ritmo regular. Ausculta pulmonar com murmúrio vesicular presente, sem ruídos adventícios. Abdome sem alterações.\n\nHipótese diagnóstica: angina instável.\n\nConduta: solicitar eletrocardiograma e troponina. Prescrever AAS 100 mg/dia. Orientar retorno em 24 horas.","outOfContextWords":[]}
+
+OBSERVE: cada bloco temático (identificação, exame físico, hipótese, conduta) ficou em parágrafo separado com \\n\\n.
+
 ═══ FORMATO DE RESPOSTA ═══
 Responda EXCLUSIVAMENTE com JSON válido — nenhum texto antes ou depois:
 Modo transcrição: { "correctedText": "...", "outOfContextWords": ["palavra1"] }
 Modo tradução:    { "correctedText": "...", "outOfContextWords": [], "translatedTo": "Inglês" }`,
-    user: `Analise o texto de ditado médico abaixo, detecte o modo (tradução ou transcrição) e responda APENAS com o JSON:\n\n`,
+    user: `Analise o texto de ditado médico abaixo e responda APENAS com o JSON. Use \\n\\n para separar cada bloco temático, exatamente como no exemplo acima:\n\n`,
   },
   en: {
     system: `YOU ARE A SPECIALIST REVIEWER FOR MEDICAL AND CLINICAL DICTATION.
@@ -94,11 +102,19 @@ Typical medical note sections that MUST always be in separate paragraphs:
   • Assessment / Diagnosis
   • Orders / Prescription / Instructions
 
+═══ MANDATORY EXAMPLE — follow this paragraphing pattern ═══
+Input: "patient john smith 45 year old male chief complaint chest pain for 3 days denies fever has hypertension uses losartan for 2 years blood pressure 150 over 90 heart rate 88 regular rhythm lung auscultation clear no adventitious sounds abdomen unremarkable assessment unstable angina plan order ECG and troponin prescribe aspirin 100 milligrams per day follow up in 24 hours"
+
+Correct output:
+{"correctedText":"Patient John Smith, 45-year-old male. Chief complaint: chest pain for 3 days. Denies fever. Has hypertension, uses losartan for 2 years.\n\nBlood pressure: 150/90 mmHg. Heart rate: 88 bpm, regular rhythm. Lung auscultation clear, no adventitious sounds. Abdomen unremarkable.\n\nAssessment: unstable angina.\n\nPlan: order ECG and troponin. Prescribe aspirin 100 mg/day. Follow up in 24 hours.","outOfContextWords":[]}
+
+NOTE: each thematic block (identification, physical exam, assessment, plan) is in a separate paragraph with \\n\\n.
+
 ═══ RESPONSE FORMAT ═══
 Reply EXCLUSIVELY with valid JSON — no text before or after:
 Transcription mode: { "correctedText": "...", "outOfContextWords": ["word1"] }
 Translation mode:   { "correctedText": "...", "outOfContextWords": [], "translatedTo": "Spanish" }`,
-    user: `Analyze the medical dictation text below, detect the mode (translation or transcription) and reply ONLY with the JSON:\n\n`,
+    user: `Analyze the medical dictation below and reply ONLY with the JSON. Use \\n\\n to separate each thematic block, exactly as in the example above:\n\n`,
   },
   es: {
     system: `ERES UN REVISOR ESPECIALIZADO EN DICTADO MÉDICO Y CLÍNICO.
@@ -142,11 +158,19 @@ Secciones típicas que SIEMPRE deben estar en párrafos distintos:
   • Estudios solicitados
   • Plan / Prescripción / Indicaciones
 
+═══ EJEMPLO OBLIGATORIO — sigue este patrón de párrafos ═══
+Entrada: "paciente juan pérez 45 años masculino motivo consulta dolor torácico hace 3 días niega fiebre tiene hipertensión arterial usa losartán hace 2 años presión arterial 150 sobre 90 frecuencia cardíaca 88 ritmo regular auscultación pulmonar murmullo vesicular presente sin ruidos adventicios abdomen sin alteraciones juicio clínico angina inestable plan solicitar electrocardiograma y troponina prescribir aspirina 100 miligramos por día control en 24 horas"
+
+Salida correcta:
+{"correctedText":"Paciente Juan Pérez, 45 años, masculino. Motivo de consulta: dolor torácico hace 3 días. Niega fiebre. Tiene hipertensión arterial, usa losartán hace 2 años.\n\nPresión arterial: 150/90 mmHg. Frecuencia cardíaca: 88 lpm, ritmo regular. Auscultación pulmonar con murmullo vesicular presente, sin ruidos adventicios. Abdomen sin alteraciones.\n\nJuicio clínico: angina inestable.\n\nPlan: solicitar electrocardiograma y troponina. Prescribir aspirina 100 mg/día. Control en 24 horas.","outOfContextWords":[]}
+
+OBSERVA: cada bloque temático (identificación, exploración física, diagnóstico, plan) está en párrafo separado con \\n\\n.
+
 ═══ FORMATO DE RESPUESTA ═══
 Responde EXCLUSIVAMENTE con JSON válido — ningún texto antes ni después:
 Modo transcripción: { "correctedText": "...", "outOfContextWords": ["palabra1"] }
 Modo traducción:    { "correctedText": "...", "outOfContextWords": [], "translatedTo": "Inglés" }`,
-    user: `Analiza el texto de dictado médico a continuación, detecta el modo (traducción o transcripción) y responde SÓLO con el JSON:\n\n`,
+    user: `Analiza el dictado médico a continuación y responde SÓLO con el JSON. Usa \\n\\n para separar cada bloque temático, exactamente como en el ejemplo de arriba:\n\n`,
   },
 };
 
