@@ -114,6 +114,25 @@ export default function Home() {
     setProcessingStep("idle");
   };
 
+  const handleReCorrect = async (editedOriginal: string) => {
+    try {
+      const correctionResult = await correctMutation.mutateAsync({
+        text: editedOriginal,
+        language: "auto",
+      });
+      setProcessingState(prev => prev ? {
+        ...prev,
+        transcription: editedOriginal,
+        corrected: correctionResult.correctedText,
+        outOfContextWords: correctionResult.outOfContextWords || [],
+        translatedTo: correctionResult.translatedTo ?? undefined,
+      } : null);
+      toast.success("Texto re-corrigido!");
+    } catch (error: any) {
+      toast.error(`Erro ao re-corrigir: ${error.message || "Erro desconhecido"}`);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -228,6 +247,7 @@ export default function Home() {
             translatedTo={processingState.translatedTo}
             language="auto"
             onClose={handleReset}
+            onReCorrect={handleReCorrect}
           />
         ) : (
           <div className="w-full max-w-4xl mx-auto flex items-center justify-center">

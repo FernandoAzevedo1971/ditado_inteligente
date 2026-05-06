@@ -9,6 +9,7 @@ import {
   ChevronUp,
   RotateCcw,
   Languages,
+  RefreshCw,
 } from "lucide-react";
 import VoiceEditPanel from "./VoiceEditPanel";
 
@@ -19,6 +20,7 @@ interface ComparisonViewProps {
   language?: string;
   translatedTo?: string;
   onClose: () => void;
+  onReCorrect?: (editedOriginal: string) => Promise<void>;
 }
 
 export function ComparisonView({
@@ -28,11 +30,14 @@ export function ComparisonView({
   language = "auto",
   translatedTo,
   onClose,
+  onReCorrect,
 }: ComparisonViewProps) {
   const [copied, setCopied] = useState(false);
   const [currentCorrected, setCurrentCorrected] = useState(correctedText);
   const [showOriginalText, setShowOriginalText] = useState(false);
   const [showVoiceEdit, setShowVoiceEdit] = useState(false);
+  const [editedOriginal, setEditedOriginal] = useState(originalText);
+  const [isReCorrectLoading, setIsReCorrectLoading] = useState(false);
 
   const handleCopy = async () => {
     try {
@@ -57,6 +62,20 @@ export function ComparisonView({
   const handleVoiceTextUpdated = (finalText: string) => {
     setCurrentCorrected(finalText);
   };
+
+  const handleReCorrect = async () => {
+    if (!onReCorrect || !editedOriginal.trim()) return;
+    setIsReCorrectLoading(true);
+    try {
+      await onReCorrect(editedOriginal);
+    } finally {
+      setIsReCorrectLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    setCurrentCorrected(correctedText);
+  }, [correctedText]);
 
   const tokens = useMemo(() => {
     return currentCorrected.split(/([\s.,:;!?\n]+)/);
@@ -147,9 +166,24 @@ export function ComparisonView({
               </button>
             </div>
             {showOriginalText && (
-              <p className="text-slate-400 text-xs sm:text-sm leading-relaxed font-medium italic select-none mt-2 max-h-20 overflow-y-auto">
-                {originalText}
-              </p>
+              <div className="mt-2 flex flex-col gap-2">
+                <textarea
+                  className="w-full text-slate-300 text-xs sm:text-sm leading-relaxed font-medium bg-slate-800/50 rounded-md px-2 py-1.5 resize-none outline-none border border-white/5 focus:border-indigo-500/50 max-h-32 overflow-y-auto"
+                  value={editedOriginal}
+                  onChange={(e) => setEditedOriginal(e.target.value)}
+                  rows={3}
+                />
+                {onReCorrect && editedOriginal !== originalText && (
+                  <button
+                    onClick={handleReCorrect}
+                    disabled={isReCorrectLoading}
+                    className="flex items-center justify-center gap-1.5 px-3 py-1.5 text-[10px] font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 active:scale-95 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    <RefreshCw className={`w-3 h-3 ${isReCorrectLoading ? "animate-spin" : ""}`} />
+                    {isReCorrectLoading ? "Re-corrigindo..." : "Re-corrigir com este texto"}
+                  </button>
+                )}
+              </div>
             )}
           </div>
 
