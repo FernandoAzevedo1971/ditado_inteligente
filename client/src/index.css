@@ -95,12 +95,20 @@
     @apply bg-white/[0.04] backdrop-blur-3xl border border-white/[0.1] shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] rounded-3xl;
   }
 
+  .glass-dark {
+    @apply bg-white/[0.02] backdrop-blur-md border border-white/[0.06] rounded-2xl;
+  }
+
   .glass-button {
     @apply bg-white/[0.05] backdrop-blur-md border border-white/[0.1] hover:bg-white/[0.1] active:scale-95 transition-all;
   }
 
   .text-glow {
     text-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+  }
+
+  .text-glow-primary {
+    text-shadow: 0 0 30px rgba(99, 102, 241, 0.4);
   }
 
   .premium-gradient {

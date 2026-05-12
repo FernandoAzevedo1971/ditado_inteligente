@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users, transcriptions, InsertTranscription } from "../drizzle/schema.js";
 import type { User } from "../drizzle/schema.js";
@@ -106,4 +106,55 @@ export async function deleteTranscription(id: number, userId: number) {
   return db
     .delete(transcriptions)
     .where(and(eq(transcriptions.id, id), eq(transcriptions.userId, userId)));
+}
+
+export async function incrementDictationCount(openId: string): Promise<number> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(users)
+    .set({ dictationCount: sql`${users.dictationCount} + 1` })
+    .where(eq(users.openId, openId));
+
+  const result = await db
+    .select({ dictationCount: users.dictationCount })
+    .from(users)
+    .where(eq(users.openId, openId))
+    .limit(1);
+
+  return result[0]?.dictationCount ?? 0;
+}
+
+export async function getUserSubscriptionInfo(openId: string) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db
+    .select({
+      dictationCount: users.dictationCount,
+      subscriptionStatus: users.subscriptionStatus,
+      subscriptionExpiry: users.subscriptionExpiry,
+    })
+    .from(users)
+    .where(eq(users.openId, openId))
+    .limit(1);
+
+  return result[0] ?? null;
+}
+
+export async function updateSubscription(
+  openId: string,
+  status: "free" | "active" | "expired" | "cancelled",
+  expiry?: Date,
+  playStoreToken?: string
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const updateSet: Record<string, unknown> = { subscriptionStatus: status };
+  if (expiry) updateSet.subscriptionExpiry = expiry;
+  if (playStoreToken) updateSet.playStoreToken = playStoreToken;
+
+  await db.update(users).set(updateSet).where(eq(users.openId, openId));
 }

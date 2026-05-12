@@ -1,80 +1,129 @@
 import { useState } from "react";
-import { Lock, Zap, Loader2 } from "lucide-react";
+import { Crown, Sparkles, Infinity, Mic, X, Loader2, CheckCircle2 } from "lucide-react";
+import { SUBSCRIPTION_PRICE_BRL, FREE_DICTATION_LIMIT } from "@shared/const";
 
 interface PaywallModalProps {
-  openId: string;
+  isOpen: boolean;
+  onClose: () => void;
+  onSubscribe: () => Promise<any>;
+  dictationCount: number;
+  isPurchasing: boolean;
 }
 
-export function PaywallModal({ openId }: PaywallModalProps) {
-  const [loading, setLoading] = useState(false);
+export function PaywallModal({
+  isOpen,
+  onClose,
+  onSubscribe,
+  dictationCount,
+  isPurchasing,
+}: PaywallModalProps) {
   const [error, setError] = useState<string | null>(null);
 
+  if (!isOpen) return null;
+
   const handleSubscribe = async () => {
-    setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/stripe/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ openId }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Erro ao iniciar pagamento");
-      window.location.href = data.url;
+      await onSubscribe();
     } catch (err: any) {
-      setError(err.message);
-      setLoading(false);
+      setError(err.message || "Erro ao processar assinatura");
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md">
-      <div className="glass-card w-full max-w-sm mx-4 p-8 rounded-2xl border border-white/10 shadow-[0_0_80px_rgba(99,102,241,0.2)] flex flex-col items-center gap-6">
-        <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
-          <Lock className="w-8 h-8 text-indigo-400" />
-        </div>
-
-        <div className="text-center space-y-2">
-          <h2 className="text-xl font-semibold text-foreground tracking-tight">
-            Limite gratuito atingido
-          </h2>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            Você usou todos os seus <span className="text-foreground font-medium">30 usos gratuitos</span>.
-            Assine para continuar usando sem limites.
-          </p>
-        </div>
-
-        <div className="w-full rounded-xl bg-indigo-500/5 border border-indigo-500/20 p-4 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-semibold text-foreground">Plano Pro</p>
-            <p className="text-xs text-muted-foreground">Usos ilimitados</p>
-          </div>
-          <div className="text-right">
-            <p className="text-lg font-bold text-indigo-400">US$ 1,99</p>
-            <p className="text-xs text-muted-foreground">/mês</p>
-          </div>
-        </div>
-
-        {error && (
-          <p className="text-xs text-red-400 text-center">{error}</p>
-        )}
-
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-lg flex items-center justify-center z-50 animate-in fade-in duration-300 p-4">
+      <div className="glass-card max-w-md w-full relative overflow-hidden">
+        {/* Close Button */}
         <button
-          onClick={handleSubscribe}
-          disabled={loading}
-          className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white font-semibold text-sm transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-indigo-500/20"
+          onClick={onClose}
+          className="absolute top-4 right-4 p-2 rounded-xl hover:bg-white/10 text-muted-foreground hover:text-foreground transition-all z-10"
         >
-          {loading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <Zap className="w-4 h-4" />
-          )}
-          {loading ? "Redirecionando..." : "Assinar por US$ 1,99/mês"}
+          <X className="w-5 h-5" />
         </button>
 
-        <p className="text-[10px] text-muted-foreground/50 text-center">
-          Pagamento seguro via Stripe. Cancele a qualquer momento.
-        </p>
+        {/* Premium Gradient Header */}
+        <div className="relative px-8 pt-10 pb-8 text-center">
+          <div className="absolute inset-0 bg-gradient-to-b from-amber-500/10 via-orange-500/5 to-transparent" />
+          <div className="relative z-10">
+            {/* Crown Icon */}
+            <div className="w-20 h-20 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-2xl shadow-amber-500/30 animate-float">
+              <Crown className="w-10 h-10 text-white" />
+            </div>
+
+            <h2 className="text-3xl font-semibold text-foreground tracking-tighter font-display mb-2">
+              Ditado <span className="text-amber-400">Premium</span>
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Você usou todos os seus ditados gratuitos
+            </p>
+          </div>
+        </div>
+
+        {/* Usage Counter */}
+        <div className="px-8 mb-6">
+          <div className="glass-dark rounded-2xl p-4 border border-white/5">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm text-muted-foreground">Ditados utilizados</span>
+              <span className="text-sm font-semibold text-amber-400">
+                {dictationCount}/{FREE_DICTATION_LIMIT}
+              </span>
+            </div>
+            <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full transition-all duration-1000"
+                style={{ width: `${Math.min(100, (dictationCount / FREE_DICTATION_LIMIT) * 100)}%` }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Benefits */}
+        <div className="px-8 mb-8 space-y-3">
+          {[
+            { icon: Infinity, text: "Ditados ilimitados" },
+            { icon: Sparkles, text: "Correção IA sem limites" },
+            { icon: Mic, text: "Edição por voz premium" },
+          ].map(({ icon: Icon, text }, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0">
+                <Icon className="w-4 h-4 text-amber-400" />
+              </div>
+              <span className="text-sm text-foreground/80">{text}</span>
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 ml-auto shrink-0" />
+            </div>
+          ))}
+        </div>
+
+        {/* Price & CTA */}
+        <div className="px-8 pb-8">
+          {error && (
+            <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-sm text-center">
+              {error}
+            </div>
+          )}
+
+          <button
+            onClick={handleSubscribe}
+            disabled={isPurchasing}
+            className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 text-white font-semibold text-lg tracking-tight shadow-2xl shadow-amber-500/30 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {isPurchasing ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Processando...
+              </>
+            ) : (
+              <>
+                <Crown className="w-5 h-5" />
+                Assinar por R$ {SUBSCRIPTION_PRICE_BRL}/mês
+              </>
+            )}
+          </button>
+
+          <p className="text-center text-xs text-muted-foreground/50 mt-4">
+            Cancele quando quiser pela Play Store
+          </p>
+        </div>
       </div>
     </div>
   );

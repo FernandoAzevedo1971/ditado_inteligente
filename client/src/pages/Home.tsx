@@ -4,13 +4,17 @@ import { Button } from "@/components/ui/button";
 import { RecordingInterface } from "@/components/RecordingInterface";
 import { ComparisonView } from "@/components/ComparisonView";
 import { HistoryPanel } from "@/components/HistoryPanel";
+import { PaywallModal } from "@/components/PaywallModal";
+import { DictationCounter } from "@/components/DictationCounter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { useTranscriptionHistory } from "@/hooks/useTranscriptionHistory";
+import { useSubscription } from "@/hooks/useSubscription";
 import { History, LogOut, Loader2 } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { AudioLines } from "lucide-react";
+import { PAYMENT_REQUIRED_ERR_MSG } from "@shared/const";
 
 interface ProcessingState {
   transcription: string;
@@ -24,16 +28,24 @@ type ProcessingStep = "idle" | "transcribing" | "correcting";
 export default function Home() {
   const { user, loading, isAuthenticated, logout } = useAuth();
   const { addRecord } = useTranscriptionHistory();
+  const { info, canDictate, isPurchasing, recordDictation, purchaseSubscription } = useSubscription();
   const [processingState, setProcessingState] = useState<ProcessingState | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingStep, setProcessingStep] = useState<ProcessingStep>("idle");
   const [showHistory, setShowHistory] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
 
   const correctMutation = trpc.text.correct.useMutation();
 
   const handleTranscriptionStart = async (audioBlob: Blob) => {
     if (!user) {
       toast.error("Você precisa estar autenticado");
+      return;
+    }
+
+    // Check if user can still dictate
+    if (!canDictate) {
+      setShowPaywall(true);
       return;
     }
 
@@ -77,6 +89,15 @@ export default function Home() {
         text: originalText,
         language: "auto",
       });
+
+      // Record the dictation (increment counter)
+      try {
+        await recordDictation();
+      } catch (err: any) {
+        if (err.message?.includes(PAYMENT_REQUIRED_ERR_MSG)) {
+          setShowPaywall(true);
+        }
+      }
 
       addRecord(correctionResult.correctedText, "auto");
 
@@ -199,24 +220,32 @@ export default function Home() {
             </h1>
           </div>
           <div className="flex flex-col items-end gap-2 shrink-0 ml-3">
-            <button
-              onClick={logout}
-              className="p-2.5 rounded-xl transition-all glass-dark hover:bg-red-500/10 text-muted-foreground hover:text-red-400 border border-white/5"
-              title="Sair"
-            >
-              <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>
-            <button
-              onClick={() => setShowHistory(!showHistory)}
-              className={`p-2.5 rounded-xl transition-all border border-white/5 glass-button ${
-                showHistory
-                  ? "bg-indigo-500/20 text-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.2)]"
-                  : "text-muted-foreground hover:text-indigo-400"
-              }`}
-              title="Histórico"
-            >
-              <History className="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>
+            {/* Dictation Counter Badge */}
+            <DictationCounter
+              dictationCount={info.dictationCount}
+              isPremium={info.isPremium}
+              onClick={() => !info.isPremium && setShowPaywall(true)}
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={logout}
+                className="p-2.5 rounded-xl transition-all glass-dark hover:bg-red-500/10 text-muted-foreground hover:text-red-400 border border-white/5"
+                title="Sair"
+              >
+                <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
+              </button>
+              <button
+                onClick={() => setShowHistory(!showHistory)}
+                className={`p-2.5 rounded-xl transition-all border border-white/5 glass-button ${
+                  showHistory
+                    ? "bg-indigo-500/20 text-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.2)]"
+                    : "text-muted-foreground hover:text-indigo-400"
+                }`}
+                title="Histórico"
+              >
+                <History className="w-4 h-4 sm:w-5 sm:h-5" />
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -281,6 +310,15 @@ export default function Home() {
           </div>
         )}
       </main>
+
+      {/* Paywall Modal */}
+      <PaywallModal
+        isOpen={showPaywall}
+        onClose={() => setShowPaywall(false)}
+        onSubscribe={purchaseSubscription}
+        dictationCount={info.dictationCount}
+        isPurchasing={isPurchasing}
+      />
 
       <footer className="absolute bottom-4 left-0 right-0 flex justify-center text-[9px] text-muted-foreground/20 font-semibold tracking-[0.4em] uppercase pointer-events-none">
         BY FERNANDO AZEVEDO

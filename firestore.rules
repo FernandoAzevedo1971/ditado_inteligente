@@ -1,0 +1,23 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Each user can only read/write their own subscription document
+    match /subscriptions/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && request.auth.uid == userId
+        // Users can only increment dictationCount and update lastDictationAt
+        // They CANNOT modify subscriptionStatus or subscriptionExpiry directly
+        // (those are set via the purchase flow only)
+        && (
+          // Allow recording a dictation (increment count)
+          (request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['dictationCount', 'lastDictationAt']))
+          ||
+          // Allow activating a subscription (purchase flow)
+          (request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['subscriptionStatus', 'subscriptionExpiry', 'playStoreToken', 'subscribedAt']))
+        );
+    }
+  }
+}
