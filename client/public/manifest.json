@@ -1,4 +1,5 @@
 {
+  "id": "com.fernandoazevedo.ditadointeligente",
   "name": "Ditado Inteligente",
   "short_name": "Ditado IA",
   "description": "Transcreva e corrija seus textos com Inteligência Artificial",
@@ -31,6 +32,32 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot1.jpeg",
+      "sizes": "1080x2400",
+      "type": "image/jpeg",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/screenshot2.jpeg",
+      "sizes": "1080x2400",
+      "type": "image/jpeg",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/screenshot3.jpeg",
+      "sizes": "1080x2400",
+      "type": "image/jpeg",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/screenshot4.jpeg",
+      "sizes": "1080x2400",
+      "type": "image/jpeg",
+      "form_factor": "narrow"
     }
   ],
   "categories": ["productivity", "utilities"],

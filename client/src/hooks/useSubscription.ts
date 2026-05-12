@@ -3,6 +3,8 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { doc, getDoc, setDoc, increment, onSnapshot } from "firebase/firestore";
 import { useState, useEffect, useCallback } from "react";
 import { FREE_DICTATION_LIMIT, SUBSCRIPTION_PRICE_BRL, SUBSCRIPTION_SKU } from "@shared/const";
+import { canDictateOffline, getOfflineKey } from "@shared/subscription";
+
 
 export interface SubscriptionInfo {
   dictationCount: number;
@@ -97,12 +99,66 @@ export function useSubscription() {
     return () => unsubscribe();
   }, [user]);
 
-  const canDictate = info.isPremium || info.dictationsRemaining > 0;
+  // Sync offline dictations when coming back online
+  useEffect(() => {
+    const syncOfflineData = async () => {
+      if (!user || !db || !navigator.onLine) return;
+
+      const pendingSync = parseInt(localStorage.getItem("pending_sync_count") || "0", 10);
+      if (pendingSync > 0) {
+        try {
+          const userDocRef = doc(db, "subscriptions", user.uid);
+          await setDoc(
+            userDocRef,
+            {
+              dictationCount: increment(pendingSync),
+            },
+            { merge: true }
+          );
+          localStorage.setItem("pending_sync_count", "0");
+          console.log(`[Subscription] Synchronized ${pendingSync} offline dictations.`);
+        } catch (error) {
+          console.error("[Subscription] Failed to sync offline dictations:", error);
+        }
+      }
+    };
+
+    syncOfflineData();
+    window.addEventListener("online", syncOfflineData);
+    return () => window.removeEventListener("online", syncOfflineData);
+  }, [user, db]);
+
+  const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
+  const offlineKey = getOfflineKey(new Date());
+  const offlineCount = typeof window !== 'undefined' ? parseInt(localStorage.getItem(offlineKey) || "0", 10) : 0;
+
+  const canDictate = info.isPremium || (isOffline ? canDictateOffline(offlineCount) : info.dictationsRemaining > 0);
 
   // Increment the dictation count in Firestore
   const recordDictation = useCallback(async () => {
+    const isOfflineNow = !navigator.onLine;
+    const key = getOfflineKey(new Date());
+    const count = parseInt(localStorage.getItem(key) || "0", 10);
+
+    if (isOfflineNow) {
+      if (!canDictateOffline(count)) {
+        throw new Error("Limite de ditados offline atingido para hoje.");
+      }
+      
+      const newOfflineCount = count + 1;
+      localStorage.setItem(key, String(newOfflineCount));
+      
+      const pendingSync = parseInt(localStorage.getItem("pending_sync_count") || "0", 10);
+      localStorage.setItem("pending_sync_count", String(pendingSync + 1));
+
+      const current = parseInt(localStorage.getItem("dictation_count") || "0", 10);
+      const newCount = current + 1;
+      localStorage.setItem("dictation_count", String(newCount));
+      
+      return { count: newCount, remaining: Math.max(0, FREE_DICTATION_LIMIT - newCount) };
+    }
+
     if (!user || !db) {
-      // Fallback: use localStorage
       const current = parseInt(localStorage.getItem("dictation_count") || "0", 10);
       const newCount = current + 1;
       localStorage.setItem("dictation_count", String(newCount));
@@ -119,7 +175,6 @@ export function useSubscription() {
       { merge: true }
     );
 
-    // Also update localStorage as backup
     const newCount = info.dictationCount + 1;
     localStorage.setItem("dictation_count", String(newCount));
 
@@ -128,6 +183,7 @@ export function useSubscription() {
       remaining: info.isPremium ? Infinity : Math.max(0, FREE_DICTATION_LIMIT - newCount),
     };
   }, [user, info]);
+
 
   // Check if Google Play Billing is available (only in TWA/Android context)
   const checkPlayBillingAvailable = useCallback(async (): Promise<boolean> => {
