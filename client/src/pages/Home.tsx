@@ -215,25 +215,19 @@ export default function Home() {
             <div className="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
               <AudioLines className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-2xl font-semibold text-foreground tracking-tighter whitespace-nowrap font-display">
+            <h1 className="text-xl sm:text-2xl font-semibold text-foreground tracking-tighter font-display">
               Ditado <span className="text-indigo-500">Inteligente</span>
             </h1>
           </div>
-          <div className="flex flex-col items-end gap-2 shrink-0 ml-3">
-            {/* Dictation Counter Badge */}
-            <DictationCounter
-              dictationCount={info.dictationCount}
-              isPremium={info.isPremium}
-              onClick={() => !info.isPremium && setShowPaywall(true)}
-            />
-            <div className="flex gap-2">
-              <button
-                onClick={logout}
-                className="p-2.5 rounded-xl transition-all glass-dark hover:bg-red-500/10 text-muted-foreground hover:text-red-400 border border-white/5"
-                title="Sair"
-              >
-                <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
-              </button>
+          <div className="flex items-start gap-2 shrink-0 ml-3">
+            <button
+              onClick={logout}
+              className="p-2.5 rounded-xl transition-all glass-dark hover:bg-red-500/10 text-muted-foreground hover:text-red-400 border border-white/5"
+              title="Sair"
+            >
+              <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
+            <div className="relative">
               <button
                 onClick={() => setShowHistory(!showHistory)}
                 className={`p-2.5 rounded-xl transition-all border border-white/5 glass-button ${
@@ -245,6 +239,14 @@ export default function Home() {
               >
                 <History className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
+              {/* Dictation Counter Badge */}
+              <div className="absolute top-full mt-1 right-0 z-30">
+                <DictationCounter
+                  dictationCount={info.dictationCount}
+                  isPremium={info.isPremium}
+                  onClick={() => !info.isPremium && setShowPaywall(true)}
+                />
+              </div>
             </div>
           </div>
         </div>
