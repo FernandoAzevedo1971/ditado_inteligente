@@ -6,6 +6,7 @@ import { ComparisonView } from "@/components/ComparisonView";
 import { HistoryPanel } from "@/components/HistoryPanel";
 import { PaywallModal } from "@/components/PaywallModal";
 import { DictationCounter } from "@/components/DictationCounter";
+import { AdminPanel } from "@/components/AdminPanel";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { useTranscriptionHistory } from "@/hooks/useTranscriptionHistory";
@@ -15,6 +16,8 @@ import { auth } from "@/lib/firebase";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { AudioLines } from "lucide-react";
 import { PAYMENT_REQUIRED_ERR_MSG } from "@shared/const";
+
+const ADMIN_EMAIL = "fazevedopneumosono@gmail.com";
 
 interface ProcessingState {
   transcription: string;
@@ -281,11 +284,12 @@ export default function Home() {
             onReCorrect={handleReCorrect}
           />
         ) : (
-          <div className="w-full max-w-4xl mx-auto flex items-center justify-center">
+          <div className="w-full max-w-4xl mx-auto flex flex-col items-center gap-6 px-4">
             <RecordingInterface
               onTranscriptionStart={handleTranscriptionStart}
               isProcessing={isProcessing}
             />
+            {user?.email === ADMIN_EMAIL && <AdminPanel />}
           </div>
         )}
 

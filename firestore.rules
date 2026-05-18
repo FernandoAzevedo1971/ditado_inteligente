@@ -19,5 +19,15 @@ service cloud.firestore {
             .hasOnly(['subscriptionStatus', 'subscriptionExpiry', 'playStoreToken', 'subscribedAt']))
         );
     }
+
+    // Free access whitelist — only admin can write; users can read their own entry
+    match /freeAccess/{email} {
+      allow read: if request.auth != null && (
+        request.auth.token.email == email ||
+        request.auth.token.email == 'fazevedopneumosono@gmail.com'
+      );
+      allow write: if request.auth != null
+        && request.auth.token.email == 'fazevedopneumosono@gmail.com';
+    }
   }
 }

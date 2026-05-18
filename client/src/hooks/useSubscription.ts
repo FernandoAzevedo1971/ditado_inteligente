@@ -1,6 +1,6 @@
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { doc, getDoc, setDoc, increment, onSnapshot } from "firebase/firestore";
+import { doc, setDoc, increment, onSnapshot } from "firebase/firestore";
 import { useState, useEffect, useCallback } from "react";
 import { FREE_DICTATION_LIMIT, SUBSCRIPTION_PRICE_BRL, SUBSCRIPTION_SKU } from "@shared/const";
 import { canDictateOffline, getOfflineKey } from "@shared/subscription";
@@ -12,6 +12,7 @@ export interface SubscriptionInfo {
   subscriptionStatus: "free" | "active" | "expired" | "cancelled";
   isPremium: boolean;
   limit: number;
+  isFreeAccess?: boolean;
 }
 
 const DEFAULT_INFO: SubscriptionInfo = {
@@ -25,6 +26,7 @@ const DEFAULT_INFO: SubscriptionInfo = {
 export function useSubscription() {
   const { user } = useAuth();
   const [info, setInfo] = useState<SubscriptionInfo>(DEFAULT_INFO);
+  const [hasFreeAccess, setHasFreeAccess] = useState(false);
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -99,6 +101,23 @@ export function useSubscription() {
     return () => unsubscribe();
   }, [user]);
 
+  // Listen for free-access grants from admin
+  useEffect(() => {
+    if (!user?.email || !db) {
+      setHasFreeAccess(false);
+      return;
+    }
+
+    const freeAccessRef = doc(db, "freeAccess", user.email);
+    const unsubscribe = onSnapshot(
+      freeAccessRef,
+      (snap) => setHasFreeAccess(snap.exists() && snap.data()?.active === true),
+      () => setHasFreeAccess(false)
+    );
+
+    return () => unsubscribe();
+  }, [user?.email]);
+
   // Sync offline dictations when coming back online
   useEffect(() => {
     const syncOfflineData = async () => {
@@ -132,7 +151,16 @@ export function useSubscription() {
   const offlineKey = getOfflineKey(new Date());
   const offlineCount = typeof window !== 'undefined' ? parseInt(localStorage.getItem(offlineKey) || "0", 10) : 0;
 
-  const canDictate = info.isPremium || (isOffline ? canDictateOffline(offlineCount) : info.dictationsRemaining > 0);
+  // Effective premium includes paid subscription OR admin-granted free access
+  const effectiveIsPremium = info.isPremium || hasFreeAccess;
+  const effectiveInfo: SubscriptionInfo = {
+    ...info,
+    isPremium: effectiveIsPremium,
+    dictationsRemaining: effectiveIsPremium ? Infinity : info.dictationsRemaining,
+    isFreeAccess: hasFreeAccess,
+  };
+
+  const canDictate = effectiveIsPremium || (isOffline ? canDictateOffline(offlineCount) : effectiveInfo.dictationsRemaining > 0);
 
   // Increment the dictation count in Firestore
   const recordDictation = useCallback(async () => {
@@ -180,9 +208,9 @@ export function useSubscription() {
 
     return {
       count: newCount,
-      remaining: info.isPremium ? Infinity : Math.max(0, FREE_DICTATION_LIMIT - newCount),
+      remaining: effectiveIsPremium ? Infinity : Math.max(0, FREE_DICTATION_LIMIT - newCount),
     };
-  }, [user, info]);
+  }, [user, info, effectiveIsPremium]);
 
 
   // Check if Google Play Billing is available (only in TWA/Android context)
@@ -265,7 +293,7 @@ export function useSubscription() {
   }, [checkPlayBillingAvailable, user]);
 
   return {
-    info,
+    info: effectiveInfo,
     canDictate,
     isPurchasing,
     isLoading,
