@@ -5,7 +5,7 @@ export const UNAUTHED_ERR_MSG = 'Please login (10001)';
 export const NOT_ADMIN_ERR_MSG = 'You do not have required permission (10002)';
 export const PAYMENT_REQUIRED_ERR_MSG = 'Limite de ditados gratuitos atingido (10003)';
 
-// Freemium limits
-export const FREE_DICTATION_LIMIT = 20;
+// Freemium limits (temporarily set high to suspend billing)
+export const FREE_DICTATION_LIMIT = 9999;
 export const SUBSCRIPTION_PRICE_BRL = '2,99';
 export const SUBSCRIPTION_SKU = 'ditado_inteligente_mensal';
