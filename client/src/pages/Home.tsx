@@ -6,6 +6,8 @@ import { ComparisonView } from "@/components/ComparisonView";
 import { HistoryPanel } from "@/components/HistoryPanel";
 import { PaywallModal } from "@/components/PaywallModal";
 import { DictationCounter } from "@/components/DictationCounter";
+import { RegistrationModal } from "@/components/RegistrationModal";
+import { AdminPanel } from "@/components/AdminPanel";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { useTranscriptionHistory } from "@/hooks/useTranscriptionHistory";
@@ -14,7 +16,7 @@ import { History, LogOut, Loader2 } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { AudioLines } from "lucide-react";
-import { PAYMENT_REQUIRED_ERR_MSG } from "@shared/const";
+import { PAYMENT_REQUIRED_ERR_MSG, REGISTRATION_GRACE_LIMIT } from "@shared/const";
 
 interface ProcessingState {
   transcription: string;
@@ -34,12 +36,34 @@ export default function Home() {
   const [processingStep, setProcessingStep] = useState<ProcessingStep>("idle");
   const [showHistory, setShowHistory] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [forceShowRegistration, setForceShowRegistration] = useState(false);
 
   const correctMutation = trpc.text.correct.useMutation();
+
+  // Fetch user profile from MySQL (role, freeAccess, registrationComplete)
+  const profileQuery = trpc.user.getProfile.useQuery(undefined, {
+    enabled: isAuthenticated,
+    staleTime: 30_000,
+  });
+  const isAdmin = profileQuery.data?.role === "admin";
+  const needsRegistration =
+    isAuthenticated &&
+    profileQuery.data !== undefined &&
+    !profileQuery.data.registrationComplete &&
+    !isAdmin;
+  const showRegistrationModal =
+    needsRegistration &&
+    (info.dictationCount >= REGISTRATION_GRACE_LIMIT || forceShowRegistration);
 
   const handleTranscriptionStart = async (audioBlob: Blob) => {
     if (!user) {
       toast.error("Você precisa estar autenticado");
+      return;
+    }
+
+    // Block if registration is required
+    if (needsRegistration && info.dictationCount >= REGISTRATION_GRACE_LIMIT) {
+      setForceShowRegistration(true);
       return;
     }
 
@@ -269,6 +293,7 @@ export default function Home() {
               </Button>
             </div>
             <HistoryPanel />
+            {isAdmin && <AdminPanel />}
           </div>
         ) : processingState ? (
           <ComparisonView
@@ -281,11 +306,12 @@ export default function Home() {
             onReCorrect={handleReCorrect}
           />
         ) : (
-          <div className="w-full max-w-4xl mx-auto flex items-center justify-center">
+          <div className="w-full max-w-4xl mx-auto flex flex-col items-center justify-center gap-4">
             <RecordingInterface
               onTranscriptionStart={handleTranscriptionStart}
               isProcessing={isProcessing}
             />
+            {isAdmin && <AdminPanel />}
           </div>
         )}
 
@@ -320,6 +346,16 @@ export default function Home() {
         onSubscribe={purchaseSubscription}
         dictationCount={info.dictationCount}
         isPurchasing={isPurchasing}
+      />
+
+      {/* Registration Modal — shown after grace period if not yet registered */}
+      <RegistrationModal
+        isOpen={showRegistrationModal}
+        defaultEmail={user?.email ?? ""}
+        onComplete={() => {
+          setForceShowRegistration(false);
+          profileQuery.refetch();
+        }}
       />
 
       <footer className="absolute bottom-4 left-0 right-0 flex justify-center text-[9px] text-muted-foreground/20 font-semibold tracking-[0.4em] uppercase pointer-events-none">

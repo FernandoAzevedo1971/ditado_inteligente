@@ -1,16 +1,20 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { boolean, int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 
 export const users = mysqlTable("users", {
   id: int("id").autoincrement().primaryKey(),
   openId: varchar("openId", { length: 64 }).notNull().unique(),
   name: text("name"),
   email: varchar("email", { length: 320 }),
+  phone: varchar("phone", { length: 30 }).unique(),
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
   dictationCount: int("dictationCount").notNull().default(0),
   subscriptionStatus: mysqlEnum("subscriptionStatus", ["free", "active", "expired", "cancelled"]).default("free").notNull(),
   subscriptionExpiry: timestamp("subscriptionExpiry"),
   playStoreToken: varchar("playStoreToken", { length: 512 }),
+  termsAccepted: boolean("termsAccepted").default(false).notNull(),
+  registrationComplete: boolean("registrationComplete").default(false).notNull(),
+  freeAccess: boolean("freeAccess").default(false).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),

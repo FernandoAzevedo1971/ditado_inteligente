@@ -1,11 +1,23 @@
 import { systemRouter } from "./_core/systemRouter.js";
-import { publicProcedure, protectedProcedure, router } from "./_core/trpc.js";
+import { publicProcedure, router } from "./_core/trpc.js";
 import { z } from "zod";
 import { transcribeAudioFile, type SupportedLanguage } from "./transcription.js";
 import { correctTextWithAI, type SupportedLanguage as CorrectionLanguage } from "./textCorrection.js";
 import { applyVoiceCorrections } from "./voiceCorrections.js";
-import { incrementDictationCount, getUserSubscriptionInfo, updateSubscription } from "./db.js";
-import { FREE_DICTATION_LIMIT, PAYMENT_REQUIRED_ERR_MSG } from "../shared/const.js";
+import {
+  incrementDictationCount,
+  getUserSubscriptionInfo,
+  updateSubscription,
+  completeRegistration,
+  grantFreeAccess,
+  revokeFreeAccess,
+  listFreeAccessUsers,
+} from "./db.js";
+import {
+  FREE_DICTATION_LIMIT,
+  PAYMENT_REQUIRED_ERR_MSG,
+  PHONE_IN_USE_ERR_MSG,
+} from "../shared/const.js";
 import { TRPCError } from "@trpc/server";
 import fs from "node:fs";
 import os from "node:os";
@@ -72,9 +84,44 @@ export const appRouter = router({
       }),
   }),
 
+  // User profile & registration
+  user: router({
+    getProfile: publicProcedure.query(async ({ ctx }) => {
+      if (!ctx.user) {
+        return { role: "user" as const, freeAccess: false, registrationComplete: true, email: null };
+      }
+      return {
+        role: ctx.user.role,
+        freeAccess: ctx.user.freeAccess ?? false,
+        // If column missing (pre-migration), default to true to avoid blocking users
+        registrationComplete: ctx.user.registrationComplete ?? true,
+        email: ctx.user.email ?? null,
+      };
+    }),
+
+    completeRegistration: publicProcedure
+      .input(z.object({
+        email: z.string().email(),
+        phone: z.string().min(8).max(30),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user) {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "Login necessário" });
+        }
+        try {
+          await completeRegistration(ctx.user.openId, { email: input.email, phone: input.phone });
+          return { success: true };
+        } catch (err: any) {
+          if (err.message === "PHONE_IN_USE") {
+            throw new TRPCError({ code: "CONFLICT", message: PHONE_IN_USE_ERR_MSG });
+          }
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Erro ao salvar cadastro" });
+        }
+      }),
+  }),
+
   // Subscription & billing routes
   subscription: router({
-    // Get current user's subscription info and dictation count
     getInfo: publicProcedure.query(async ({ ctx }) => {
       if (!ctx.user) {
         return {
@@ -97,13 +144,12 @@ export const appRouter = router({
         };
       }
 
-      // Check if subscription has expired
       const isExpired = info.subscriptionExpiry && new Date(info.subscriptionExpiry) < new Date();
       const effectiveStatus = isExpired && info.subscriptionStatus === "active"
         ? "expired"
         : info.subscriptionStatus;
 
-      const isPremium = effectiveStatus === "active" || ctx.user.role === "admin";
+      const isPremium = effectiveStatus === "active" || info.role === "admin" || info.freeAccess === true;
       const remaining = isPremium
         ? Infinity
         : Math.max(0, FREE_DICTATION_LIMIT - info.dictationCount);
@@ -117,26 +163,20 @@ export const appRouter = router({
       };
     }),
 
-    // Increment dictation count (called after each successful transcription)
     recordDictation: publicProcedure.mutation(async ({ ctx }) => {
       if (!ctx.user) {
         throw new TRPCError({ code: "UNAUTHORIZED", message: "Login necessário" });
       }
 
-      // Admins have unlimited access
-      if (ctx.user.role === "admin") {
+      if (ctx.user.role === "admin" || ctx.user.freeAccess) {
         return { allowed: true, count: 0, remaining: Infinity };
       }
 
-      // Check subscription status
       const info = await getUserSubscriptionInfo(ctx.user.openId);
       const isPremium = info?.subscriptionStatus === "active";
 
       if (!isPremium && info && info.dictationCount >= FREE_DICTATION_LIMIT) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: PAYMENT_REQUIRED_ERR_MSG,
-        });
+        throw new TRPCError({ code: "FORBIDDEN", message: PAYMENT_REQUIRED_ERR_MSG });
       }
 
       const newCount = await incrementDictationCount(ctx.user.openId);
@@ -145,7 +185,6 @@ export const appRouter = router({
       return { allowed: true, count: newCount, remaining };
     }),
 
-    // Validate a Google Play purchase and activate subscription
     validatePurchase: publicProcedure
       .input(z.object({
         purchaseToken: z.string(),
@@ -156,9 +195,6 @@ export const appRouter = router({
           throw new TRPCError({ code: "UNAUTHORIZED", message: "Login necessário" });
         }
 
-        // For now, store the token and activate.
-        // In production, validate with Google Play Developer API.
-        // See: https://developers.google.com/android-publisher/api-ref/rest/v3/purchases.subscriptions
         const expiryDate = new Date();
         expiryDate.setMonth(expiryDate.getMonth() + 1);
 
@@ -170,6 +206,36 @@ export const appRouter = router({
         );
 
         return { success: true, expiresAt: expiryDate.toISOString() };
+      }),
+  }),
+
+  // Admin routes — only accessible to users with role = 'admin'
+  admin: router({
+    listFreeAccessUsers: publicProcedure.query(async ({ ctx }) => {
+      if (!ctx.user || ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "UNAUTHORIZED", message: "Acesso negado" });
+      }
+      return listFreeAccessUsers();
+    }),
+
+    grantFreeAccess: publicProcedure
+      .input(z.object({ email: z.string().email() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user || ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "Acesso negado" });
+        }
+        await grantFreeAccess(input.email);
+        return { success: true };
+      }),
+
+    revokeFreeAccess: publicProcedure
+      .input(z.object({ email: z.string().email() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user || ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "Acesso negado" });
+        }
+        await revokeFreeAccess(input.email);
+        return { success: true };
       }),
   }),
 });
