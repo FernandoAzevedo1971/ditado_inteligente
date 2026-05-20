@@ -7,9 +7,8 @@ export const PAYMENT_REQUIRED_ERR_MSG = 'Limite de ditados gratuitos atingido (1
 export const REGISTRATION_REQUIRED_ERR_MSG = 'Cadastro necessário para continuar (10004)';
 export const PHONE_IN_USE_ERR_MSG = 'Este número de telefone já está cadastrado (10005)';
 
-// Freemium limits (temporarily set high to suspend billing)
+// Both limits temporarily set high — re-enable when DB and billing are ready
 export const FREE_DICTATION_LIMIT = 9999;
-// How many free dictations before registration is required
-export const REGISTRATION_GRACE_LIMIT = 3;
+export const REGISTRATION_GRACE_LIMIT = 9999;
 export const SUBSCRIPTION_PRICE_BRL = '2,99';
 export const SUBSCRIPTION_SKU = 'ditado_inteligente_mensal';
