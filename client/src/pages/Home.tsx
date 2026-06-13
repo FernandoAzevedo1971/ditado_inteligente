@@ -16,7 +16,7 @@ import { History, LogOut, Loader2 } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { AudioLines } from "lucide-react";
-import { PAYMENT_REQUIRED_ERR_MSG, REGISTRATION_GRACE_LIMIT } from "@shared/const";
+import { PAYMENT_REQUIRED_ERR_MSG, REGISTRATION_GRACE_LIMIT, NO_SPEECH_DETECTED_MSG } from "@shared/const";
 
 interface ProcessingState {
   transcription: string;
@@ -107,6 +107,15 @@ export default function Home() {
       if (!response.ok) throw new Error(responseData?.error || "Falha na transcrição");
 
       const originalText = responseData.text;
+
+      // Áudio em branco ou sem fala identificável: não envia para correção
+      if (!originalText || !originalText.trim()) {
+        setProcessingStep("idle");
+        setIsProcessing(false);
+        toast.error(NO_SPEECH_DETECTED_MSG);
+        return;
+      }
+
       setProcessingStep("correcting");
 
       const correctionResult = await correctMutation.mutateAsync({

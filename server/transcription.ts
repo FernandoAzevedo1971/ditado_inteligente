@@ -14,6 +14,49 @@ const LANGUAGE_PROMPTS: Record<SupportedLanguage, string> = {
   es: "Dictado en español. Puede ser de cualquier naturaleza: médico, jurídico, empresarial o personal. Términos médicos comunes cuando aplique: auscultación, presión arterial, frecuencia cardíaca, saturación de oxígeno, hemograma, glucemia, creatinina, TGO, TGP, troponina, tomografía, resonancia magnética, electrocardiograma, ecocardiograma, hipertensión arterial, diabetes mellitus, insuficiencia cardíaca, fibrilación auricular, infarto agudo de miocardio, accidente cerebrovascular, neumonía, sepsis, EPOC, omeprazol, metformina, losartán, atenolol, furosemida, simvastatina, levotiroxina, amoxicilina, ceftriaxona, heparina, enoxaparina, aspirina, prednisona, historia clínica, UCI.",
 };
 
+// Limiar a partir do qual consideramos que o trecho de áudio não contém fala real.
+// O modelo Whisper informa essa probabilidade por segmento.
+const NO_SPEECH_PROB_THRESHOLD = 0.6;
+
+// Frases "fantasma" que o Whisper costuma alucinar quando o áudio está em
+// silêncio, é muito curto ou contém apenas ruído (ex: anúncios/legendas que
+// fizeram parte do material de treino do modelo). Quando o texto transcrito
+// corresponde a uma dessas frases, tratamos como "nenhuma fala detectada".
+const HALLUCINATION_PHRASES = [
+  "acesse o nosso site www.opusdei.pt para mais informações",
+  "acesse o nosso site www.opusdei.pt para mais informacoes",
+  "legendas pela comunidade amara.org",
+  "subscrevam o canal",
+  "se inscreva no canal",
+  "obrigado por assistir",
+  "obrigado por ver",
+];
+
+function normalizeForComparison(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[.,!?;:]+$/g, "")
+    .trim();
+}
+
+function isLikelyHallucination(text: string): boolean {
+  const normalized = normalizeForComparison(text);
+  if (!normalized) return false;
+  return HALLUCINATION_PHRASES.some((phrase) => normalized === phrase);
+}
+
+type WhisperVerboseSegment = {
+  text: string;
+  no_speech_prob: number;
+  avg_logprob: number;
+};
+
+type WhisperVerboseResponse = {
+  text: string;
+  segments?: WhisperVerboseSegment[];
+};
+
 export async function transcribeAudioFile(filePath: string, language: SupportedLanguage = "pt"): Promise<string> {
   console.log(`[Transcription] Iniciando transcrição. Idioma: ${language}`);
 
@@ -35,12 +78,28 @@ export async function transcribeAudioFile(filePath: string, language: SupportedL
       file: fs.createReadStream(filePath),
       model: "whisper-large-v3",
       prompt: LANGUAGE_PROMPTS[language],
-      response_format: "text",
+      response_format: "verbose_json",
       language: language === "pt" ? "pt" : language === "es" ? "es" : "en",
       temperature: 0,
     });
 
-    const transcription = (result as unknown as string).trim();
+    const verboseResult = result as unknown as WhisperVerboseResponse;
+    const transcription = (verboseResult.text || "").trim();
+    const segments = verboseResult.segments || [];
+
+    // Áudio em branco/sem fala: o Whisper costuma retornar nenhum segmento,
+    // ou segmentos com alta probabilidade de "sem fala". Nesses casos o
+    // texto retornado é frequentemente uma alucinação (texto inventado pelo
+    // modelo a partir de dados de treino) e não deve ser exibido ao usuário.
+    const noSpeechDetected =
+      segments.length === 0 ||
+      segments.every((segment) => segment.no_speech_prob >= NO_SPEECH_PROB_THRESHOLD);
+
+    if (!transcription || noSpeechDetected || isLikelyHallucination(transcription)) {
+      console.warn("[Transcription] Nenhuma fala detectada no áudio (ou resultado alucinado pelo modelo).");
+      return "";
+    }
+
     console.log(`[Transcription] Sucesso! Texto: "${transcription.substring(0, 50).trim()}..."`);
     return transcription;
   } catch (error: any) {
