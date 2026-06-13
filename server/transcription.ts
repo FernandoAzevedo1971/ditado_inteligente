@@ -14,9 +14,12 @@ const LANGUAGE_PROMPTS: Record<SupportedLanguage, string> = {
   es: "Dictado en español. Puede ser de cualquier naturaleza: médico, jurídico, empresarial o personal. Términos médicos comunes cuando aplique: auscultación, presión arterial, frecuencia cardíaca, saturación de oxígeno, hemograma, glucemia, creatinina, TGO, TGP, troponina, tomografía, resonancia magnética, electrocardiograma, ecocardiograma, hipertensión arterial, diabetes mellitus, insuficiencia cardíaca, fibrilación auricular, infarto agudo de miocardio, accidente cerebrovascular, neumonía, sepsis, EPOC, omeprazol, metformina, losartán, atenolol, furosemida, simvastatina, levotiroxina, amoxicilina, ceftriaxona, heparina, enoxaparina, aspirina, prednisona, historia clínica, UCI.",
 };
 
-// Limiar a partir do qual consideramos que o trecho de áudio não contém fala real.
-// O modelo Whisper informa essa probabilidade por segmento.
+// Limiares usados pelo próprio Whisper para decidir se um segmento é silêncio:
+// só é tratado como "sem fala" quando a probabilidade de silêncio é alta E a
+// confiança da transcrição (avg_logprob) é baixa. Isso evita descartar falas
+// curtas/baixas que o modelo ainda transcreveu com confiança.
 const NO_SPEECH_PROB_THRESHOLD = 0.6;
+const LOGPROB_THRESHOLD = -1.0;
 
 // Frases "fantasma" que o Whisper costuma alucinar quando o áudio está em
 // silêncio, é muito curto ou contém apenas ruído (ex: anúncios/legendas que
@@ -88,14 +91,26 @@ export async function transcribeAudioFile(filePath: string, language: SupportedL
     const segments = verboseResult.segments || [];
 
     // Áudio em branco/sem fala: o Whisper costuma retornar nenhum segmento,
-    // ou segmentos com alta probabilidade de "sem fala". Nesses casos o
-    // texto retornado é frequentemente uma alucinação (texto inventado pelo
-    // modelo a partir de dados de treino) e não deve ser exibido ao usuário.
+    // ou segmentos com alta probabilidade de "sem fala" E baixa confiança na
+    // transcrição. Nesses casos o texto retornado é frequentemente uma
+    // alucinação (texto inventado pelo modelo a partir de dados de treino) e
+    // não deve ser exibido ao usuário.
     const noSpeechDetected =
       segments.length === 0 ||
-      segments.every((segment) => segment.no_speech_prob >= NO_SPEECH_PROB_THRESHOLD);
+      segments.every(
+        (segment) => segment.no_speech_prob >= NO_SPEECH_PROB_THRESHOLD && segment.avg_logprob < LOGPROB_THRESHOLD
+      );
 
-    if (!transcription || noSpeechDetected || isLikelyHallucination(transcription)) {
+    // Frases conhecidas de alucinação (ex: anúncios) só são descartadas se o
+    // áudio também tiver indícios de silêncio/ruído. Assim, se o usuário
+    // realmente ditar uma dessas frases com fala clara, ela é preservada.
+    const avgNoSpeechProb =
+      segments.length > 0
+        ? segments.reduce((sum, segment) => sum + segment.no_speech_prob, 0) / segments.length
+        : 1;
+    const looksLikeHallucination = isLikelyHallucination(transcription) && avgNoSpeechProb >= 0.3;
+
+    if (!transcription || noSpeechDetected || looksLikeHallucination) {
       console.warn("[Transcription] Nenhuma fala detectada no áudio (ou resultado alucinado pelo modelo).");
       return "";
     }
