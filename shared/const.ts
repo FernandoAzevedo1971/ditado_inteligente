@@ -6,6 +6,7 @@ export const NOT_ADMIN_ERR_MSG = 'You do not have required permission (10002)';
 export const PAYMENT_REQUIRED_ERR_MSG = 'Limite de ditados gratuitos atingido (10003)';
 export const REGISTRATION_REQUIRED_ERR_MSG = 'Cadastro necessário para continuar (10004)';
 export const PHONE_IN_USE_ERR_MSG = 'Este número de telefone já está cadastrado (10005)';
+export const NO_SPEECH_DETECTED_MSG = 'Não conseguimos identificar nenhuma fala no áudio. Aproxime-se do microfone e tente novamente.';
 
 // Both limits temporarily set high — re-enable when DB and billing are ready
 export const FREE_DICTATION_LIMIT = 9999;

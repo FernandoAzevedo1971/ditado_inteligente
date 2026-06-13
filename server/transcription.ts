@@ -14,6 +14,52 @@ const LANGUAGE_PROMPTS: Record<SupportedLanguage, string> = {
   es: "Dictado en español. Puede ser de cualquier naturaleza: médico, jurídico, empresarial o personal. Términos médicos comunes cuando aplique: auscultación, presión arterial, frecuencia cardíaca, saturación de oxígeno, hemograma, glucemia, creatinina, TGO, TGP, troponina, tomografía, resonancia magnética, electrocardiograma, ecocardiograma, hipertensión arterial, diabetes mellitus, insuficiencia cardíaca, fibrilación auricular, infarto agudo de miocardio, accidente cerebrovascular, neumonía, sepsis, EPOC, omeprazol, metformina, losartán, atenolol, furosemida, simvastatina, levotiroxina, amoxicilina, ceftriaxona, heparina, enoxaparina, aspirina, prednisona, historia clínica, UCI.",
 };
 
+// Limiares usados pelo próprio Whisper para decidir se um segmento é silêncio:
+// só é tratado como "sem fala" quando a probabilidade de silêncio é alta E a
+// confiança da transcrição (avg_logprob) é baixa. Isso evita descartar falas
+// curtas/baixas que o modelo ainda transcreveu com confiança.
+const NO_SPEECH_PROB_THRESHOLD = 0.6;
+const LOGPROB_THRESHOLD = -1.0;
+
+// Frases "fantasma" que o Whisper costuma alucinar quando o áudio está em
+// silêncio, é muito curto ou contém apenas ruído (ex: anúncios/legendas que
+// fizeram parte do material de treino do modelo). Quando o texto transcrito
+// corresponde a uma dessas frases, tratamos como "nenhuma fala detectada".
+const HALLUCINATION_PHRASES = [
+  "acesse o nosso site www.opusdei.pt para mais informações",
+  "acesse o nosso site www.opusdei.pt para mais informacoes",
+  "legendas pela comunidade amara.org",
+  "subscrevam o canal",
+  "se inscreva no canal",
+  "obrigado por assistir",
+  "obrigado por ver",
+];
+
+function normalizeForComparison(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[.,!?;:]+$/g, "")
+    .trim();
+}
+
+function isLikelyHallucination(text: string): boolean {
+  const normalized = normalizeForComparison(text);
+  if (!normalized) return false;
+  return HALLUCINATION_PHRASES.some((phrase) => normalized === phrase);
+}
+
+type WhisperVerboseSegment = {
+  text: string;
+  no_speech_prob: number;
+  avg_logprob: number;
+};
+
+type WhisperVerboseResponse = {
+  text: string;
+  segments?: WhisperVerboseSegment[];
+};
+
 export async function transcribeAudioFile(filePath: string, language: SupportedLanguage = "pt"): Promise<string> {
   console.log(`[Transcription] Iniciando transcrição. Idioma: ${language}`);
 
@@ -35,12 +81,40 @@ export async function transcribeAudioFile(filePath: string, language: SupportedL
       file: fs.createReadStream(filePath),
       model: "whisper-large-v3",
       prompt: LANGUAGE_PROMPTS[language],
-      response_format: "text",
+      response_format: "verbose_json",
       language: language === "pt" ? "pt" : language === "es" ? "es" : "en",
       temperature: 0,
     });
 
-    const transcription = (result as unknown as string).trim();
+    const verboseResult = result as unknown as WhisperVerboseResponse;
+    const transcription = (verboseResult.text || "").trim();
+    const segments = verboseResult.segments || [];
+
+    // Áudio em branco/sem fala: o Whisper costuma retornar nenhum segmento,
+    // ou segmentos com alta probabilidade de "sem fala" E baixa confiança na
+    // transcrição. Nesses casos o texto retornado é frequentemente uma
+    // alucinação (texto inventado pelo modelo a partir de dados de treino) e
+    // não deve ser exibido ao usuário.
+    const noSpeechDetected =
+      segments.length === 0 ||
+      segments.every(
+        (segment) => segment.no_speech_prob >= NO_SPEECH_PROB_THRESHOLD && segment.avg_logprob < LOGPROB_THRESHOLD
+      );
+
+    // Frases conhecidas de alucinação (ex: anúncios) só são descartadas se o
+    // áudio também tiver indícios de silêncio/ruído. Assim, se o usuário
+    // realmente ditar uma dessas frases com fala clara, ela é preservada.
+    const avgNoSpeechProb =
+      segments.length > 0
+        ? segments.reduce((sum, segment) => sum + segment.no_speech_prob, 0) / segments.length
+        : 1;
+    const looksLikeHallucination = isLikelyHallucination(transcription) && avgNoSpeechProb >= 0.3;
+
+    if (!transcription || noSpeechDetected || looksLikeHallucination) {
+      console.warn("[Transcription] Nenhuma fala detectada no áudio (ou resultado alucinado pelo modelo).");
+      return "";
+    }
+
     console.log(`[Transcription] Sucesso! Texto: "${transcription.substring(0, 50).trim()}..."`);
     return transcription;
   } catch (error: any) {
