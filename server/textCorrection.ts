@@ -157,8 +157,11 @@ export async function correctTextWithAI(
         { role: "system", content: prompts.system },
         { role: "user", content: `${prompts.user}${originalText}` }
       ],
-      model: "llama-3.3-70b-versatile",
+      // llama-3.3-70b-versatile foi desativado pela Groq em 16/08/2026;
+      // openai/gpt-oss-120b é a substituição recomendada pela própria Groq.
+      model: "openai/gpt-oss-120b",
       temperature: 0.2,
+      reasoning_effort: "low",
       response_format: { type: "json_object" }
     });
 

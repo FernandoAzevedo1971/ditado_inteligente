@@ -75,8 +75,11 @@ Reglas:
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
       ],
-      model: "llama-3.3-70b-versatile", // Modelo poderoso para interpretar intenções
+      // llama-3.3-70b-versatile foi desativado pela Groq em 16/08/2026;
+      // openai/gpt-oss-120b é a substituição recomendada pela própria Groq.
+      model: "openai/gpt-oss-120b",
       temperature: 0.1,
+      reasoning_effort: "low",
     });
 
     const content = chatCompletion.choices[0]?.message?.content;
