@@ -43,6 +43,31 @@ const HALLUCINATION_PHRASES = [
   "obrigado por ver",
 ];
 
+// Marcas de propaganda e de legenda que o Whisper injeta em áudio de baixa
+// energia. Diferente de HALLUCINATION_PHRASES, que exige correspondência
+// exata com o texto e só descarta o trecho quando o modelo também sinaliza
+// baixa confiança, estes marcadores são bloqueados INCONDICIONALMENTE e em
+// qualquer redação. São domínios e chamadas de canal que não aparecem num
+// ditado legítimo, e o modelo às vezes os devolve com no_speech_prob baixo e
+// avg_logprob alto, o que fazia o filtro por confiança deixá-los passar.
+const HALLUCINATION_MARKERS: RegExp[] = [
+  /(?:www\.)?opus\s?dei\.[a-z]{2,4}/i,
+  /amara\.org/i,
+  /legenda\w*\s+(?:pela|por|feitas?\s+pela)\s+comunidade/i,
+  /(?:se\s+)?inscrev\w*(?:-se)?\s+no\s+canal/i,
+  /subscrev\w*\s+o\s+canal/i,
+  /ativ\w*\s+o\s+sininho/i,
+  /legendas?\s+por\s+\w+/i,
+];
+
+// Expressões que costumam abrir a frase de propaganda. Quando o marcador vem
+// grudado a uma fala real sem pontuação separando as duas, o corte começa
+// aqui em vez de descartar a sentença inteira, preservando o ditado.
+const HALLUCINATION_LEAD_INS =
+  /\b(?:acess\w*|visit\w*|confir\w*|veja|vejam|assist\w*|cliqu\w*|saiba\s+mais|para\s+mais\s+informa\w*|legenda\w*)\b/gi;
+
+const SENTENCE_TERMINATORS = /[.!?\n]/;
+
 function normalizeForComparison(text: string): string {
   return text
     .toLowerCase()
@@ -51,19 +76,59 @@ function normalizeForComparison(text: string): string {
     .trim();
 }
 
+// Remove a frase inteira em torno de cada marcador de alucinação: expande do
+// marcador até o começo da sentença (ou até o último "lead-in", quando a
+// propaganda vem grudada numa fala real sem pontuação) e até o terminador
+// seguinte, inclusive.
+function stripHallucinationMarkers(text: string): string {
+  let result = text;
+
+  for (const marker of HALLUCINATION_MARKERS) {
+    // O mesmo marcador pode aparecer repetido; o limite evita laço infinito
+    // caso alguma expressão passe a casar com string vazia.
+    for (let pass = 0; pass < 10; pass++) {
+      const match = result.match(marker);
+      if (!match || match.index === undefined) break;
+
+      let start = match.index;
+      while (start > 0 && !SENTENCE_TERMINATORS.test(result[start - 1])) start--;
+
+      const before = result.slice(start, match.index);
+      // Corta a partir do PRIMEIRO lead-in da sentença: a propaganda costuma
+      // encadear várias dessas expressões ("Para mais informações acesse ...")
+      // e cortar só a última deixaria resíduo no texto entregue ao usuário.
+      HALLUCINATION_LEAD_INS.lastIndex = 0;
+      const firstLeadIn = HALLUCINATION_LEAD_INS.exec(before);
+      if (firstLeadIn) start += firstLeadIn.index;
+
+      let end = match.index + match[0].length;
+      while (end < result.length && !SENTENCE_TERMINATORS.test(result[end])) end++;
+      if (end < result.length) end++;
+
+      result = `${result.slice(0, start)} ${result.slice(end)}`;
+    }
+  }
+
+  return result
+    .replace(/\s+/g, " ")
+    .replace(/\s+([.,!?;:])/g, "$1")
+    .trim();
+}
+
 function isLikelyHallucination(text: string): boolean {
   const normalized = normalizeForComparison(text);
   if (!normalized) return false;
+  if (HALLUCINATION_MARKERS.some((marker) => marker.test(text))) return true;
   return HALLUCINATION_PHRASES.some((phrase) => normalized === phrase);
 }
 
-// Remove, frase por frase, qualquer sentença que corresponda a uma alucinação
-// conhecida — mesmo quando ela aparece grudada ao final (ou no meio) de um
-// ditado real, e não como a transcrição inteira. Funciona como uma segunda
-// camada de proteção, independente de haver ou não sinais de confiança do
-// modelo (necessário para provedores que não expõem no_speech_prob).
+// Sanitização final aplicada ao texto de qualquer provedor: primeiro corta os
+// marcadores incondicionais, depois descarta sentença por sentença o que
+// ainda corresponder a uma frase fantasma conhecida. Independe de o provedor
+// expor sinais de confiança (no_speech_prob / avg_logprob).
 function stripHallucinationSentences(text: string): string {
-  const sentences = text.split(/(?<=[.!?])\s+/);
+  const withoutMarkers = stripHallucinationMarkers(text);
+  const sentences = withoutMarkers.split(/(?<=[.!?])\s+/);
   const kept = sentences.filter((sentence) => !isLikelyHallucination(sentence));
   return kept.join(" ").replace(/\s+/g, " ").trim();
 }
@@ -82,6 +147,16 @@ type WhisperVerboseResponse = {
 function isSegmentHallucination(segment: WhisperVerboseSegment): boolean {
   const normalized = normalizeForComparison(segment.text);
   if (!normalized) return false;
+
+  // Marcadores de propaganda são tratados sem consultar a confiança do
+  // modelo: já foi observado o Whisper devolvê-los com no_speech_prob baixo.
+  // O segmento inteiro só é descartado quando nada sobra depois do corte —
+  // se ele também carrega fala real, quem limpa o resíduo é o
+  // stripHallucinationSentences aplicado ao texto final.
+  if (HALLUCINATION_MARKERS.some((marker) => marker.test(segment.text))) {
+    return stripHallucinationMarkers(segment.text).length === 0;
+  }
+
   const matchesKnownPhrase = HALLUCINATION_PHRASES.some((phrase) => normalized === phrase);
   if (!matchesKnownPhrase) return false;
   return (
@@ -109,13 +184,12 @@ async function transcribeWithGroq(filePath: string, language: SupportedLanguage)
     // Sem segmentos: não há como avaliar confiança por trecho. Caímos de
     // volta na checagem do texto inteiro (comportamento anterior).
     const wholeText = (verboseResult.text || "").trim();
-    const noSpeechDetected = !wholeText;
-    const looksLikeHallucination = isLikelyHallucination(wholeText);
-    if (noSpeechDetected || looksLikeHallucination) {
+    const cleaned = stripHallucinationSentences(wholeText);
+    if (!cleaned) {
       console.warn("[Transcription] Nenhuma fala detectada no áudio (ou resultado alucinado pelo modelo).");
       return "";
     }
-    return wholeText;
+    return cleaned;
   }
 
   // Descarta, segmento a segmento, qualquer trecho que seja tanto uma frase
@@ -139,7 +213,8 @@ async function transcribeWithGroq(filePath: string, language: SupportedLanguage)
     return "";
   }
 
-  return realSegments.map((segment) => segment.text.trim()).filter(Boolean).join(" ");
+  const joined = realSegments.map((segment) => segment.text.trim()).filter(Boolean).join(" ");
+  return stripHallucinationSentences(joined);
 }
 
 async function transcribeWithVoxtral(filePath: string, language: SupportedLanguage): Promise<string> {
@@ -203,9 +278,13 @@ export async function transcribeAudioFile(filePath: string, language: SupportedL
       throw new Error("Arquivo de áudio não encontrado no servidor.");
     }
 
-    const transcription = usingVoxtral
+    const rawTranscription = usingVoxtral
       ? await transcribeWithVoxtral(filePath, language)
       : await transcribeWithGroq(filePath, language);
+
+    // Rede de segurança final: nenhuma propaganda alucinada sai daqui, seja
+    // qual for o provedor ou o caminho percorrido acima.
+    const transcription = stripHallucinationSentences(rawTranscription);
 
     if (transcription) {
       console.log(`[Transcription] Sucesso! Texto: "${transcription.substring(0, 50).trim()}..."`);
