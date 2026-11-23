@@ -58,6 +58,10 @@ const HALLUCINATION_MARKERS: RegExp[] = [
   /subscrev\w*\s+o\s+canal/i,
   /ativ\w*\s+o\s+sininho/i,
   /legendas?\s+por\s+\w+/i,
+  // "Acesse o link na descrição do vídeo para ..." é texto típico de vídeos do
+  // YouTube que o Whisper devolve em áudio de baixa energia.
+  /link\s+(?:na|da|abaixo\s+na)\s+descri\S+\s+do\s+v[ií]deo/i,
+  /descri\S+\s+do\s+v[ií]deo/i,
 ];
 
 // Expressões que costumam abrir a frase de propaganda. Quando o marcador vem
