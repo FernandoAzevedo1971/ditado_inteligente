@@ -124,6 +124,34 @@ describe("transcribeAudioFile (Groq) — filtro de alucinações", () => {
     expect(result).toBe("Índice de apneia e hipopneia de trinta e dois eventos por hora");
   });
 
+  it("remove a frase 'link na descrição do vídeo' grudada a um ditado real", async () => {
+    const ditado = "Dosagem de TGO e TGP dentro da normalidade.";
+    const lixo = "Acesse o link na descrição do vídeo para aprender mais sobre o que é o TGO.";
+    createMock.mockResolvedValueOnce({
+      text: `${ditado} ${lixo}`,
+      segments: [
+        { text: ditado, no_speech_prob: 0.02, avg_logprob: -0.1 },
+        { text: lixo, no_speech_prob: 0.02, avg_logprob: -0.1 },
+      ],
+    });
+
+    const { transcribeAudioFile } = await importTranscription();
+    const result = await transcribeAudioFile(tempFilePath, "pt");
+    expect(result).toBe(ditado);
+  });
+
+  it("descarta a frase 'link na descrição do vídeo' quando é o único conteúdo", async () => {
+    const lixo = "Acesse o link na descrição do vídeo para aprender mais sobre o que é o TGO.";
+    createMock.mockResolvedValueOnce({
+      text: lixo,
+      segments: [{ text: lixo, no_speech_prob: 0.02, avg_logprob: -0.1 }],
+    });
+
+    const { transcribeAudioFile } = await importTranscription();
+    const result = await transcribeAudioFile(tempFilePath, "pt");
+    expect(result).toBe("");
+  });
+
   it("preserva integralmente um ditado clínico legítimo", async () => {
     const ditado =
       "Paciente do sexo masculino, sessenta e quatro anos, em uso de CPAP com pressão de dez centímetros de água. Refere melhora da sonolência diurna.";
